@@ -7,6 +7,7 @@ Owning multiple linux daily drivers, I need to achieve workflow parity to get cl
 - Minimialist.
 - Open-source stuff.
 - Automated widgets e.g. RemNote / SuperMemo/ TickTick data all combined into a central, always visible "desktop background" terminal, with a GUI (in the terminal), like the maccel terminal.
+- Modules of my OS reflect how my own human brain abstracts concepts e.g. Basal Ganglia -> Calendar and TickTick integrations, Hippocampus -> RemNote spaced repetition queues, Neocortex -> Long-term NAS storages.
   
 # Installation guide
 - [ ] Run the Nix bootstrap command or smth idk.

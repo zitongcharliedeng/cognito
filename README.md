@@ -8,7 +8,7 @@ Owning multiple linux daily drivers, I need to achieve workflow parity to get cl
 
 # Principles for my OS
 - Linux distro agnostic, terminal-desktop-environment.
-- **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game.
+- **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game. Should be more intuitive for even boomers, or me if I had amnesia and needed to remember who I was - me as a shell of a man should still be able to use my LifeOS, and maybe through spaced-repetition healing and automation, I would pseudo-comeback from the dead and regenerate myself from my digital systems.  _Maybe the minimal requirement is that the user understands English._
 - Minimialist.
 - Open-source stuff.
 - Automated widgets e.g. RemNote / SuperMemo/ TickTick data all combined into a central, always visible "desktop background" terminal, with a GUI (in the terminal), like the maccel terminal.

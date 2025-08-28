@@ -1,6 +1,11 @@
 # u17553z-OS
 Owning multiple linux daily drivers, I need to achieve workflow parity to get closer to my ideal LifeOS which automates everything for me and tells me what to do to GTD and health-maxx. NixOS, being declarative, sounds like the perfect option. But I have no experience in it, so this repo will contain the history of me slowly crafting my dream OS! Will also document my current understanding of the Nix manager and flakes or whatever.
 
+# Development timeline (in-order)
+- [ ] Start off not with NixOS, but something purely in the terminal dotfiles or whatever. ie. get something working on my current Arch System that would also work on my Ubuntu laptop.
+- [ ] Scrap all other distros and go with NixOS if i.e. gaming compatibility in Steam is fine, otherwise I can stick with stable distros which fix compatibilities like that for me, a layer above my main terminal-desktop-env.
+- [ ] Rice the shit.
+
 # Principles for my OS
 - Linux distro agnostic, terminal-desktop-environment.
 - **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game.

@@ -9,4 +9,4 @@ Owning multiple linux daily drivers, I need to achieve workflow parity to get cl
 - Automated widgets e.g. RemNote / SuperMemo/ TickTick data all combined into a central, always visible "desktop background" terminal, with a GUI (in the terminal), like the maccel terminal.
   
 # Installation guide
-- [] Run the Nix bootstrap command or smth idk.
+- [ ] Run the Nix bootstrap command or smth idk.

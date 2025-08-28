@@ -7,6 +7,7 @@ Owning multiple linux daily drivers, I need to achieve workflow parity to get cl
 - [ ] Rice the shit.
 
 # Principles for my OS
+https://youtu.be/YHm7e3f87iY
 - Linux distro agnostic, terminal-desktop-environment.
 - **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game. Should be more intuitive than Windows for boomers, or me if I had amnesia and needed to remember who I was - me as a shell of a man should still be able to use my LifeOS, and maybe through spaced-repetition healing and automation, I would pseudo-comeback from the dead and regenerate myself from my digital systems.  _Maybe the minimal requirement is that the user understands English._
 - Minimialist.

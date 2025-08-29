@@ -25,4 +25,4 @@ https://youtu.be/YHm7e3f87iY
 First, you need to install Nix on your current Linux distribution. This is a one-line command that sets up the Nix package manager alongside your existing system. This is what allows you to use Nix to manage user-level packages.
 `sh <(curl -L https://nixos.org/nix/install) --daemon`
 
-**Step 2:** Go to (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install.
+**Step 2:** Go to (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install. Or nix run --extra-experimental-features "nix-command flakes" home-manager/release-23.11 -- switch --flake .#zitchaden

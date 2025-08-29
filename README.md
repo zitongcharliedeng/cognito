@@ -18,5 +18,20 @@ https://youtu.be/YHm7e3f87iY
   - As a result, maybe my home screen can be a graphical diagram of a brain, and I click on whatever section of the digital brain I want to access to get there.
 - Network based bi-linking - imitate the brain and read more about interesting concepts like supermemo.guru
   
-# Installation guide
-- [ ] Run the Nix bootstrap command or smth idk.
+# Installation guide for a TDE ontop of the current, non-NixOS distro
+
+**Step 1:** Install the Nix Package Manager
+
+First, you need to install Nix on your current Linux distribution. This is a one-line command that sets up the Nix package manager alongside your existing system. This is what allows you to use Nix to manage user-level packages.
+`sh <(curl -L https://nixos.org/nix/install) --daemon`
+
+**Step 2:** Install Home Manager
+Once Nix is installed, you can use it to install Home Manager itself. Think of Home Manager as a specialized application that runs on top of Nix, giving you the declarative features we're aiming for.
+
+```
+nix-channel --add https://github.com/nix-community/home-manager/archive/release-23.11.tar.gz home-manager
+nix-channel --update
+nix-shell '<home-manager>' -A install
+```
+
+**Step 3:** Go to (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`.

@@ -2,14 +2,15 @@
 Owning multiple linux daily drivers, I need to achieve workflow parity to get closer to my ideal LifeOS which automates everything for me and tells me what to do to GTD and health-maxx. NixOS, being declarative, sounds like the perfect option. But I have no experience in it, so this repo will contain the history of me slowly crafting my dream OS! Will also document my current understanding of the Nix manager and flakes or whatever.
 
 # Development timeline (in-order)
-- [ ] Start off not with NixOS, but something purely in the terminal dotfiles or whatever (_i think this is called the nix Home Manager_). ie. get something working on my current Arch System that would also work on my Ubuntu laptop.
+- [x] ~~Start off not with NixOS, but something purely in the terminal dotfiles or whatever (_i think this is called the nix Home Manager_). ie. get something working on my current Arch System that would also work on my Ubuntu laptop.~~
+- [x] Experiment on a VM using full on NixOS
 - [ ] Scrap all other distros and go with the full NixOS if i.e. gaming compatibility in Steam is fine; otherwise I can stick with stable distros which fix compatibilities like that for me, a layer above my main terminal-desktop-env.
 - [ ] Rice the shit.
 
 # Principles for my OS
 https://www.youtube.com/watch?v=9OMDnZWXjn4&pp=0gcJCf8Ao7VqN5tD
 https://youtu.be/YHm7e3f87iY
-- Linux distro agnostic, terminal-desktop-environment.
+- ~~Linux distro agnostic~~, terminal-desktop-environment.
 - **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game. Should be more intuitive than Windows for boomers, or me if I had amnesia and needed to remember who I was - me as a shell of a man should still be able to use my LifeOS, and maybe through spaced-repetition healing and automation, I would pseudo-comeback from the dead and regenerate myself from my digital systems.  _Maybe the minimal requirement is that the user understands English._
 - Minimialist.
 - Open-source stuff.

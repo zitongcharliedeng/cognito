@@ -16,12 +16,21 @@
   boot.loader.systemd-boot.enable = false;
   boot.loader.generic-extlinux-compatible.enable = false;
 
-  # Enable X11 and LightDM
-  services.xserver.enable = true;
-  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver = {
+    enable = true;
+    displayManager.startx.enable = true; # use startx instead of lightdm
+    windowManager.i3 = {
+      enable = true;
+      package = pkgs.i3-gaps; # use i3-gaps for better visuals
+    };
+  };
 
-  # Use i3 as the window manager
-  services.xserver.windowManager.i3.enable = true;
+  # Auto-start X (and i3) after root autologin
+  environment.loginShellInit = ''
+    if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+      exec startx
+    fi
+  '';
 
   environment.systemPackages = with pkgs; [
     git

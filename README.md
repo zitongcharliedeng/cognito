@@ -1,5 +1,61 @@
-# u17553z-OS
-Owning multiple linux daily drivers, I need to achieve workflow parity to get closer to my ideal LifeOS which automates everything for me and tells me what to do to GTD and health-maxx. NixOS, being declarative, sounds like the perfect option. But I have no experience in it, so this repo will contain the history of me slowly crafting my dream OS! Will also document my current understanding of the Nix manager and flakes or whatever.
+Say Hi to Cognito, my PROJECT:u17553z OS.
+
+# Purpose of this operating system and CUJs
+
+## Cognito's Principle Zero
+> “**CUJ 0:** As a user, I want my operating systems across all my devices to have frictionless workflow parity, and aim to mimic the functional parts of my brain so that it enhances memory, creativity, and habits — while enforcing guardrails against destructive behaviors — making my computer a digital extension of my cognition.”
+
+## Emergent CUJs from this goal
+### CUJ 1 - Brain as Interface
+> As a user, I want to navigate Cognito OS through an interactive brain diagram (clickable/keyboard navigable) so that my life functions are organized by mental metaphor rather than menus.
+_The sections of this diagram could be comprised of:_
+- Basal Ganglia → timekeeping, reminders, habit guardrails.
+- Hippocampus → flashcards, knowledge apps, browser-based learning tools.
+- Neocortex → archives, projects, PKM.
+- Occipital/Parietal lobes (optional expansion) → creative/media tools, spatial tools.
+
+### CUJ 2 - Omnipotent omnibar
+> As a user, I want the primary way to access any action, to be via a fuzzy-finding omnibar, so I never need to memorize shortcuts or stupid linux keywords or repetitive multiline scripts. I should be able to use this system even if I had a traumatic brain injury with amnesia. The only pre-requisite being: knowing the English language. UX should be intuitive, like a good video game, that even my boomer parents can navigate in, despite it being terminal based. Natural discoverability > memorization
+
+_Examples:_
+- "upload changes to this git repo (performs git pull, add, commit, and push all in one)" 
+- “show today’s reminders”
+- “launch Steam”
+- “open hippocampus → anki”
+- Self-regulation can simply be restricting certain omnibar commands during i.e. certain times, since this is the primary "action" UI.
+
+### CUJ 3. In-terminal/ embedded Chromium browser compatibility for PKM and GTD tools and studying.
+> As a user, I want the browser integrated into Cognito OS as a native module, so I can access flashcards, PKM tools, and web apps without context-switching.
+
+_Details:_
+- Specific brain regions can map directly to web apps which open "inside the terminal", as widgets or popups even.
+- Example: Hippocampus → opens AnkiWeb, Memrise, or Obsidian publish site.
+- Omnibar can fuzzy-find and launch web apps like local apps.
+
+### CUJ 4 - Habit Guardrails
+> As a user, I want Cognito OS to apply digital friction or restrictions to bad habits (like late-night usage), so I build healthier routines.
+
+_Examples:_
+- After 23:00 → apps tagged as “dopamine” require justification to open.
+- Screen gently dims or locks → nudging to sleep.
+- Calendar integration enforces downtime.
+- Outcome: OS becomes a partner in self-discipline.
+
+### CUJ 5 - Gaming & Creativity Compatibility
+> As a user, I want to run all Steam Proton games and open-source creative software seamlessly, so Cognito OS supports both work and play.
+
+_Examples:_
+- “Occipital Lobe → Blender, Krita, Kdenlive.”
+- “Launch Elden Ring (Proton)” from omnibar.
+- Outcome: No compromise between productivity and play.
+
+### CUJ 6 - Reproducible Mind across machines
+> As a user, I want to be able to declaratively rebuild my Cognito OS environment (configs, brain diagram, apps) on new hardware, so my digital mind is portable and stable.
+
+_Examples:_
+- nixos-rebuild switch --flake . → restores entire environment.
+- Git-based life config = versioned brain.
+- Outcome: Cognition is reproducible.
 
 # Development timeline (in-order)
 - [x] ~~Start off not with NixOS, but something purely in the terminal dotfiles or whatever (_i think this is called the nix Home Manager_). ie. get something working on my current Arch System that would also work on my Ubuntu laptop.~~
@@ -10,7 +66,6 @@ Owning multiple linux daily drivers, I need to achieve workflow parity to get cl
 # Principles for my OS
 https://www.youtube.com/watch?v=9OMDnZWXjn4&pp=0gcJCf8Ao7VqN5tD
 https://youtu.be/YHm7e3f87iY
-- ~~Linux distro agnostic~~, terminal-desktop-environment.
 - **No memorization needed**, fuzzy-finding and icon/ hints/ LLM / good intuitive UX, like a well made game. Should be more intuitive than Windows for boomers, or me if I had amnesia and needed to remember who I was - me as a shell of a man should still be able to use my LifeOS, and maybe through spaced-repetition healing and automation, I would pseudo-comeback from the dead and regenerate myself from my digital systems.  _Maybe the minimal requirement is that the user understands English._
 - Minimialist.
 - Open-source stuff.
@@ -21,9 +76,6 @@ https://youtu.be/YHm7e3f87iY
   
 # Installation guide for a TDE ontop of the current, non-NixOS distro
 
-**Step 1:** Install the Nix Package Manager
+**Step 1:** Install NixOS on the device - no desktop environment needed.
 
-First, you need to install Nix on your current Linux distribution. This is a one-line command that sets up the Nix package manager alongside your existing system. This is what allows you to use Nix to manage user-level packages.
-`sh <(curl -L https://nixos.org/nix/install) --daemon`
-
-**Step 2:** Go to (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install. Or nix run --extra-experimental-features "nix-command flakes" home-manager/release-23.11 -- switch --flake .#zitchaden
+**Step 2:** Go to `/etc/nixos/` and replace all files there with this repo (containing Nix configs), (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install. Or nix run --extra-experimental-features "nix-command flakes" home-manager/release-23.11 -- switch --flake .#cognito

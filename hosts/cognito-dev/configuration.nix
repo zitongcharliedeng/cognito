@@ -25,15 +25,22 @@
     x = 1280;
     y = 800;
   };
+  
+  # TODO move this out of a machine-specific config module
+  users.users.root = {
+    isNormalUser = false;
+    initialPassword = "password";  # 👈 plain password
+  };
+
+  users.users.cognitodev = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "password";
+  };
+
 
   # Allow X to autostart since this VM won’t have a TTY login
   services.xserver.displayManager.startx.enable = true;
-
-  # Run a VNC server so you can see the desktop
-  services.x11vnc = {
-    enable = true;
-    options = "-forever -nopw -display :0";
-  };
 
   system.stateVersion = "23.11";
 }

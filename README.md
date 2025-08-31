@@ -2,8 +2,8 @@ Say Hi to Cognito, my PROJECT:u17553z OS.
 
 # Purpose of this operating system and CUJs
 
-## Cognito's Principle Zero
-> “**CUJ 0:** As a user, I want my operating systems across all my devices to have frictionless workflow parity, and aim to mimic the functional parts of my brain so that it enhances memory, creativity, and habits — while enforcing guardrails against destructive behaviors — making my computer a digital extension of my cognition.”
+## Cognito's Goal
+> As a user, I want my operating systems across all my devices to have frictionless workflow parity, and aim to mimic the functional parts of my brain so that it enhances memory, creativity, and habits — while enforcing guardrails against destructive behaviors — making my computer a digital extension of my cognition.”
 
 ## Emergent CUJs from this goal
 ### CUJ 1 - Brain as Interface
@@ -58,6 +58,7 @@ _Examples:_
 - Outcome: Cognition is reproducible.
 
 # Development timeline (in-order)
+- Now following this series of guides: https://youtube.com/playlist?list=PL_WcXIXdDWWpuypAEKzZF2b5PijTluxRG&si=i4WdNmapB2amEeyy
 - [x] ~~Start off not with NixOS, but something purely in the terminal dotfiles or whatever (_i think this is called the nix Home Manager_). ie. get something working on my current Arch System that would also work on my Ubuntu laptop.~~
 - [x] Experiment on a VM using full on NixOS
 - [ ] Scrap all other distros and go with the full NixOS if i.e. gaming compatibility in Steam is fine; otherwise I can stick with stable distros which fix compatibilities like that for me, a layer above my main terminal-desktop-env.

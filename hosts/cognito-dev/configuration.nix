@@ -1,5 +1,3 @@
-# /etc/nixos/hosts/cognito-dev/configuration.nix
-
 { config, pkgs, ... }:
 
 {
@@ -8,36 +6,34 @@
   networking.hostName = "cognito-dev";
 
   services.openssh.enable = true;
-  
   services.getty.extraArgs = [ "--autologin" "root" ];
 
-  # Don't manage the boot loader on this cloud PC as the provider does that allegedly
+  # Don’t manage bootloader in cloud
   boot.loader.grub.enable = false;
   boot.loader.systemd-boot.enable = false;
   boot.loader.generic-extlinux-compatible.enable = false;
-
-  services.xserver = {
-    enable = true;
-    displayManager.startx.enable = true; # use startx instead of lightdm
-    windowManager.i3 = {
-      enable = true;
-      package = pkgs.i3-gaps; # use i3-gaps for better visuals
-    };
-  };
-
-  # Auto-start X (and i3) after root autologin
-  environment.loginShellInit = ''
-    if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-      exec startx
-    fi
-  '';
 
   environment.systemPackages = with pkgs; [
     git
     vim
     htop
-    tmux   # for pane splitting test
   ];
+
+  services.xserver.enable = true;
+  services.xserver.videoDrivers = [ "dummy" ];
+  services.xserver.virtualScreen = {
+    x = 1280;
+    y = 800;
+  };
+
+  # Allow X to autostart since this VM won’t have a TTY login
+  services.xserver.displayManager.startx.enable = true;
+
+  # Run a VNC server so you can see the desktop
+  services.x11vnc = {
+    enable = true;
+    options = "-forever -nopw -display :0";
+  };
 
   system.stateVersion = "23.11";
 }

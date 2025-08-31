@@ -1,5 +1,31 @@
 Say Hi to Cognito, my PROJECT:u17553z OS.
 
+```mermaid
+flowchart LR
+    A[flake.nix] --> B[overlays]
+    B --> C[pkgs]
+    C -->|outputs| D[os.nix]
+
+    D -->|host| E[cognito-dev]
+    D -->|host| F[work-laptop]
+    D -->|host| G[vm-test]
+
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,color:#000;
+    classDef source fill:#b3e5fc,stroke:#0277bd,color:#000;
+    classDef pkg fill:#ffcdd2,stroke:#c62828,color:#000;
+    classDef os fill:#bbdefb,stroke:#1565c0,color:#000;
+    classDef host fill:#c8e6c9,stroke:#2e7d32,color:#000;
+
+    A:::source
+    B:::pkg
+    C:::pkg
+    D:::os
+    E:::host
+    F:::host
+    G:::host
+```
+Lack of home-manager, flake-parts inspired by sioodmy/dotfiles. I am a noob, but his explanations had good minimialistic jazz to it I had to try it! 
+
 # Purpose of this operating system and CUJs
 
 ## Cognito's Goal

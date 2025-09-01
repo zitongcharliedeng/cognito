@@ -2,6 +2,14 @@ Say Hi to Cognito, my PROJECT:u17553z OS.
 sudo nixos-generate-config
 to create the hardware config in case the nixos didnt auto gen it for your machine in /etc/nixos
 
+Great question — this goes right to the heart of the flakes vs legacy config.nix model 👌.
+
+🔑 The key idea:
+
+With flakes, /etc/nixos no longer has to be your source of truth.
+
+Your repo can live anywhere (e.g. $HOME/cognito), because you explicitly tell Nix to build from it with:
+
 ```mermaid
 flowchart LR
     C[my nixos config]

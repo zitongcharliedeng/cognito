@@ -4,9 +4,7 @@ to create the hardware config in case the nixos didnt auto gen it for your machi
 
 ```mermaid
 flowchart LR
-    A[flake.nix] --> B[overlays]
-    B --> C[pkgs]
-
+    C[my nixos config]
     C -->|outputs| D[cognito/]
     D -->|subfolder| E[user/]
     C -->|outputs| G[hardware-shims/]
@@ -24,8 +22,6 @@ flowchart LR
     classDef host fill:#c8e6c9,stroke:#2e7d32,color:#000;
     classDef feature fill:#f0e68c,stroke:#c0a000,color:#000;
 
-    A:::source
-    B:::pkg
     C:::pkg
     D:::sys
     E:::sys

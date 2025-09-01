@@ -7,9 +7,9 @@ flowchart LR
     A[flake.nix] --> B[overlays]
     B --> C[pkgs]
 
-    C -->|outputs| D[system/]
+    C -->|outputs| D[cognito/]
     D -->|subfolder| E[user/]
-    C -->|outputs| G[hosts/]
+    C -->|outputs| G[hardware-shims/]
 
     D -->|manages| H[base OS config]
     E -->|manages| I[user environment]
@@ -126,6 +126,8 @@ https://youtu.be/YHm7e3f87iY
 - Modules of my OS reflect how my own human brain abstracts concepts e.g. Basal Ganglia -> Calendar and TickTick integrations, Hippocampus -> RemNote spaced repetition queues, Neocortex -> Long-term NAS storages.
   - As a result, maybe my home screen can be a graphical diagram of a brain, and I click on whatever section of the digital brain I want to access to get there.
 - Network based bi-linking - imitate the brain and read more about interesting concepts like supermemo.guru
+- Minimal dependencies needed, hardware agnostic as it can be - this ie rules out using wayland or sway in favour of i3, we cant have propietary drivers and software only some types of hardware can run, if a machine can install nixOS, it can run my set up. :fire:
+- 
   
 # Installation guide for a TDE ontop of the current, non-NixOS distro
 

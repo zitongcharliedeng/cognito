@@ -1,4 +1,6 @@
 Say Hi to Cognito, my PROJECT:u17553z OS.
+sudo nixos-generate-config
+to create the hardware config in case the nixos didnt auto gen it for your machine in /etc/nixos
 
 ```mermaid
 flowchart LR

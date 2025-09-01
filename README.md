@@ -4,27 +4,51 @@ Say Hi to Cognito, my PROJECT:u17553z OS.
 flowchart LR
     A[flake.nix] --> B[overlays]
     B --> C[pkgs]
-    C -->|outputs| D[os.nix]
 
-    D -->|host| E[cognito-dev]
-    D -->|host| F[work-laptop]
-    D -->|host| G[vm-test]
+    C -->|outputs| D[system/]
+    D -->|subfolder| E[user/]
+    C -->|outputs| G[hosts/]
+
+    D -->|manages| H[base OS config]
+    E -->|manages| I[user environment]
+    G -->|host| K[my-blue-laptop]
+    G -->|host| L[work-laptop]
+    G -->|host| M[vm-yolo-nix-testing]
 
     classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,color:#000;
     classDef source fill:#b3e5fc,stroke:#0277bd,color:#000;
     classDef pkg fill:#ffcdd2,stroke:#c62828,color:#000;
-    classDef os fill:#bbdefb,stroke:#1565c0,color:#000;
+    classDef sys fill:#bbdefb,stroke:#1565c0,color:#000;
     classDef host fill:#c8e6c9,stroke:#2e7d32,color:#000;
+    classDef feature fill:#f0e68c,stroke:#c0a000,color:#000;
 
     A:::source
     B:::pkg
     C:::pkg
-    D:::os
-    E:::host
-    F:::host
-    G:::host
+    D:::sys
+    E:::sys
+    G:::sys
+    K:::host
+    L:::host
+    M:::host
 ```
-Lack of home-manager, flake-parts inspired by sioodmy/dotfiles. I am a noob, but his explanations had good minimialistic jazz to it I had to try it! 
+Keep in mind the _modules/ directory is just custom made pkgs that I CBA to upload to the Nix Repo to import from there.
+
+📖 How to use this model
+
+On a new device i.e. my-blue-laptop:
+Install NixOS normally → you’ll get a hardware-configuration.nix.
+Drop that into hosts/<hostname>/.
+Update flake.nix so this host is listed in nixosConfigurations.
+On an existing device:
+Pull everything from your GitHub repo into /etc/nixos.
+Run rebuild with the host-specific flag:
+sudo nixos-rebuild switch --flake /etc/nixos#<hostname>
+e.g. --flake /etc/nixos#my-blue-laptop.
+Day to day:
+Always rebuild using the host flag for the current machine.
+
+Lack of home-manager or flake-parts is inspired by sioodmy/dotfiles. I am a noob, but his explanations had good minimialistic jazz to it I had to try it! 
 
 # Purpose of this operating system and CUJs
 

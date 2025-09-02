@@ -26,8 +26,19 @@
   services.xserver.windowManager.xmonad = {
     enable = true;
     enableContribAndExtras = true;
-          config = builtins.readFile ./scripts/xmonad.hs;
+    config = builtins.readFile ./scripts/xmonad.hs;
   };
+  
+  # Ensure XMonad session is properly registered
+  services.xserver.displayManager.session = [
+    {
+      name = "xmonad";
+      start = ''
+        ${pkgs.xmonad}/bin/xmonad &
+        waitPID=$!
+      '';
+    }
+  ];
   
   # Create configuration for xmobar, the status bar for XMonad
   systemd.tmpfiles.rules = [

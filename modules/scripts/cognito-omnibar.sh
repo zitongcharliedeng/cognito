@@ -77,7 +77,7 @@ commands=(
 
 # Show commands with rofi
 if command -v rofi >/dev/null 2>&1; then
-    input=$(printf '%s\n' "${commands[@]}" | rofi -i -p "🔍 Cognito Omnibar" -width 60 -lines 20)
+    input=$(printf '%s\n' "${commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 60 -lines 20)
     
     if [[ -n "$input" ]]; then
         cmd=$(echo "$input" | cut -d: -f2)

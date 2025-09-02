@@ -37,13 +37,11 @@
   
 
 
-  # Enable Awesome WM
-  services.xserver.windowManager.awesome.enable = true;
-  
-  # Create Awesome WM configuration directory and file
-  systemd.tmpfiles.rules = [
-    "d /root/.config/awesome 0755 root root -"
-    "L+ /root/.config/awesome/rc.lua - - - - ${pkgs.writeText "awesome-config" ''
+  # Enable Awesome WM with custom configuration
+  services.xserver.windowManager.awesome = {
+    enable = true;
+    luaModules = with pkgs.luaPackages; [];
+    config = ''
       -- Cognito OS Awesome WM Configuration
       -- Migrated from i3 due to bar customization issues with i3 migration script
       -- Zero keyboard shortcuts - all actions via rofi omnibar
@@ -148,11 +146,8 @@
       client.connect_signal("mouse::enter", function(c)
           c:emit_signal("request::activate", "mouse_enter", {raise = false})
       end)
-      
-      -- Auto-start applications
-      awful.spawn.with_shell("kitty")
-    ''}"
-  ];
+    '';
+  };
 
   # System packages (all hardware agnostic)
   environment.systemPackages = with pkgs; [

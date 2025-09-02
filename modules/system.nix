@@ -194,7 +194,7 @@
     package = pkgs.i3-gaps;  # Use i3-gaps like the working example
     extraPackages = with pkgs; [
       rofi      # Apple-like omnibar launcher
-      i3status-rs  # Rust-based status bar (more modern)
+      i3status-rust  # Rust-based status bar (more modern)
       i3lock    # lock screen
     ];
     
@@ -238,9 +238,9 @@
       default_border pixel 3
       default_floating_border pixel 3
 
-      # Status bar configuration (using i3status-rs)
+      # Status bar configuration (using i3status-rust)
       bar {
-          status_command i3status-rs
+          status_command i3status-rust
           position top
       }
     '';

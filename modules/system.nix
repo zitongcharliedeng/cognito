@@ -200,7 +200,7 @@
   # because the i3 migration script fails to handle bar blocks and other directives.
   # Instead, we create separate config files and symlink them to avoid migration issues.
   systemd.tmpfiles.rules = [
-    "L+ /root/.config/i3/config - - - - ${./i3config}"
-    "L+ /root/.config/i3status/config - - - - ${./i3statusconfig}"
+    "L+ /root/.config/i3/config - - - - ${../i3config}"
+    "L+ /root/.config/i3status/config - - - - ${../i3statusconfig}"
   ];
 }

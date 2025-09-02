@@ -101,7 +101,12 @@ build_system() {
   }
   
   echo "Building system..."
-  sudo nixos-rebuild switch --flake .#${HOSTNAME}
+  echo "Debug: Attempting to build host: ${HOSTNAME}"
+  echo "Debug: Available hosts in flake:"
+  nix flake show --extra-experimental-features "nix-command flakes" | grep -A 10 "nixosConfigurations" || echo "No nixosConfigurations found"
+  echo ""
+  echo "Debug: Running nixos-rebuild with verbose output..."
+  sudo nixos-rebuild switch --flake .#${HOSTNAME} --verbose
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
   echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
 }

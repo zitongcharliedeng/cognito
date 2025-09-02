@@ -353,6 +353,10 @@
           # === DEBUG & TEST ===
           ["debug"]="echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
           ["test"]="notify-send 'Test' 'This is a test notification'"
+          ["debug simple icon test"]="debug-simple-icon-test"
+          ["debug test loghook"]="debug-test-loghook"
+          ["restart xmobar"]="restart-xmobar"
+
           ["check-rofi"]="rofi -dmenu -i -p 'Rofi Test'"
           ["test-kitty"]="kitty"
           ["test-firefox"]="firefox"
@@ -368,6 +372,7 @@
           ["debug-simple-icon-test"]="echo 'Simple icon test:' && echo 'Testing kitty icon lookup...' && find /nix/store -name '*kitty*' -type f 2>/dev/null | grep -E '\\.(png|svg|ico)$' | head -3 && echo 'Testing firefox icon lookup...' && find /nix/store -name '*firefox*' -type f 2>/dev/null | grep -E '\\.(png|svg|ico)$' | head -3"
           ["debug-test-loghook"]="echo 'Testing logHook manually...' && echo '1[K] 2[] 3[] 4[] 5[] 6[] 7[] 8[] 9[] 10[] }{ <fc=#68d391>Manual Test</fc> | <fc=#a0aec0>META+SPACE</fc>' > /tmp/xmobar-input && notify-send 'Debug' 'Manual logHook test sent to xmobar'"
           ["restart-xmobar"]="pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc & && notify-send 'Debug' 'Xmobar restarted'"
+
 
       )
       

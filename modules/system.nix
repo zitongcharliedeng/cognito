@@ -216,8 +216,10 @@
                   icon_result=$(get_app_icon "$window_class" "$window_id")
                   # Check if result is a file path or a character
                   if [ -f "$icon_result" ]; then
-                    # Use xmobar's image display capability for real icons
-                    app_icons="$app_icons<icon=$icon_result/>"
+                    # Extract app name from icon path for display (xmobar doesn't support <icon> tags)
+                    # e.g., /path/to/firefox.svg -> F, /path/to/kitty.svg -> K
+                    local app_name=$(basename "$icon_result" .svg | cut -c1 | tr '[:lower:]' '[:upper:]')
+                    app_icons="$app_icons<fc=#68d391>$app_name</fc>"
                   else
                     # Display first letter fallback
                     app_icons="$app_icons<fc=#a0aec0>$icon_result</fc>"
@@ -361,6 +363,7 @@
           ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
           ["debug-window-class"]="wmctrl -l | head -5 > /tmp/window-classes.txt && notify-send 'Debug' 'Window classes saved to /tmp/window-classes.txt'"
           ["debug-icon-theme"]="echo 'Testing icon theme lookup...' > /tmp/icon-theme.txt && echo 'GTK Icon Theme:' >> /tmp/icon-theme.txt && grep 'gtk-icon-theme-name=' /etc/xdg/gtk-3.0/settings.ini 2>/dev/null >> /tmp/icon-theme.txt && echo 'Papirus theme icons:' >> /tmp/icon-theme.txt && find /nix/store /run/current-system/sw/share /usr/share -path '*/icons/Papirus/*' -name '*kitty*' -o -name '*firefox*' 2>/dev/null | head -3 >> /tmp/icon-theme.txt && echo 'Fallback test: Kitty->K, Firefox->F' >> /tmp/icon-theme.txt && notify-send 'Debug' 'Icon theme lookup saved to /tmp/icon-theme.txt'"
+          ["debug-workspace-preview"]="echo 'Debugging workspace preview...' > /tmp/workspace-debug.txt && echo 'wmctrl output:' >> /tmp/workspace-debug.txt && wmctrl -l >> /tmp/workspace-debug.txt && echo 'Current workspace:' >> /tmp/workspace-debug.txt && xprop -root _NET_CURRENT_DESKTOP >> /tmp/workspace-debug.txt && echo 'Workspace preview output:' >> /tmp/workspace-debug.txt && workspace-preview >> /tmp/workspace-debug.txt && notify-send 'Debug' 'Workspace preview debug saved to /tmp/workspace-debug.txt'"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -485,6 +488,7 @@
           ["start xmobar"]="test-xmobar"
           ["debug window class"]="debug-window-class"
           ["debug icon theme"]="debug-icon-theme"
+          ["debug workspace preview"]="debug-workspace-preview"
       )
       
       # Screenshot commands (complex, so defined separately)

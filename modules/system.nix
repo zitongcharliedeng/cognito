@@ -75,7 +75,9 @@
           "web browser:firefox"
           "text editor:vim"
           "settings:gnome-control-center"
-          "screenshot:scrot"
+          "screenshot:scrot -d 1 ~/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved to ~/screenshot-$(date +%Y%m%d-%H%M%S).png'"
+          "screenshot window:scrot -s ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved'"
+          "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved'"
           
           # === WORKSPACES (1-10) ===
           "workspace 1:i3-msg workspace 1"
@@ -204,8 +206,8 @@
     exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
     exec --no-startup-id nm-applet
     
-    # Debug: Auto-open terminal for troubleshooting
-    exec --no-startup-id kitty
+    # Debug: Auto-open terminal for troubleshooting with omnibar hint
+    exec --no-startup-id kitty -e bash -c 'echo "🔍 Cognito OS - Meta+Space or Alt+Space for Omnibar"; echo "Type any command: shutdown, workspace 1, volume up, etc."; echo ""; exec bash'
 
     # Use Mouse+$mod to drag floating windows to their wanted position
     floating_modifier Mod4
@@ -225,11 +227,27 @@
     # Workspace behavior
     workspace_auto_back_and_forth yes
 
-    # No bar configuration - let i3 use defaults
+    # Minimal status bar with omnibar hint
+    bar {
+        position top
+        status_command echo "🔍 Meta+Space or Alt+Space for Omnibar | $(date '+%H:%M')"
+    }
+  '';
+
+  # Create custom bash profile with omnibar hint
+  environment.etc."bashrc".text = ''
+    # Cognito OS Bash Profile
+    # Show omnibar hint on terminal startup
+    if [[ $- == *i* ]]; then
+        echo "🔍 Cognito OS - Meta+Space or Alt+Space for Omnibar"
+        echo "💡 Try: shutdown, workspace 1, volume up, brightness down, etc."
+        echo ""
+    fi
   '';
 
   # Create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
+    "L+ /root/.bashrc - - - - /etc/bashrc"
   ];
 }

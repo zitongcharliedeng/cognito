@@ -13,12 +13,6 @@ import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
 import XMonad.Util.UngrabMouse
 import XMonad.Util.SpawnOnce
-import XMonad.Actions.CycleWS
-import XMonad.Actions.WindowGo
-import XMonad.Actions.FloatSnap
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Maximize
-import XMonad.Actions.Maximize
 
 -- Main configuration
 main :: IO ()

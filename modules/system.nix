@@ -61,6 +61,15 @@
     alsa-utils # for volume control (amixer)
     brightnessctl # for brightness control
     
+    # Simple status bar script
+    (pkgs.writeScriptBin "cognito-status" ''
+      #!${pkgs.bash}/bin/bash
+      while true; do
+        echo "🔍 Meta+Space for Omnibar | $(date '+%H:%M:%S') | $(whoami)@$(hostname)"
+        sleep 1
+      done
+    '')
+    
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" ''
       #!${pkgs.bash}/bin/bash
@@ -206,8 +215,8 @@
     exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
     exec --no-startup-id nm-applet
     
-    # Debug: Auto-open terminal for troubleshooting with omnibar hint
-    exec --no-startup-id kitty -e bash -c 'echo "🔍 Cognito OS - Meta+Space or Alt+Space for Omnibar"; echo "Type any command: shutdown, workspace 1, volume up, etc."; echo ""; exec bash'
+    # Auto-open terminal for debugging
+    exec --no-startup-id kitty
 
     # Use Mouse+$mod to drag floating windows to their wanted position
     floating_modifier Mod4
@@ -227,27 +236,15 @@
     # Workspace behavior
     workspace_auto_back_and_forth yes
 
-    # Minimal status bar with omnibar hint
+    # Status bar with omnibar hint
     bar {
         position top
-        status_command echo "🔍 Meta+Space or Alt+Space for Omnibar | $(date '+%H:%M')"
+        status_command cognito-status
     }
-  '';
-
-  # Create custom bash profile with omnibar hint
-  environment.etc."bashrc".text = ''
-    # Cognito OS Bash Profile
-    # Show omnibar hint on terminal startup
-    if [[ $- == *i* ]]; then
-        echo "🔍 Cognito OS - Meta+Space or Alt+Space for Omnibar"
-        echo "💡 Try: shutdown, workspace 1, volume up, brightness down, etc."
-        echo ""
-    fi
   '';
 
   # Create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
-    "L+ /root/.bashrc - - - - /etc/bashrc"
   ];
 }

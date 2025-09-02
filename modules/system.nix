@@ -92,14 +92,6 @@
     bar {
         position top
         status_command i3status
-        colors {
-            background #2f343f
-            statusline #ffffff
-            separator #666666
-            focused_background #285577
-            focused_statusline #ffffff
-            focused_separator #285577
-        }
     }
   '';
 

@@ -139,13 +139,18 @@
           end
       end)
       
+      -- Auto-start applications after Awesome is fully loaded
+      awesome.connect_signal("startup", function()
+          awful.spawn.with_shell("kitty")
+      end)
+      
       -- Enable sloppy focus, so that focus follows mouse
       client.connect_signal("mouse::enter", function(c)
           c:emit_signal("request::activate", "mouse_enter", {raise = false})
       end)
       
-      -- Auto-start applications with delay to ensure Awesome is fully loaded
-      awful.spawn.with_shell("sleep 2 && kitty")
+      -- Auto-start applications
+      awful.spawn.with_shell("kitty")
     ''}"
   ];
 
@@ -282,6 +287,8 @@
           "debug:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
           "test:notify-send 'Test' 'This is a test notification'"
           "check rofi:rofi -dmenu -i -p 'Rofi Test'"
+          "test kitty:kitty &"
+          "test firefox:firefox &"
       )
       
       # Show commands with rofi
@@ -291,7 +298,10 @@
           if [[ -n "$input" ]]; then
               cmd=$(echo "$input" | cut -d: -f2)
               echo "Executing: $cmd"
-              eval "$cmd"
+              # Log to a file for debugging
+              echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
+              # Execute command in background to avoid blocking rofi
+              eval "$cmd &"
           fi
       else
           echo "Rofi not found"

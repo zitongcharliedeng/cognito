@@ -61,14 +61,7 @@
     alsa-utils # for volume control (amixer)
     brightnessctl # for brightness control
     
-    # Simple status bar script
-    (pkgs.writeScriptBin "cognito-status" ''
-      #!${pkgs.bash}/bin/bash
-      while true; do
-        echo "🔍 Meta+Space for Omnibar | $(date '+%H:%M:%S') | $(whoami)@$(hostname)"
-        sleep 1
-      done
-    '')
+
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" ''
@@ -236,15 +229,37 @@
     # Workspace behavior
     workspace_auto_back_and_forth yes
 
-    # Status bar with omnibar hint
+    # Status bar with i3status
     bar {
         position top
-        status_command cognito-status
+        status_command i3status
+    }
+  '';
+
+  # Create i3status configuration with omnibar hint
+  environment.etc."i3status.conf".text = ''
+    general {
+        output_format = "i3bar"
+        colors = true
+        interval = 5
+    }
+
+    order += "omnibar_hint"
+    order += "tztime local"
+
+    omnibar_hint {
+        format = "🔍 Meta+Space for Omnibar"
+        color = "#007acc"
+    }
+
+    tztime local {
+        format = "%H:%M:%S"
     }
   '';
 
   # Create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
+    "L+ /root/.config/i3status/config - - - - /etc/i3status.conf"
   ];
 }

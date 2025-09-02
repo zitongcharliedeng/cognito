@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # === SIMPLE DIRECT COMMANDS (One Entry Per Action) ===
 commands=(

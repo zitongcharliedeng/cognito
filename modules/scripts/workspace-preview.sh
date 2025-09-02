@@ -1,4 +1,3 @@
-#!/bin/bash
 
 get_app_icon() {
     local app_name="$1"

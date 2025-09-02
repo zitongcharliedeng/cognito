@@ -8,6 +8,8 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
+import System.IO
+import System.Process
 import XMonad.Layout.Spacing
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
@@ -29,7 +31,7 @@ main = xmonad $ ewmh $ docks def
   , layoutHook = myLayout
   , manageHook = myManageHook
   , startupHook = myStartupHook
-  , logHook = dynamicLogWithPP myPP
+  , logHook = myLogHook
   , mouseBindings = myMouseBindings
   , workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]  -- Explicitly define 10 workspaces (1-10)
   } `additionalKeysP` myKeys
@@ -61,11 +63,38 @@ myPP = def
   , ppOrder = \(ws:_:t:_) -> [ws, t]
   }
 
+-- Event-driven log hook that pipes to xmobar
+myLogHook = do
+  -- Get workspace preview from our script
+  workspacePreview <- io $ readProcess "workspace-preview" [] ""
+  -- Get current window title
+  windowTitle <- io $ do
+    activeWindow <- readProcess "xprop" ["-root", "-notype", "_NET_ACTIVE_WINDOW"] ""
+    case words activeWindow of
+      (_:_:_:_:windowId:_) -> do
+        title <- readProcess "xprop" ["-id", windowId, "-notype", "_NET_WM_NAME"] ""
+        return $ case lines title of
+          (_:titleLine:_) -> case dropWhile (/= '"') titleLine of
+            ('"':rest) -> takeWhile (/= '"') rest
+            _ -> "No Window"
+          _ -> "No Window"
+      _ -> return "No Window"
+  
+  -- Format the status bar content
+  let statusContent = workspacePreview ++ " }{ <fc=#68d391>" ++ windowTitle ++ "</fc> | <fc=#a0aec0>META+SPACE</fc>"
+  
+  -- Write to xmobar via stdin (if xmobar is running)
+  io $ do
+    handle <- openFile "/tmp/xmobar-input" WriteMode
+    hPutStrLn handle statusContent
+    hClose handle
+
 -- Startup hook
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
-  spawnOnce "xmobar /etc/xmobar/xmobarrc &"
+  spawnOnce "mkfifo /tmp/xmobar-input 2>/dev/null || true"
+  spawnOnce "xmobar /etc/xmobar/xmobarrc < /tmp/xmobar-input &"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =

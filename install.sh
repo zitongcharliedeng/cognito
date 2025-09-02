@@ -77,7 +77,31 @@ EOF
 
 build_system() {
   echo "Building system for host $HOSTNAME..."
-  sudo nixos-rebuild switch --flake "$REPO_PATH#$HOSTNAME"
+  echo "Running from directory: $(pwd)"
+  
+  # Check if flake.nix exists in current directory otherwise nixos-rebuild will not use this repo's configs
+  if [[ ! -f "flake.nix" ]]; then
+    echo "❌ flake.nix not found in current directory"
+    echo "Please run this script from the root of your cognito repository"
+    exit 1
+  fi
+  
+  # Test that this NixOS version can use flake evaluation first
+  echo "Testing flake configuration..."
+  nix flake show --extra-experimental-features "nix-command flakes" 2>/dev/null || {
+    echo "❌ Flake evaluation failed."
+    echo "This could be because:"
+    echo "  1. Flakes are not enabled on this NixOS system"
+    echo "  2. Your flake.nix has syntax errors"
+    echo "  3. Experimental features are disabled"
+    echo ""
+    echo "To enable flakes permanently, add this to your /etc/nixos/configuration.nix:"
+    echo "  nix.settings.experimental-features = [ \"nix-command\" \"flakes\" ];"
+    exit 1
+  }
+  
+  echo "Building system..."
+  sudo nixos-rebuild switch --flake ".#$HOSTNAME"
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
   echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
 }

@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ../system.nix ];
-
   # Graphical login
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.windowManager.i3 = {

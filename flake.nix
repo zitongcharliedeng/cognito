@@ -11,14 +11,15 @@
     let
       system = "x86_64-linux";
 
-      # Discover all host configs programmatically inside ./hardware-shims/
-      hosts = builtins.attrNames (builtins.readDir ./hardware-shims);
+      # Discover all host configs programmatically inside ./hosts/
+      hosts = builtins.attrNames (builtins.readDir ./hosts);
 
       mkHost = name: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./hardware-shims/${name}/configuration.nix
-          ./home/display-manager/i3.nix
+          ./modules/system.nix
+          ./hosts/${name}/configuration.nix
+          ./modules/display-manager.nix
 
           home-manager.nixosModules.home-manager
           {

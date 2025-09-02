@@ -6,13 +6,13 @@ REPO_PATH="/etc/nixos"
 
 print_header() {
   echo "=== Cognito Installer ==="
-  echo "This will set up a new hardware-shim or reuse an existing one."
+  echo "This will set up a new host or reuse an existing one."
   echo
 }
 
 list_hosts() {
-  echo "Existing hardware-shims:"
-  ls -1 "$REPO_PATH/hardware-shims" || echo "(none yet)"
+  echo "Existing hosts:"
+  ls -1 "$REPO_PATH/hosts" || echo "(none yet)"
   echo
 }
 
@@ -22,7 +22,7 @@ get_host() {
 }
 
 create_host_dir() {
-  HOST_DIR="$REPO_PATH/hardware-shims/$HOSTNAME"
+  HOST_DIR="$REPO_PATH/hosts/$HOSTNAME"
   if [[ -d "$HOST_DIR" ]]; then
     echo "✔ Host $HOSTNAME already exists, using it."
   else
@@ -44,7 +44,6 @@ create_host_dir() {
 {
   imports = [
     ./hardware-configuration.nix
-    ../../system/default.nix
   ];
 
   # Hostname ties this config to the device
@@ -52,6 +51,9 @@ create_host_dir() {
 
   # ⚠️ If you need device-specific quirks (e.g. mic LED fix),
   # put them here — NOT in hardware-configuration.nix.
+  # 
+  # Note: Common system features (SSH, X server, basic packages, users)
+  # are automatically included via the flake.nix configuration.
 }
 EOF
     echo "✔ Created minimal configuration.nix for $HOSTNAME"

@@ -42,6 +42,82 @@
   
   # Enable i3lock (from NixOS docs)
   programs.i3lock.enable = true;
+  
+  # Create Polybar configuration directory and file
+  systemd.tmpfiles.rules = [
+    "d /root/.config/polybar 0755 root root -"
+    "L+ /root/.config/polybar/config.ini - - - - ${pkgs.writeText "polybar-config" ''
+      [colors]
+      background = #272e33
+      foreground = #d3c6aa
+      
+      [bar/top]
+      monitor = ${"${primary}"}
+      width = 100%
+      height = 30
+      offset-x = 0
+      offset-y = 0
+      radius = 0.0
+      fixed-center = true
+      
+      background = ${colors.background}
+      foreground = ${colors.foreground}
+      
+      line-size = 3
+      line-color = #f00
+      
+      border-size = 0
+      border-color = #00000000
+      
+      padding-left = 0
+      padding-right = 2
+      
+      module-margin-left = 1
+      module-margin-right = 2
+      
+      font-0 = fixed:pixelsize=10;1
+      font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
+      font-2 = siji:pixelsize=10;1
+      
+      modules-left = i3
+      modules-center = 
+      modules-right = 
+      
+      tray-position = right
+      tray-padding = 2
+      tray-background = ${colors.background}
+      
+      cursor-click = pointer
+      cursor-scroll = ns-resize
+      
+      [module/i3]
+      type = internal/i3
+      format = <label-state> <label-mode>
+      index-sort = true
+      wrapping-scroll = false
+      
+      label-mode-padding = 2
+      label-mode-foreground = #000
+      label-mode-background = ${colors.foreground}
+      
+      label-focused = %index%
+      label-focused-background = ${colors.background}
+      label-focused-underline= ${colors.foreground}
+      label-focused-padding = 2
+      
+      label-unfocused = %index%
+      label-unfocused-padding = 2
+      
+      label-visible = %index%
+      label-visible-background = ${self.label-focused-background}
+      label-visible-underline = ${self.label-focused-underline}
+      label-visible-padding = ${self.label-focused-padding}
+      
+      label-urgent = %index%
+      label-urgent-background = ${colors.background}
+      label-urgent-padding = 2
+    ''}"
+  ];
 
   # System packages (all hardware agnostic)
   environment.systemPackages = with pkgs; [
@@ -248,8 +324,14 @@
       # 3. Polybar handles positioning independently and is more popular
       # 4. No bar block = i3's built-in bar is disabled by default
       
-      # Launch Polybar (i3's built-in bar is disabled when no bar block is present)
-      exec --no-startup-id polybar top
+      # Explicitly disable i3's built-in bar (no status_command to avoid migration errors)
+      bar {
+          mode hide
+          hidden_state hide
+      }
+      
+      # Launch Polybar with configuration file
+      exec --no-startup-id polybar --config=/root/.config/polybar/config.ini top
     '';
   };
 }

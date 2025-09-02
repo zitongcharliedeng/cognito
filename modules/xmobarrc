@@ -10,8 +10,10 @@ Config { font = "xft:Monospace:size=12:antialias=true"
        , persistent = True
        , commands = [ Run StdinReader
                     , Run Com "workspace-preview" [] "workspace_preview" 2
+                    , Run Com "xprop" ["-root", "-notype", "_NET_ACTIVE_WINDOW"] "active_window" 1
+                    , Run Com "sh" ["-c", "xprop -id `xprop -root -notype _NET_ACTIVE_WINDOW | awk '{print $5}'` -notype _NET_WM_NAME | cut -d'\"' -f2 || echo 'No Window'"] "window_title" 1
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%workspace_preview% }{ %StdinReader%"
+       , template = "%workspace_preview% }{ <fc=#68d391>%window_title%</fc> | <fc=#a0aec0>META+SPACE</fc>"
        }

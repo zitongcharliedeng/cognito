@@ -137,24 +137,51 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon based on window class (simplified)
+      # Function to get app icon based on window class (programmatic)
       get_app_icon() {
         local window_class="$1"
-        case "$window_class" in
-          *[Ff]irefox*) echo "🌐" ;;
-          *[Cc]hrome*|*[Gg]oogle*) echo "🌐" ;;
-          *[Kk]itty*) echo "💻" ;;
-          *[Tt]hunar*) echo "📁" ;;
-          *[Vv]im*) echo "📝" ;;
-          *[Oo]bs*) echo "📹" ;;
-          *[Vv]lc*) echo "🎬" ;;
-          *[Ss]potify*) echo "🎵" ;;
-          *[Dd]iscord*) echo "💬" ;;
-          *[Cc]ode*|*[Vv]s*) echo "⚡" ;;
-          *[Gg]imp*) echo "🎨" ;;
-          *[Gg]nome-control*) echo "⚙️" ;;
-          *) echo "📱" ;; # Default icon
-        esac
+        local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+        
+        # Try multiple search strategies
+        local icon_path=""
+        
+        # Strategy 1: Direct class name match
+        icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1)
+        
+        # Strategy 2: Try common icon directories with class name
+        if [ -z "$icon_path" ]; then
+          icon_path=$(find /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1)
+        fi
+        
+        # Strategy 3: Try pixmaps directory
+        if [ -z "$icon_path" ]; then
+          icon_path=$(find /usr/share/pixmaps -name "*$class_lower*" -type f 2>/dev/null | head -1)
+        fi
+        
+        # Strategy 4: Try to find desktop file and extract icon
+        if [ -z "$icon_path" ]; then
+          local desktop_file=$(find /usr/share/applications -name "*$class_lower*" -type f 2>/dev/null | head -1)
+          if [ -n "$desktop_file" ]; then
+            local icon_name=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+            if [ -n "$icon_name" ]; then
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
+            fi
+          fi
+        fi
+        
+        # Strategy 5: Try to get icon from window properties
+        if [ -z "$icon_path" ]; then
+          # This would require more complex xprop parsing, but let's try a simple approach
+          local window_id="$2"
+          if [ -n "$window_id" ]; then
+            local icon_name=$(xprop -id "$window_id" _NET_WM_ICON_NAME 2>/dev/null | cut -d'"' -f2)
+            if [ -n "$icon_name" ]; then
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
+            fi
+          fi
+        fi
+        
+        echo "$icon_path"
       }
       
       # Function to get window class from window ID
@@ -179,8 +206,14 @@
               if [ -n "$window_id" ]; then
                 window_class=$(get_window_class "$window_id")
                 if [ -n "$window_class" ]; then
-                  icon=$(get_app_icon "$window_class")
-                  app_icons="$app_icons$icon"
+                  icon_path=$(get_app_icon "$window_class" "$window_id")
+                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
+                    # Use xmobar's image display capability
+                    app_icons="$app_icons<icon=$icon_path/>"
+                  else
+                    # Fallback to blank white square
+                    app_icons="$app_icons<fc=#ffffff>■</fc>"
+                  fi
                 fi
               fi
             done <<< "$window_ids"
@@ -315,10 +348,12 @@
           ["test-firefox"]="firefox"
           ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
           ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
-          ["test-xmobar"]="pkill xmobar; sleep 1; xmobar /etc/xmobar/xmobarrc &"
+          ["test-xmobar"]="pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc &"
           ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
           ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
           ["debug-kitty-icon"]="find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null | head -5 > /tmp/kitty-icons.txt && notify-send 'Debug' 'Kitty icons saved to /tmp/kitty-icons.txt'"
+          ["debug-app-icons"]="find /usr/share/pixmaps /usr/share/icons -name '*firefox*' -o -name '*kitty*' -o -name '*thunar*' -type f 2>/dev/null | head -10 > /tmp/app-icons.txt && notify-send 'Debug' 'App icons saved to /tmp/app-icons.txt'"
+          ["debug-window-class"]="wmctrl -l | head -5 > /tmp/window-classes.txt && notify-send 'Debug' 'Window classes saved to /tmp/window-classes.txt'"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -441,6 +476,8 @@
           ["test xmobar"]="test-xmobar"
           ["launch xmobar"]="test-xmobar"
           ["start xmobar"]="test-xmobar"
+          ["debug app icons"]="debug-app-icons"
+          ["debug window class"]="debug-window-class"
       )
       
       # Screenshot commands (complex, so defined separately)

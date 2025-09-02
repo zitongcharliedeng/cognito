@@ -24,6 +24,6 @@
   # Root user configuration
   users.users.root = {
     isNormalUser = false;
-    initialPassword = "password";
+    initialPassword = "root";
   };
 }

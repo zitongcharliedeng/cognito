@@ -60,9 +60,9 @@ create_host_dir() {
   # Hostname ties this config to the device
   networking.hostName = "${HOSTNAME}";
 
-  # Bootloader configuration (will be overridden by hardware-configuration.nix if needed)
+  # Bootloader configuration (hardware agnostic)
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";  # Will be set by hardware-configuration.nix
+  boot.loader.grub.device = "nodev";  # Hardware agnostic - will be auto-detected or set by hardware-configuration.nix
 
   # ⚠️ If you need device-specific quirks (e.g. mic LED fix),
   # put them here — NOT in hardware-configuration.nix.
@@ -94,27 +94,21 @@ build_system() {
   echo "Testing flake configuration..."
   nix flake show --extra-experimental-features "nix-command flakes" 2>/dev/null || {
     echo "❌ Flake evaluation failed."
-    echo "This could be because:"
-    echo "  1. Flakes are not enabled on this NixOS system"
-    echo "  2. Your flake.nix has syntax errors"
-    echo "  3. Experimental features are disabled"
-    echo ""
-    echo "To enable flakes permanently, add this to your /etc/nixos/configuration.nix:"
+    echo "Flakes may not be enabled on this NixOS system."
+    echo "To enable flakes, add this to /etc/nixos/configuration.nix:"
     echo "  nix.settings.experimental-features = [ \"nix-command\" \"flakes\" ];"
+    echo "Then run: sudo nixos-rebuild switch"
     exit 1
   }
   
   echo "Building system..."
-  echo "Debug: Attempting to build host: ${HOSTNAME}"
-  echo "Debug: Available hosts in flake:"
-  nix flake show --extra-experimental-features "nix-command flakes" | grep -A 10 "nixosConfigurations" || echo "No nixosConfigurations found"
-  echo ""
-  echo "Debug: Committing new host configuration to Git... since nix flake builds use only git committed configs"
+  echo "Committing new host configuration to Git (required for flake builds)..."
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   
-  echo "Debug: Running nixos-rebuild with verbose output..."
-  sudo nixos-rebuild switch --flake .#${HOSTNAME} --verbose
+  echo "Building system configuration..."
+  echo "Note: You'll be prompted for your sudo password (same as your NixOS installer password)"
+  sudo nixos-rebuild switch --flake .#${HOSTNAME}
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
   echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
 }

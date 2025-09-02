@@ -160,3 +160,14 @@ cd cognito
 ```bash
 bash ./install.sh
 ```
+
+**Note:** You'll be prompted for your account details after installation, see the flake.nix for details as it will be different from the account you made from the NixOS installation:
+
+i.e.
+```
+# Root user configuration
+  users.users.root = {
+    isNormalUser = false;
+    initialPassword = "root";
+  };
+```

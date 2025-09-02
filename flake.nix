@@ -1,5 +1,5 @@
 {
-  description = "Cognito OS - Flake config (with i3 under home/)";
+  description = "Cognito OS";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
@@ -7,22 +7,30 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager }: {
-    nixosConfigurations = {
-      cognito-dev = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+  outputs = { self, nixpkgs, home-manager, ... }:
+    let
+      system = "x86_64-linux";
+
+      # Discover all host configs programmatically inside ./hardware-shims/
+      hosts = builtins.attrNames (builtins.readDir ./hardware-shims);
+
+      mkHost = name: nixpkgs.lib.nixosSystem {
+        inherit system;
         modules = [
-          ./hosts/cognito-dev/configuration.nix
+          ./hardware-shims/${name}/configuration.nix
           ./home/display-manager/i3.nix
+
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            # ⚠️ For now, root is the only HM user
             home-manager.users.root = import ./home/root.nix;
           }
         ];
       };
+    in {
+      nixosConfigurations =
+        builtins.listToAttrs (map (name: { name = name; value = mkHost name; }) hosts);
     };
-  };
 }
-

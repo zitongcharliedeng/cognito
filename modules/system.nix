@@ -35,27 +35,7 @@
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
-  # Polybar configuration (minimal)
-  environment.etc."polybar/config.ini".text = ''
-    [bar/main]
-    monitor = 
-    width = 100%
-    height = 30
-    background = #1a202c
-    foreground = #e2e8f0
-    font-0 = "Monospace:size=12"
-    modules-left = workspace-preview
-    modules-right = window-title
 
-    [module/workspace-preview]
-    type = custom/script
-    exec = workspace-preview-polybar
-    interval = 2
-
-    [module/window-title]
-    type = internal/xwindow
-    label = %title%
-  '';
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)
@@ -77,7 +57,7 @@
     rofi      # application launcher for omnibar
     xdotool   # X11 automation tool for omnibar commands
     xsel      # clipboard utility for XMonad commands
-    polybar   # modern status bar for XMonad
+    xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
 
     # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent
@@ -86,8 +66,7 @@
     # Workspace preview script for xmobar (real app icons)
     (pkgs.writeScriptBin "workspace-preview" (builtins.readFile ./scripts/workspace-preview.sh))
     
-    # Workspace preview script for polybar
-    (pkgs.writeScriptBin "workspace-preview-polybar" (builtins.readFile ./scripts/workspace-preview-polybar.sh))
+
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" (builtins.readFile ./scripts/cognito-omnibar.sh))

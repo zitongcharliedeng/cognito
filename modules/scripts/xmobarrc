@@ -8,8 +8,7 @@ Config { font = "xft:Monospace:size=12:antialias=true"
        , overrideRedirect = True
        , pickBroadest = False
        , persistent = True
-       , commands = [ Run StdinReader
-                    , Run Com "workspace-preview" [] "workspace_preview" 5
+       , commands = [ Run Com "workspace-preview" [] "workspace_preview" 5
                     , Run Com "xprop" ["-root", "-notype", "_NET_ACTIVE_WINDOW"] "active_window" 5
                     , Run Com "sh" ["-c", "xprop -id `xprop -root -notype _NET_ACTIVE_WINDOW | awk '{print $5}'` -notype _NET_WM_NAME | cut -d'\"' -f2 || echo 'No Window'"] "window_title" 5
                     ]

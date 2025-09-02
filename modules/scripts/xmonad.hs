@@ -19,9 +19,12 @@ import XMonad.Actions.WindowGo
 import qualified Data.Map as M
 import XMonad.Hooks.EwmhDesktops
 
+-- Status bar configuration
+mySB = statusBarProp "xmobar /etc/xmobar/xmobarrc" (pure myPP)
+
 -- Main configuration
 main :: IO ()
-main = xmonad $ ewmh $ docks def
+main = xmonad $ withEasySB mySB defToggleStrutsKey $ ewmh def
   { modMask = mod4Mask  -- Use Super key as mod
   , terminal = "kitty"
   , borderWidth = 2
@@ -30,7 +33,6 @@ main = xmonad $ ewmh $ docks def
   , layoutHook = myLayout
   , manageHook = myManageHook
   , startupHook = myStartupHook
-  , logHook = dynamicLogWithPP myPP
   , mouseBindings = myMouseBindings
   , workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]  -- Explicitly define 10 workspaces (1-10)
   } `additionalKeysP` myKeys
@@ -68,7 +70,6 @@ myPP = def
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
-  spawnOnce "sleep 1 && polybar main -c /etc/polybar/config.ini &"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =

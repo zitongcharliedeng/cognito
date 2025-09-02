@@ -158,5 +158,5 @@ cd cognito
 ## 3. Use and follow install script
 
 ```bash
-./install.sh
+bash ./install.sh
 ```

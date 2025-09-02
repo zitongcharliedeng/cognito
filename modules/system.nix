@@ -287,8 +287,9 @@
           "debug:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
           "test:notify-send 'Test' 'This is a test notification'"
           "check rofi:rofi -dmenu -i -p 'Rofi Test'"
-          "test kitty:kitty &"
-          "test firefox:firefox &"
+          "test kitty:kitty"
+          "test firefox:firefox"
+          "test echo:echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
       )
       
       # Show commands with rofi
@@ -300,8 +301,8 @@
               echo "Executing: $cmd"
               # Log to a file for debugging
               echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
-              # Execute command in background to avoid blocking rofi
-              eval "$cmd &"
+              # Execute command directly in the current shell context
+              "$cmd" &
           fi
       else
           echo "Rofi not found"

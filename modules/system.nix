@@ -36,9 +36,10 @@
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
   # Gaming:
-  hardware.graphics = {
+  hardware.opengl = {
     enable = true;
-    enable32Bit = true;
+    driSupport = true;
+    driSupport32Bit = true;
   };
   programs.steam.enable = true;
   programs.steam.gamescopeSession.enable = true;

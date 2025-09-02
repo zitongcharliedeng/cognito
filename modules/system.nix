@@ -59,7 +59,6 @@
   environment.etc."i3/config".text = ''
     # Cognito OS i3 Configuration - Apple-style Omnibar Interface
     # Single keyboard shortcut (Meta+Space) launches omnibar from anywhere
-    # Everything else through English commands - no memorization required
 
     # Font for window titles and bar
     font pango:monospace 10
@@ -77,11 +76,10 @@
     # SINGLE KEYBOARD SHORTCUT - Meta+Space launches omnibar (like Apple Spotlight)
     bindsym Mod4+space exec cognito-omnibar
 
-    # Start i3bar with omnibar hint
+    # Start i3bar
     bar {
         position top
         status_command i3status
-        font pango:monospace 10
     }
   '';
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Path to your repo — change this if your repo lives elsewhere
-REPO_PATH="/etc/nixos"
+# Path to your repo — use current directory for flake-based setup
+REPO_PATH="$(pwd)"
 
 # TODO rename hosts to be hardware-shims
 print_header() {
@@ -31,8 +31,9 @@ create_host_dir() {
     mkdir -p "$HOST_DIR"
 
     if [[ ! -f /etc/nixos/hardware-configuration.nix ]]; then
-      echo "❌ Couldn’t find /etc/nixos/hardware-configuration.nix"
+      echo "❌ Couldn't find /etc/nixos/hardware-configuration.nix"
       echo "Have you installed NixOS on this machine yet?"
+      echo "Run 'sudo nixos-generate-config' to generate the hardware configuration."
       exit 1
     fi
 
@@ -65,6 +66,7 @@ build_system() {
   echo "Building system for host $HOSTNAME..."
   sudo nixos-rebuild switch --flake "$REPO_PATH#$HOSTNAME"
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
+  echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
 }
 
 main() {

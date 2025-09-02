@@ -35,6 +35,21 @@
   # Set XMonad as the default session (NixOS way)
   services.xserver.displayManager.defaultSession = "none+xmonad";
   
+  # GTK icon theme configuration (based on real NixOS configs)
+  # This is necessary because Nix doesn't automatically register app icons in a central location
+  # Desktop environments need icon themes to find icons for system UI elements and app fallbacks
+  environment.etc."xdg/gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-icon-theme-name=Papirus
+    gtk-theme-name=Adwaita
+  '';
+  
+  # Set default icon theme paths for proper icon discovery
+  # This tells the system where to look for icons when apps don't register them properly
+  environment.variables = {
+    XDG_DATA_DIRS = [ "${pkgs.gnome.adwaita-icon-theme}/share" "${pkgs.papirus-icon-theme}/share" "${pkgs.hicolor-icon-theme}/share" ];
+  };
+  
 
   
 
@@ -82,6 +97,20 @@
     i3lock    # screen locker (used in omnibar commands)
     xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
+    
+    # Icon themes and packages (based on real NixOS configs)
+    # IMPORTANT: Nix's immutable store means app icons are scattered across different paths
+    # Even though apps come with their own icons, Nix doesn't automatically register them
+    # in a central location that desktop environments can find. Icon themes provide:
+    # 1. Centralized icon lookup for system UI elements (folders, tray, notifications)
+    # 2. Fallback icons when app icons aren't found or properly registered
+    # 3. Visual consistency across the entire desktop environment
+    # This is a limitation of Nix's package management - we need icon packs as a workaround
+    hicolor-icon-theme  # base icon theme (required fallback)
+    papirus-icon-theme  # comprehensive icon theme with app icons
+    gnome.adwaita-icon-theme  # GNOME default icons
+    arc-icon-theme      # modern icon theme
+    tango-icon-theme    # classic icon theme
     
 
     
@@ -137,107 +166,37 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon based on window class (programmatic favicon detection)
+      # Function to get app icon based on window class (icon theme lookup, letter fallback)
+      # NOTE: Use icon theme as source of truth, fall back to first letter only if that fails
       get_app_icon() {
         local window_class="$1"
         local window_id="$2"
+        local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+        
+        # Use gtk-icon-theme-name from GTK settings as the source of truth
+        local icon_theme="Papirus"
+        if [ -f "/etc/xdg/gtk-3.0/settings.ini" ]; then
+          icon_theme=$(grep "gtk-icon-theme-name=" /etc/xdg/gtk-3.0/settings.ini 2>/dev/null | cut -d'=' -f2 || echo "Papirus")
+        fi
+        
+        # Try to find icon in the configured icon theme
         local icon_path=""
-        
-        # Strategy 1: Get icon from desktop file (most reliable)
-        local desktop_file=""
-        # Try exact class name match first
-        desktop_file=$(find /usr/share/applications -name "*$window_class*" -type f 2>/dev/null | head -1)
-        # Try lowercase version
-        if [ -z "$desktop_file" ]; then
-          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-          desktop_file=$(find /usr/share/applications -name "*$class_lower*" -type f 2>/dev/null | head -1)
-        fi
-        
-        if [ -n "$desktop_file" ]; then
-          local icon_name=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
-          if [ -n "$icon_name" ]; then
-            # Try to find the icon file
-            icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "$icon_name.*" -type f 2>/dev/null | head -1)
-            # If not found, try with common extensions
-            if [ -z "$icon_path" ]; then
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "$icon_name" -type f 2>/dev/null | head -1)
-            fi
-            # Try with wildcard
-            if [ -z "$icon_path" ]; then
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
-            fi
+        for theme_dir in /nix/store/*/share/icons/$icon_theme /run/current-system/sw/share/icons/$icon_theme /usr/share/icons/$icon_theme; do
+          if [ -d "$theme_dir" ]; then
+            # Look for icon by class name in the theme
+            icon_path=$(find "$theme_dir" -name "*$class_lower*" -type f 2>/dev/null | head -1)
+            [ -n "$icon_path" ] && break
           fi
-        fi
+        done
         
-        # Strategy 2: Direct class name search in icon directories
-        if [ -z "$icon_path" ]; then
-          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-          # Search in common icon directories
-          icon_path=$(find /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1)
-          # Try pixmaps
-          if [ -z "$icon_path" ]; then
-            icon_path=$(find /usr/share/pixmaps -name "*$class_lower*" -type f 2>/dev/null | head -1)
-          fi
+        # Return icon path if found, otherwise return first letter fallback
+        if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
+          echo "$icon_path"
+        else
+          # Absolute fallback: first letter of application class in caps
+          local first_char=$(echo "$window_class" | cut -c1 | tr '[:lower:]' '[:upper:]')
+          echo "$first_char"
         fi
-        
-        # Strategy 3: Try to get icon from window properties
-        if [ -z "$icon_path" ] && [ -n "$window_id" ]; then
-          # Try _NET_WM_ICON_NAME
-          local icon_name=$(xprop -id "$window_id" _NET_WM_ICON_NAME 2>/dev/null | cut -d'"' -f2)
-          if [ -n "$icon_name" ]; then
-            icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
-          fi
-          
-          # Try WM_CLASS for icon name
-          if [ -z "$icon_path" ]; then
-            local wm_class=$(xprop -id "$window_id" WM_CLASS 2>/dev/null | cut -d'"' -f2)
-            if [ -n "$wm_class" ]; then
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$wm_class*" -type f 2>/dev/null | head -1)
-            fi
-          fi
-        fi
-        
-        # Strategy 4: Try common application icon paths
-        if [ -z "$icon_path" ]; then
-          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-          case "$class_lower" in
-            *firefox*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1)
-              ;;
-            *kitty*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1)
-              ;;
-            *thunar*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1)
-              ;;
-            *chrome*|*google*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1)
-              ;;
-            *code*|*vscode*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1)
-              ;;
-            *discord*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1)
-              ;;
-            *spotify*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1)
-              ;;
-            *vlc*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1)
-              ;;
-            *obs*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1)
-              ;;
-            *gimp*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1)
-              ;;
-            *gnome-control*|*settings*)
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1)
-              ;;
-          esac
-        fi
-        
-        echo "$icon_path"
       }
       
       # Function to get window class from window ID
@@ -262,13 +221,14 @@
               if [ -n "$window_id" ]; then
                 window_class=$(get_window_class "$window_id")
                 if [ -n "$window_class" ]; then
-                  icon_path=$(get_app_icon "$window_class" "$window_id")
-                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
-                    # Use xmobar's image display capability
-                    app_icons="$app_icons<icon=$icon_path/>"
+                  icon_result=$(get_app_icon "$window_class" "$window_id")
+                  # Check if result is a file path or a character
+                  if [ -f "$icon_result" ]; then
+                    # Use xmobar's image display capability for real icons
+                    app_icons="$app_icons<icon=$icon_result/>"
                   else
-                    # Fallback to blank white square
-                    app_icons="$app_icons<fc=#ffffff>■</fc>"
+                    # Display first letter fallback
+                    app_icons="$app_icons<fc=#a0aec0>$icon_result</fc>"
                   fi
                 fi
               fi
@@ -407,11 +367,8 @@
           ["test-xmobar"]="pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc &"
           ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
           ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
-          ["debug-kitty-icon"]="find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null | head -5 > /tmp/kitty-icons.txt && notify-send 'Debug' 'Kitty icons saved to /tmp/kitty-icons.txt'"
-          ["debug-app-icons"]="find /usr/share/pixmaps /usr/share/icons -name '*firefox*' -o -name '*kitty*' -o -name '*thunar*' -type f 2>/dev/null | head -10 > /tmp/app-icons.txt && notify-send 'Debug' 'App icons saved to /tmp/app-icons.txt'"
           ["debug-window-class"]="wmctrl -l | head -5 > /tmp/window-classes.txt && notify-send 'Debug' 'Window classes saved to /tmp/window-classes.txt'"
-          ["debug-desktop-files"]="find /usr/share/applications -name '*kitty*' -o -name '*firefox*' -o -name '*thunar*' -type f 2>/dev/null | head -5 > /tmp/desktop-files.txt && notify-send 'Debug' 'Desktop files saved to /tmp/desktop-files.txt'"
-          ["debug-icon-detection"]="echo 'Testing icon detection...' > /tmp/icon-detection.txt && echo 'Kitty desktop:' >> /tmp/icon-detection.txt && find /usr/share/applications -name '*kitty*' -type f 2>/dev/null >> /tmp/icon-detection.txt && echo 'Kitty icons:' >> /tmp/icon-detection.txt && find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null >> /tmp/icon-detection.txt && notify-send 'Debug' 'Icon detection debug saved to /tmp/icon-detection.txt'"
+          ["debug-icon-theme"]="echo 'Testing icon theme lookup...' > /tmp/icon-theme.txt && echo 'GTK Icon Theme:' >> /tmp/icon-theme.txt && grep 'gtk-icon-theme-name=' /etc/xdg/gtk-3.0/settings.ini 2>/dev/null >> /tmp/icon-theme.txt && echo 'Papirus theme icons:' >> /tmp/icon-theme.txt && find /nix/store /run/current-system/sw/share /usr/share -path '*/icons/Papirus/*' -name '*kitty*' -o -name '*firefox*' 2>/dev/null | head -3 >> /tmp/icon-theme.txt && echo 'Fallback test: Kitty->K, Firefox->F' >> /tmp/icon-theme.txt && notify-send 'Debug' 'Icon theme lookup saved to /tmp/icon-theme.txt'"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -534,10 +491,8 @@
           ["test xmobar"]="test-xmobar"
           ["launch xmobar"]="test-xmobar"
           ["start xmobar"]="test-xmobar"
-          ["debug app icons"]="debug-app-icons"
           ["debug window class"]="debug-window-class"
-          ["debug desktop files"]="debug-desktop-files"
-          ["debug icon detection"]="debug-icon-detection"
+          ["debug icon theme"]="debug-icon-theme"
       )
       
       # Screenshot commands (complex, so defined separately)

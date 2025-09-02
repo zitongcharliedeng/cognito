@@ -20,7 +20,10 @@
   
   # Graphical login screen
   services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
+  services.xserver.displayManager.lightdm.greeters.gtk = {
+    indicators = [ "hostname" "clock" "session" ];
+    default-user = "root";
+  };
   
   services.xserver.displayManager.defaultSession = "none+xmonad"; # tried i3 and awesome to no avail
   services.xserver.windowManager.xmonad = {
@@ -36,11 +39,6 @@
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
   # Gaming:
-  hardware.opengl = {
-    enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
-  };
   programs.steam.enable = true;
   programs.steam.gamescopeSession.enable = true;
   programs.gamemode.enable = true;

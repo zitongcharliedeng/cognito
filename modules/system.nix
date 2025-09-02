@@ -32,6 +32,9 @@
   # LightDM basic configuration TODO autofill the root username
   services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
   
+  # Set i3 as the default session (NixOS way)
+  services.xserver.displayManager.defaultSession = "none+i3";
+  
   services.xserver.windowManager.i3 = {
     enable = true;
     extraPackages = with pkgs; [
@@ -39,7 +42,54 @@
       i3status  # status bar
       i3lock    # lock screen
     ];
+    
+    # i3 configuration (NixOS way)
+    config = ''
+      # Cognito OS i3 Configuration - Apple-style Omnibar Interface
+      # Single keyboard shortcut (Meta+Space) launches omnibar from anywhere
+
+      # Font for window titles and bar
+      font pango:monospace 10
+
+      # Start XDG autostart .desktop files
+      exec --no-startup-id dex --autostart --environment i3
+
+      # Essential services
+      exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+      exec --no-startup-id nm-applet
+
+      # Auto-open terminal for debugging
+      exec --no-startup-id kitty
+
+      # Use Mouse+$mod to drag floating windows to their wanted position
+      floating_modifier Mod4
+
+      # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar (like Apple Spotlight)
+      bindsym Mod4+space exec cognito-omnibar
+      bindsym Mod1+space exec cognito-omnibar
+
+      # Window behavior
+      new_window normal 1
+      new_float normal
+
+      # Focus behavior
+      focus_follows_mouse no
+      mouse_warping output
+
+      # Workspace behavior
+      workspace_auto_back_and_forth yes
+
+      # Window borders and gaps
+      default_border pixel 3
+      default_floating_border pixel 3
+    '';
   };
+
+  # Required for i3status/i3blocks to work properly (from NixOS docs)
+  environment.pathsToLink = [ "/libexec" ];
+  
+  # Enable i3lock (from NixOS docs)
+  programs.i3lock.enable = true;
 
   # System packages (all hardware agnostic)
   environment.systemPackages = with pkgs; [
@@ -54,6 +104,7 @@
     # Display manager packages
     kitty     # hardware-agnostic terminal
     scrot     # screenshot tool
+    xclip     # clipboard utility
     xfce.thunar  # file manager
     firefox   # web browser
     gnome.gnome-control-center # settings
@@ -77,9 +128,9 @@
           "web browser:firefox"
           "text editor:vim"
           "settings:gnome-control-center"
-          "screenshot:scrot -d 1 ~/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved to ~/screenshot-$(date +%Y%m%d-%H%M%S).png'"
-          "screenshot window:scrot -s ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved'"
-          "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved'"
+          "screenshot:scrot -d 1 ~/screenshot-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
+          "screenshot window:scrot -s ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
+          "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
           
           # === WORKSPACES (1-10) ===
           "workspace 1:i3-msg workspace 1"
@@ -183,20 +234,5 @@
           echo "Rofi not found"
       fi
     '')
-  ];
-
-  # ============================================================================
-  # COGNITO OMNIBAR CONFIGURATION
-  # ============================================================================
-
-
-
-  # Create config symlinks (like your friend's approach)
-  # NOTE: We can't define i3/i3status configs directly in the NixOS configuration
-  # because the i3 migration script fails to handle bar blocks and other directives.
-  # Instead, we create separate config files and symlink them to avoid migration issues.
-  systemd.tmpfiles.rules = [
-    "L+ /root/.config/i3/config - - - - ${../i3config}"
-    "L+ /root/.config/i3status/config - - - - ${../i3statusconfig}"
   ];
 }

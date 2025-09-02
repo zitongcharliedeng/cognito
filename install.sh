@@ -105,7 +105,7 @@ build_system() {
   echo "Debug: Available hosts in flake:"
   nix flake show --extra-experimental-features "nix-command flakes" | grep -A 10 "nixosConfigurations" || echo "No nixosConfigurations found"
   echo ""
-  echo "Debug: Committing new host configuration to Git..."
+  echo "Debug: Committing new host configuration to Git... since nix flake builds use only git committed configs"
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   

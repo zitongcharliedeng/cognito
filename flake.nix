@@ -19,7 +19,6 @@
         modules = [
           ./modules/system.nix
           ./hosts/${name}/configuration.nix
-          ./modules/display-manager.nix
 
           home-manager.nixosModules.home-manager
           {

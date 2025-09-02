@@ -3,10 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
-    homix.url = "github:sioodmy/homix";
   };
 
-  outputs = { self, nixpkgs, homix, ... }:
+  outputs = { self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
 
@@ -18,7 +17,6 @@
         modules = [
           ./modules/system.nix
           ./hosts/${name}/configuration.nix
-          homix.nixosModules.default
         ];
       };
     in {

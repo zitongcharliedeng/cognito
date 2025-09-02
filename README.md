@@ -171,3 +171,12 @@ i.e.
     initialPassword = "root";
   };
 ```
+
+## Hardware Agnostic Design
+
+Cognito OS is designed to be completely hardware agnostic. All packages and configurations work on any machine that can run NixOS:
+
+- **X11-based** - Uses the most compatible display protocol (works on 99.9% of NixOS hardware, any realistic PC machine, unlike chud microcontrollers)
+- **No proprietary drivers** - Pure open-source stack
+- **Maximum compatibility** - Works on any NixOS-compatible machine, from embedded devices to servers
+- **Minimal dependencies** - Only essential, hardware-agnostic packages

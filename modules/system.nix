@@ -35,12 +35,22 @@
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
+  # Gaming:
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+  programs.steam.enable = true;
+  programs.steam.gamescopeSession.enable = true;
+  programs.gamemode.enable = true;
 
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)
   # ============================================================================
   environment.systemPackages = with pkgs; [
+    protonup
+    mangohud
     git
     vim
     htop
@@ -49,7 +59,7 @@
     scrot     # screenshot tool
     xclip     # clipboard utility
     xfce.thunar  # file manager and explorer
-    firefox   # web browser
+    chromium   # web browser
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)
@@ -65,8 +75,6 @@
     
     # Workspace preview script for xmobar (real app icons)
     (pkgs.writeScriptBin "workspace-preview" (builtins.readFile ./scripts/workspace-preview.sh))
-    
-
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" (builtins.readFile ./scripts/cognito-omnibar.sh))

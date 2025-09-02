@@ -8,8 +8,7 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
-import System.IO
-import System.Process
+
 import XMonad.Layout.Spacing
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
@@ -63,13 +62,7 @@ myPP = def
   , ppOrder = \(ws:_:t:_) -> [ws, t]
   }
 
--- Event-driven log hook that pipes to xmobar
-myLogHook = do
-  -- Simple test first - just send basic info
-  io $ do
-    handle <- openFile "/tmp/xmobar-input" WriteMode
-    hPutStrLn handle "1[K] 2[] 3[] 4[] 5[] 6[] 7[] 8[] 9[] 10[] }{ <fc=#68d391>Test Window</fc> | <fc=#a0aec0>META+SPACE</fc>"
-    hClose handle
+
 
 -- Startup hook
 myStartupHook = do

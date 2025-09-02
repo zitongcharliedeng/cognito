@@ -121,112 +121,195 @@
     (pkgs.writeScriptBin "cognito-omnibar" ''
       #!${pkgs.bash}/bin/bash
       
-      # Comprehensive command database
-      commands=(
+      # === COMMAND DEFINITIONS (DRY - Single Source of Truth) ===
+      declare -A cmd_definitions=(
           # === APPLICATIONS ===
-          "new terminal:kitty"
-          "terminal:kitty"
-          "file manager:thunar"
-          "browser:firefox"
-          "web browser:firefox"
-          "text editor:vim"
-          "settings:gnome-control-center"
-          "screenshot:scrot -d 1 ~/screenshot-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
-          "screenshot window:scrot -s ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
-          "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
+          ["kitty"]="kitty"
+          ["thunar"]="thunar"
+          ["firefox"]="firefox"
+          ["vim"]="vim"
+          ["gnome-control-center"]="gnome-control-center"
           
-          # === WORKSPACES (1-10) ===
-          "workspace 1:xmonad-cmd workspace-1"
-          "workspace 2:xmonad-cmd workspace-2"
-          "workspace 3:xmonad-cmd workspace-3"
-          "workspace 4:xmonad-cmd workspace-4"
-          "workspace 5:xmonad-cmd workspace-5"
-          "workspace 6:xmonad-cmd workspace-6"
-          "workspace 7:xmonad-cmd workspace-7"
-          "workspace 8:xmonad-cmd workspace-8"
-          "workspace 9:xmonad-cmd workspace-9"
-          "workspace 10:xmonad-cmd workspace-10"
-          "go to workspace 1:xmonad-cmd workspace-1"
-          "go to workspace 2:xmonad-cmd workspace-2"
-          "go to workspace 3:xmonad-cmd workspace-3"
-          "go to workspace 4:xmonad-cmd workspace-4"
-          "go to workspace 5:xmonad-cmd workspace-5"
+          # === WORKSPACES ===
+          ["workspace-1"]="xmonad-cmd workspace-1"
+          ["workspace-2"]="xmonad-cmd workspace-2"
+          ["workspace-3"]="xmonad-cmd workspace-3"
+          ["workspace-4"]="xmonad-cmd workspace-4"
+          ["workspace-5"]="xmonad-cmd workspace-5"
+          ["workspace-6"]="xmonad-cmd workspace-6"
+          ["workspace-7"]="xmonad-cmd workspace-7"
+          ["workspace-8"]="xmonad-cmd workspace-8"
+          ["workspace-9"]="xmonad-cmd workspace-9"
+          ["workspace-10"]="xmonad-cmd workspace-10"
           
           # === WINDOW MANAGEMENT ===
-          "close window:xmonad-cmd close-window"
-          "close this window:xmonad-cmd close-window"
-          "quit window:xmonad-cmd close-window"
-          "split horizontal:xmonad-cmd split-window"
-          "split vertical:xmonad-cmd split-window"
-          "split horizontally:xmonad-cmd split-window"
-          "split vertically:xmonad-cmd split-window"
-          "fullscreen:xmonad-cmd fullscreen"
-          "toggle fullscreen:xmonad-cmd fullscreen"
-          "floating window:xmonad-cmd toggle-float"
-          "toggle floating:xmonad-cmd toggle-float"
-          "maximize window:xmonad-cmd fullscreen"
+          ["close-window"]="xmonad-cmd close-window"
+          ["split-window"]="xmonad-cmd split-window"
+          ["fullscreen"]="xmonad-cmd fullscreen"
+          ["toggle-float"]="xmonad-cmd toggle-float"
           
           # === FOCUS & MOVE ===
-          "focus window left:xmonad-cmd focus-left"
-          "focus window right:xmonad-cmd focus-right"
-          "focus window up:xmonad-cmd focus-up"
-          "focus window down:xmonad-cmd focus-down"
-          "move window left:xmonad-cmd move-left"
-          "move window right:xmonad-cmd move-right"
-          "move window up:xmonad-cmd move-up"
-          "move window down:xmonad-cmd move-down"
+          ["focus-left"]="xmonad-cmd focus-left"
+          ["focus-right"]="xmonad-cmd focus-right"
+          ["focus-up"]="xmonad-cmd focus-up"
+          ["focus-down"]="xmonad-cmd focus-down"
+          ["move-left"]="xmonad-cmd move-left"
+          ["move-right"]="xmonad-cmd move-right"
+          ["move-up"]="xmonad-cmd move-up"
+          ["move-down"]="xmonad-cmd move-down"
           
           # === LAYOUTS ===
-          "layout stacking:xmonad-cmd layout-stack"
-          "layout tabbed:xmonad-cmd layout-tab"
-          "layout toggle:xmonad-cmd layout-toggle"
-          "stacking layout:xmonad-cmd layout-stack"
-          "tabbed layout:xmonad-cmd layout-tab"
-          "tile layout:xmonad-cmd layout-tab"
+          ["layout-stack"]="xmonad-cmd layout-stack"
+          ["layout-tab"]="xmonad-cmd layout-tab"
+          ["layout-toggle"]="xmonad-cmd layout-toggle"
           
           # === SYSTEM CONTROL ===
-          "shutdown:systemctl poweroff"
-          "shut down:systemctl poweroff"
-          "power off:systemctl poweroff"
-          "reboot:systemctl reboot"
-          "restart:systemctl reboot"
-          "logout:xmonad-cmd quit-xmonad"
-          "log out:xmonad-cmd quit-xmonad"
-          "exit xmonad:xmonad-cmd quit-xmonad"
-          "lock screen:i3lock"
-          "lock:i3lock"
+          ["shutdown"]="systemctl poweroff"
+          ["reboot"]="systemctl reboot"
+          ["logout"]="xmonad-cmd quit-xmonad"
+          ["lock"]="i3lock"
           
           # === VOLUME CONTROL ===
-          "volume up:amixer set Master 5%+"
-          "volume down:amixer set Master 5%-"
-          "volume mute:amixer set Master toggle"
-          "mute:amixer set Master toggle"
-          "unmute:amixer set Master unmute"
-          "volume 50:amixer set Master 50%"
-          "volume 100:amixer set Master 100%"
+          ["volume-up"]="amixer set Master 5%+"
+          ["volume-down"]="amixer set Master 5%-"
+          ["volume-mute"]="amixer set Master toggle"
+          ["volume-unmute"]="amixer set Master unmute"
+          ["volume-50"]="amixer set Master 50%"
+          ["volume-100"]="amixer set Master 100%"
           
           # === BRIGHTNESS CONTROL ===
-          "brightness up:brightnessctl set 5%+"
-          "brightness down:brightnessctl set 5%-"
-          "brightness max:brightnessctl set 100%"
-          "brightness min:brightnessctl set 10%"
-          "brightness 50:brightnessctl set 50%"
+          ["brightness-up"]="brightnessctl set 5%+"
+          ["brightness-down"]="brightnessctl set 5%-"
+          ["brightness-max"]="brightnessctl set 100%"
+          ["brightness-min"]="brightnessctl set 10%"
+          ["brightness-50"]="brightnessctl set 50%"
           
           # === XMONAD CONTROL ===
-          "reload config:xmonad --recompile && xmonad --restart"
-          "restart xmonad:xmonad --restart"
-          "reload xmonad:xmonad --restart"
-          "restart window manager:xmonad --restart"
+          ["reload-config"]="xmonad --recompile && xmonad --restart"
+          ["restart-xmonad"]="xmonad --restart"
           
           # === DEBUG & TEST ===
-          "debug:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
-          "test:notify-send 'Test' 'This is a test notification'"
-          "check rofi:rofi -dmenu -i -p 'Rofi Test'"
-          "test kitty:kitty"
-          "test firefox:firefox"
-          "test echo:echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
-          "test touch:touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
+          ["debug"]="echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
+          ["test"]="notify-send 'Test' 'This is a test notification'"
+          ["check-rofi"]="rofi -dmenu -i -p 'Rofi Test'"
+          ["test-kitty"]="kitty"
+          ["test-firefox"]="firefox"
+          ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
+          ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
       )
+      
+      # === COMMAND ALIASES (Many-to-One Mapping) ===
+      declare -A cmd_aliases=(
+          # === APPLICATIONS ===
+          ["new terminal"]="kitty"
+          ["terminal"]="kitty"
+          ["file manager"]="thunar"
+          ["browser"]="firefox"
+          ["web browser"]="firefox"
+          ["text editor"]="vim"
+          ["settings"]="gnome-control-center"
+          
+          # === WORKSPACES ===
+          ["workspace 1"]="workspace-1"
+          ["workspace 2"]="workspace-2"
+          ["workspace 3"]="workspace-3"
+          ["workspace 4"]="workspace-4"
+          ["workspace 5"]="workspace-5"
+          ["workspace 6"]="workspace-6"
+          ["workspace 7"]="workspace-7"
+          ["workspace 8"]="workspace-8"
+          ["workspace 9"]="workspace-9"
+          ["workspace 10"]="workspace-10"
+          ["go to workspace 1"]="workspace-1"
+          ["go to workspace 2"]="workspace-2"
+          ["go to workspace 3"]="workspace-3"
+          ["go to workspace 4"]="workspace-4"
+          ["go to workspace 5"]="workspace-5"
+          
+          # === WINDOW MANAGEMENT ===
+          ["close window"]="close-window"
+          ["close this window"]="close-window"
+          ["quit window"]="close-window"
+          ["split horizontal"]="split-window"
+          ["split vertical"]="split-window"
+          ["split horizontally"]="split-window"
+          ["split vertically"]="split-window"
+          ["toggle fullscreen"]="fullscreen"
+          ["floating window"]="toggle-float"
+          ["toggle floating"]="toggle-float"
+          ["maximize window"]="fullscreen"
+          
+          # === FOCUS & MOVE ===
+          ["focus window left"]="focus-left"
+          ["focus window right"]="focus-right"
+          ["focus window up"]="focus-up"
+          ["focus window down"]="focus-down"
+          ["move window left"]="move-left"
+          ["move window right"]="move-right"
+          ["move window up"]="move-up"
+          ["move window down"]="move-down"
+          
+          # === LAYOUTS ===
+          ["layout stacking"]="layout-stack"
+          ["layout tabbed"]="layout-tab"
+          ["stacking layout"]="layout-stack"
+          ["tabbed layout"]="layout-tab"
+          ["tile layout"]="layout-tab"
+          
+          # === SYSTEM CONTROL ===
+          ["shut down"]="shutdown"
+          ["power off"]="shutdown"
+          ["restart"]="reboot"
+          ["log out"]="logout"
+          ["exit xmonad"]="logout"
+          ["lock screen"]="lock"
+          
+          # === VOLUME CONTROL ===
+          ["volume mute"]="volume-mute"
+          ["mute"]="volume-mute"
+          ["unmute"]="volume-unmute"
+          ["volume 50"]="volume-50"
+          ["volume 100"]="volume-100"
+          
+          # === BRIGHTNESS CONTROL ===
+          ["brightness max"]="brightness-max"
+          ["brightness min"]="brightness-min"
+          ["brightness 50"]="brightness-50"
+          
+          # === XMONAD CONTROL ===
+          ["reload config"]="reload-config"
+          ["restart xmonad"]="restart-xmonad"
+          ["reload xmonad"]="restart-xmonad"
+          ["restart window manager"]="restart-xmonad"
+          
+          # === DEBUG & TEST ===
+          ["check rofi"]="check-rofi"
+          ["test kitty"]="test-kitty"
+          ["test firefox"]="test-firefox"
+          ["test echo"]="test-echo"
+          ["test touch"]="test-touch"
+      )
+      
+      # Screenshot commands (complex, so defined separately)
+      screenshot_cmd="scrot -d 1 ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
+      screenshot_window_cmd="scrot -s ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
+      screenshot_area_cmd="scrot -s ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
+      
+      # === BUILD COMMAND LIST (Many-to-One Resolution) ===
+      commands=()
+      
+      # Process aliases and resolve to actual commands
+      for alias in "''${!cmd_aliases[@]}"; do
+          cmd_key="''${cmd_aliases[$alias]}"
+          if [[ -n "''${cmd_definitions[$cmd_key]}" ]]; then
+              commands+=("$alias:''${cmd_definitions[$cmd_key]}")
+          fi
+      done
+      
+      # Add screenshot commands
+      commands+=("screenshot:$screenshot_cmd")
+      commands+=("screenshot window:$screenshot_window_cmd")
+      commands+=("screenshot area:$screenshot_area_cmd")
       
       # Show commands with rofi
       if command -v rofi >/dev/null 2>&1; then
@@ -237,12 +320,8 @@
               echo "Executing: $cmd"
               # Log to a file for debugging
               echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
-              # Try multiple execution methods
-              echo "Trying direct execution: $cmd" >> /tmp/cognito-omnibar.log
-              # Method 1: Direct execution
-              "$cmd" &
-              # Method 2: Via awesome-client as backup
-              awesome-client "awful.spawn('$cmd')" 2>/dev/null &
+              # Execute command directly in current shell context
+              eval "$cmd" &
           fi
       else
           echo "Rofi not found"

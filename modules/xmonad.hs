@@ -15,7 +15,7 @@ import XMonad.Util.SpawnOnce
 
 -- Main configuration
 main :: IO ()
-main = xmonad $ withSB mySB def
+main = xmonad $ docks def
   { modMask = mod4Mask  -- Use Super key as mod
   , terminal = "kitty"
   , borderWidth = 2
@@ -24,10 +24,8 @@ main = xmonad $ withSB mySB def
   , layoutHook = myLayout
   , manageHook = myManageHook
   , startupHook = myStartupHook
+  , logHook = dynamicLogWithPP myPP
   } `additionalKeysP` myKeys
-
--- Status bar configuration
-mySB = statusBarProp "xmobar /etc/xmobar/xmobarrc" (pure myPP)
 
 -- Layout configuration
 myLayout = avoidStruts $ spacing 4 $ tiled ||| Mirror tiled ||| Full
@@ -59,9 +57,12 @@ myPP = def
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
+  spawnOnce "xmobar /etc/xmobar/xmobarrc"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =
   [ ("M-<Space>", spawn "cognito-omnibar")
   , ("M1-<Space>", spawn "cognito-omnibar")
+  , ("M-S-c", kill)
+  , ("M-S-q", spawn "xmonad --recompile && xmonad --restart")
   ]

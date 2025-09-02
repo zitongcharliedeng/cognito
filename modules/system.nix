@@ -26,14 +26,14 @@
   services.xserver.windowManager.xmonad = {
     enable = true;
     enableContribAndExtras = true;
-    config = builtins.readFile ./xmonad.hs;
+          config = builtins.readFile ./scripts/xmonad.hs;
   };
   
   # Create configuration for xmobar, the status bar for XMonad
   systemd.tmpfiles.rules = [
     "d /root/.config/xmobar 0755 root root -"
   ];
-  environment.etc."xmobar/xmobarrc".text = builtins.readFile ./xmobarrc;
+  environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)

@@ -24,22 +24,31 @@ get_host() {
 
 create_host_dir() {
   HOST_DIR="$REPO_PATH/hosts/$HOSTNAME"
-  if [[ -d "$HOST_DIR" ]]; then
-    echo "✔ Host $HOSTNAME already exists, using it."
-  else
+  
+  # Create directory if it doesn't exist
+  if [[ ! -d "$HOST_DIR" ]]; then
     echo "Creating new host directory at $HOST_DIR"
     mkdir -p "$HOST_DIR"
+  else
+    echo "✔ Host $HOSTNAME directory already exists"
+  fi
 
+  # Check if hardware configuration exists, copy if needed
+  if [[ ! -f "$HOST_DIR/hardware-configuration.nix" ]]; then
     if [[ ! -f /etc/nixos/hardware-configuration.nix ]]; then
       echo "❌ Couldn't find /etc/nixos/hardware-configuration.nix"
       echo "Have you installed NixOS on this machine yet?"
       echo "Run 'sudo nixos-generate-config' to generate the hardware configuration in-case it was deleted."
       exit 1
     fi
-
     cp /etc/nixos/hardware-configuration.nix "$HOST_DIR/hardware-configuration.nix"
+    echo "✔ Copied hardware-configuration.nix"
+  else
+    echo "✔ Hardware configuration already exists"
+  fi
 
-    # create a minimal configuration.nix for this host
+  # Create or update configuration.nix
+  if [[ ! -f "$HOST_DIR/configuration.nix" ]]; then
     cat > "$HOST_DIR/configuration.nix" <<EOF
 { config, pkgs, ... }:
 
@@ -56,9 +65,13 @@ create_host_dir() {
   # 
   # Note: System-agnostic features (SSH, X server, basic packages, users)
   # are automatically included via the flake.nix configuration.
+
+  system.stateVersion = "23.11";
 }
 EOF
     echo "✔ Created minimal configuration.nix for $HOSTNAME"
+  else
+    echo "✔ Configuration.nix already exists"
   fi
 }
 

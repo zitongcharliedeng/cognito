@@ -194,7 +194,7 @@
     package = pkgs.i3-gaps;  # Use i3-gaps like the working example
     extraPackages = with pkgs; [
       rofi      # Apple-like omnibar launcher
-      i3status-rust  # Rust-based status bar (more modern)
+      polybar   # Popular status bar (replaces i3's built-in bar)
       i3lock    # lock screen
     ];
     
@@ -238,11 +238,18 @@
       default_border pixel 3
       default_floating_border pixel 3
 
-      # Status bar configuration (using i3status-rust)
-      bar {
-          status_command i3status-rust
-          position top
-      }
+      # NOTE: We're using Polybar instead of i3's built-in bar because:
+      # 1. i3's migration script fails on "position top" syntax
+      # 2. The following bar config causes migration script errors:
+      #    bar {
+      #        status_command i3status
+      #        position top
+      #    }
+      # 3. Polybar handles positioning independently and is more popular
+      # 4. No bar block = i3's built-in bar is disabled by default
+      
+      # Launch Polybar (i3's built-in bar is disabled when no bar block is present)
+      exec --no-startup-id polybar top
     '';
   };
 }

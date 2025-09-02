@@ -103,9 +103,11 @@ build_system() {
   
   echo "Building system..."
   echo "Committing new host configuration to Git (required for flake builds)..."
+  # Set temporary Git identity to avoid annoying prompts
+  git config user.email "nixos@cognito.local" 2>/dev/null || true
+  git config user.name "Cognito NixOS" 2>/dev/null || true
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
-  # TODO remove git your username not recognised message as it is irrelevant
   echo "Building system configuration..."
   echo "Note: You'll be prompted for your sudo password (same as your NixOS installer password)"
   sudo nixos-rebuild switch --flake .#${HOSTNAME}

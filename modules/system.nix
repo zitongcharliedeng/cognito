@@ -191,6 +191,7 @@
   # i3 configuration using the working example pattern
   services.xserver.windowManager.i3 = {
     enable = true;
+    package = pkgs.i3-gaps;  # Use i3-gaps like the working example
     extraPackages = with pkgs; [
       rofi      # Apple-like omnibar launcher
       i3status  # status bar

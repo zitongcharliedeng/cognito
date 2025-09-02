@@ -20,11 +20,8 @@
   
   # Graphical login screen
   services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.displayManager.lightdm.greeters.gtk = {
-    indicators = [ "hostname" "clock" "session" ];
-    default-user = "root";
-  };
-  
+  services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
+  # TODO make a new lightdm config for the new greeter with a default user, maybe switch to a different greeter
   services.xserver.displayManager.defaultSession = "none+xmonad"; # tried i3 and awesome to no avail
   services.xserver.windowManager.xmonad = {
     enable = true;

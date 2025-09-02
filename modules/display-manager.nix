@@ -120,7 +120,7 @@
     # Create a more Apple-like interface with rofi (if available) or dmenu
     if command -v rofi >/dev/null 2>&1; then
         # Use rofi for a more polished Apple-like interface
-        input=$(printf '%s\n' "${!commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -theme-str 'entry { placeholder: "Type what you want to do..."; }' -width 50 -lines 15)
+        input=$(printf '%s\n' "${!commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 50 -lines 15)
     else
         # Fallback to dmenu with better styling
         input=$(printf '%s\n' "${!commands[@]}" | dmenu -i -p "🔍 Cognito Omnibar: " -l 15 -fn "monospace:size=12" -nb "#2d2d2d" -nf "#ffffff" -sb "#007acc" -sf "#ffffff")

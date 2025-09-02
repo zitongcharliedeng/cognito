@@ -65,7 +65,7 @@ myPP = def
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
-  spawnOnce "sleep 3 && xmobar /etc/xmobar/xmobarrc &"
+  spawnOnce "xmobar /etc/xmobar/xmobarrc &"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =

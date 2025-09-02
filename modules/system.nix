@@ -137,48 +137,104 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon based on window class (programmatic)
+      # Function to get app icon based on window class (programmatic favicon detection)
       get_app_icon() {
         local window_class="$1"
-        local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-        
-        # Try multiple search strategies
+        local window_id="$2"
         local icon_path=""
         
-        # Strategy 1: Direct class name match
-        icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1)
+        # Strategy 1: Get icon from desktop file (most reliable)
+        local desktop_file=""
+        # Try exact class name match first
+        desktop_file=$(find /usr/share/applications -name "*$window_class*" -type f 2>/dev/null | head -1)
+        # Try lowercase version
+        if [ -z "$desktop_file" ]; then
+          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+          desktop_file=$(find /usr/share/applications -name "*$class_lower*" -type f 2>/dev/null | head -1)
+        fi
         
-        # Strategy 2: Try common icon directories with class name
+        if [ -n "$desktop_file" ]; then
+          local icon_name=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+          if [ -n "$icon_name" ]; then
+            # Try to find the icon file
+            icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "$icon_name.*" -type f 2>/dev/null | head -1)
+            # If not found, try with common extensions
+            if [ -z "$icon_path" ]; then
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "$icon_name" -type f 2>/dev/null | head -1)
+            fi
+            # Try with wildcard
+            if [ -z "$icon_path" ]; then
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
+            fi
+          fi
+        fi
+        
+        # Strategy 2: Direct class name search in icon directories
         if [ -z "$icon_path" ]; then
+          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+          # Search in common icon directories
           icon_path=$(find /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1)
+          # Try pixmaps
+          if [ -z "$icon_path" ]; then
+            icon_path=$(find /usr/share/pixmaps -name "*$class_lower*" -type f 2>/dev/null | head -1)
+          fi
         fi
         
-        # Strategy 3: Try pixmaps directory
-        if [ -z "$icon_path" ]; then
-          icon_path=$(find /usr/share/pixmaps -name "*$class_lower*" -type f 2>/dev/null | head -1)
-        fi
-        
-        # Strategy 4: Try to find desktop file and extract icon
-        if [ -z "$icon_path" ]; then
-          local desktop_file=$(find /usr/share/applications -name "*$class_lower*" -type f 2>/dev/null | head -1)
-          if [ -n "$desktop_file" ]; then
-            local icon_name=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
-            if [ -n "$icon_name" ]; then
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
+        # Strategy 3: Try to get icon from window properties
+        if [ -z "$icon_path" ] && [ -n "$window_id" ]; then
+          # Try _NET_WM_ICON_NAME
+          local icon_name=$(xprop -id "$window_id" _NET_WM_ICON_NAME 2>/dev/null | cut -d'"' -f2)
+          if [ -n "$icon_name" ]; then
+            icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
+          fi
+          
+          # Try WM_CLASS for icon name
+          if [ -z "$icon_path" ]; then
+            local wm_class=$(xprop -id "$window_id" WM_CLASS 2>/dev/null | cut -d'"' -f2)
+            if [ -n "$wm_class" ]; then
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$wm_class*" -type f 2>/dev/null | head -1)
             fi
           fi
         fi
         
-        # Strategy 5: Try to get icon from window properties
+        # Strategy 4: Try common application icon paths
         if [ -z "$icon_path" ]; then
-          # This would require more complex xprop parsing, but let's try a simple approach
-          local window_id="$2"
-          if [ -n "$window_id" ]; then
-            local icon_name=$(xprop -id "$window_id" _NET_WM_ICON_NAME 2>/dev/null | cut -d'"' -f2)
-            if [ -n "$icon_name" ]; then
-              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*$icon_name*" -type f 2>/dev/null | head -1)
-            fi
-          fi
+          local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+          case "$class_lower" in
+            *firefox*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1)
+              ;;
+            *kitty*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1)
+              ;;
+            *thunar*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1)
+              ;;
+            *chrome*|*google*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1)
+              ;;
+            *code*|*vscode*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1)
+              ;;
+            *discord*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1)
+              ;;
+            *spotify*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1)
+              ;;
+            *vlc*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1)
+              ;;
+            *obs*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1)
+              ;;
+            *gimp*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1)
+              ;;
+            *gnome-control*|*settings*)
+              icon_path=$(find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1)
+              ;;
+          esac
         fi
         
         echo "$icon_path"
@@ -354,6 +410,8 @@
           ["debug-kitty-icon"]="find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null | head -5 > /tmp/kitty-icons.txt && notify-send 'Debug' 'Kitty icons saved to /tmp/kitty-icons.txt'"
           ["debug-app-icons"]="find /usr/share/pixmaps /usr/share/icons -name '*firefox*' -o -name '*kitty*' -o -name '*thunar*' -type f 2>/dev/null | head -10 > /tmp/app-icons.txt && notify-send 'Debug' 'App icons saved to /tmp/app-icons.txt'"
           ["debug-window-class"]="wmctrl -l | head -5 > /tmp/window-classes.txt && notify-send 'Debug' 'Window classes saved to /tmp/window-classes.txt'"
+          ["debug-desktop-files"]="find /usr/share/applications -name '*kitty*' -o -name '*firefox*' -o -name '*thunar*' -type f 2>/dev/null | head -5 > /tmp/desktop-files.txt && notify-send 'Debug' 'Desktop files saved to /tmp/desktop-files.txt'"
+          ["debug-icon-detection"]="echo 'Testing icon detection...' > /tmp/icon-detection.txt && echo 'Kitty desktop:' >> /tmp/icon-detection.txt && find /usr/share/applications -name '*kitty*' -type f 2>/dev/null >> /tmp/icon-detection.txt && echo 'Kitty icons:' >> /tmp/icon-detection.txt && find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null >> /tmp/icon-detection.txt && notify-send 'Debug' 'Icon detection debug saved to /tmp/icon-detection.txt'"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -478,6 +536,8 @@
           ["start xmobar"]="test-xmobar"
           ["debug app icons"]="debug-app-icons"
           ["debug window class"]="debug-window-class"
+          ["debug desktop files"]="debug-desktop-files"
+          ["debug icon detection"]="debug-icon-detection"
       )
       
       # Screenshot commands (complex, so defined separately)

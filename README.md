@@ -151,8 +151,8 @@ This will auto-generate a hardware-config which acts as a shim layer to run Cogn
 
 ```bash
 nix-shell -p git
-git clone https://github.com/Frost-Phoenix/nixos-config
-cd nixos-config
+git clone https://github.com/zitongcharliedeng/cognito
+cd cognito
 ```
 
 ## 3. Use and follow install script

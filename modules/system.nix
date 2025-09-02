@@ -35,6 +35,19 @@
   # Set XMonad as the default session (NixOS way)
   services.xserver.displayManager.defaultSession = "none+xmonad";
   
+  # Ensure xmobar starts with the session
+  systemd.user.services.xmobar = {
+    description = "Xmobar status bar";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.xmobar}/bin/xmobar /etc/xmobar/xmobarrc";
+      Restart = "always";
+      RestartSec = 5;
+    };
+  };
+  
 
 
   # Enable XMonad, tried i3 and awesome to no avail
@@ -135,23 +148,51 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon based on window class (simplified for now)
+      # Function to get app icon based on window class
       get_app_icon() {
         local window_class="$1"
         case "$window_class" in
-          *[Ff]irefox*) echo "🌐" ;;
-          *[Cc]hrome*|*[Gg]oogle*) echo "🌐" ;;
-          *[Kk]itty*) echo "💻" ;;
-          *[Tt]hunar*) echo "📁" ;;
-          *[Vv]im*) echo "📝" ;;
-          *[Oo]bs*) echo "📹" ;;
-          *[Vv]lc*) echo "🎬" ;;
-          *[Ss]potify*) echo "🎵" ;;
-          *[Dd]iscord*) echo "💬" ;;
-          *[Cc]ode*|*[Vv]s*) echo "⚡" ;;
-          *[Gg]imp*) echo "🎨" ;;
-          *[Gg]nome-control*) echo "⚙️" ;;
-          *) echo "📱" ;; # Default icon
+          *[Ff]irefox*)
+            find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1
+            ;;
+          *[Cc]hrome*|*[Gg]oogle*)
+            find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1
+            ;;
+          *[Kk]itty*)
+            find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1
+            ;;
+          *[Tt]hunar*)
+            find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1
+            ;;
+          *[Vv]im*)
+            find /usr/share/pixmaps /usr/share/icons -name "*vim*" -type f 2>/dev/null | head -1
+            ;;
+          *[Oo]bs*)
+            find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1
+            ;;
+          *[Vv]lc*)
+            find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1
+            ;;
+          *[Ss]potify*)
+            find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1
+            ;;
+          *[Dd]iscord*)
+            find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1
+            ;;
+          *[Cc]ode*|*[Vv]s*)
+            find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1
+            ;;
+          *[Gg]imp*)
+            find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1
+            ;;
+          *[Gg]nome-control*)
+            find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1
+            ;;
+          *)
+            # Try to find generic icon based on class name
+            local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+            find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1
+            ;;
         esac
       }
       
@@ -176,8 +217,15 @@
               if [ -n "$window_id" ]; then
                 window_class=$(get_window_class "$window_id")
                 if [ -n "$window_class" ]; then
-                  icon=$(get_app_icon "$window_class")
-                  app_icons="$app_icons$icon"
+                  icon_path=$(get_app_icon "$window_class")
+                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
+                    # Use xmobar's image display capability
+                    app_icons="$app_icons<icon=$icon_path/>"
+                  else
+                    # Fallback to first letter of class name
+                    first_char=$(echo "$window_class" | cut -c1 | tr '[:lower:]' '[:upper:]')
+                    app_icons="$app_icons<fc=#a0aec0>$first_char</fc>"
+                  fi
                 fi
               fi
             done <<< "$window_ids"

@@ -65,28 +65,10 @@ myPP = def
 
 -- Event-driven log hook that pipes to xmobar
 myLogHook = do
-  -- Get workspace preview from our script
-  workspacePreview <- io $ readProcess "workspace-preview" [] ""
-  -- Get current window title
-  windowTitle <- io $ do
-    activeWindow <- readProcess "xprop" ["-root", "-notype", "_NET_ACTIVE_WINDOW"] ""
-    case words activeWindow of
-      (_:_:_:_:windowId:_) -> do
-        title <- readProcess "xprop" ["-id", windowId, "-notype", "_NET_WM_NAME"] ""
-        return $ case lines title of
-          (_:titleLine:_) -> case dropWhile (/= '"') titleLine of
-            ('"':rest) -> takeWhile (/= '"') rest
-            _ -> "No Window"
-          _ -> "No Window"
-      _ -> return "No Window"
-  
-  -- Format the status bar content
-  let statusContent = workspacePreview ++ " }{ <fc=#68d391>" ++ windowTitle ++ "</fc> | <fc=#a0aec0>META+SPACE</fc>"
-  
-  -- Write to xmobar via stdin (if xmobar is running)
+  -- Simple test first - just send basic info
   io $ do
     handle <- openFile "/tmp/xmobar-input" WriteMode
-    hPutStrLn handle statusContent
+    hPutStrLn handle "1[K] 2[] 3[] 4[] 5[] 6[] 7[] 8[] 9[] 10[] }{ <fc=#68d391>Test Window</fc> | <fc=#a0aec0>META+SPACE</fc>"
     hClose handle
 
 -- Startup hook

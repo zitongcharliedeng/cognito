@@ -43,14 +43,7 @@
     gtk-icon-theme-name=Papirus
     gtk-theme-name=Adwaita
   '';
-  
-              # Set default icon theme paths for proper icon discovery
-            # This tells the system where to look for icons when apps don't register them properly
-            # Override the default XDG_DATA_DIRS from NixOS by setting it directly
-            environment.variables.XDG_DATA_DIRS = [ "${pkgs.gnome.adwaita-icon-theme}/share" "${pkgs.papirus-icon-theme}/share" "${pkgs.hicolor-icon-theme}/share" ];
-  
 
-  
 
 
   # Enable XMonad, tried i3 and awesome to no avail

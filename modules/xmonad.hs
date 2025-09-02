@@ -31,6 +31,7 @@ main = xmonad $ ewmh $ docks def
   , startupHook = myStartupHook
   , logHook = dynamicLogWithPP myPP
   , mouseBindings = myMouseBindings
+  , workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]  -- Explicitly define 10 workspaces (1-10)
   } `additionalKeysP` myKeys
 
 -- Layout configuration
@@ -92,7 +93,7 @@ myKeys =
   , ("M-7", windows $ W.greedyView "7")
   , ("M-8", windows $ W.greedyView "8")
   , ("M-9", windows $ W.greedyView "9")
-  , ("M-0", windows $ W.greedyView "0")
+  , ("M-0", windows $ W.greedyView "10")
   , ("M-S-1", windows $ W.shift "1")
   , ("M-S-2", windows $ W.shift "2")
   , ("M-S-3", windows $ W.shift "3")
@@ -102,7 +103,7 @@ myKeys =
   , ("M-S-7", windows $ W.shift "7")
   , ("M-S-8", windows $ W.shift "8")
   , ("M-S-9", windows $ W.shift "9")
-  , ("M-S-0", windows $ W.shift "0")
+  , ("M-S-0", windows $ W.shift "10")
   ]
 
 -- Mouse bindings for window management

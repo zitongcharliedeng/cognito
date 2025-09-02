@@ -35,31 +35,7 @@
   # Set XMonad as the default session (NixOS way)
   services.xserver.displayManager.defaultSession = "none+xmonad";
   
-  # Ensure xmobar starts with the session
-  systemd.user.services.xmobar = {
-    description = "Xmobar status bar";
-    wantedBy = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.xmobar}/bin/xmobar /etc/xmobar/xmobarrc";
-      Restart = "always";
-      RestartSec = 5;
-      Environment = "DISPLAY=:0";
-    };
-  };
-  
-  # Alternative: Create desktop entry for xmobar
-  environment.etc."xdg/autostart/xmobar.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Xmobar
-    Comment=Status bar for XMonad
-    Exec=xmobar /etc/xmobar/xmobarrc
-    Hidden=false
-    NoDisplay=false
-    X-GNOME-Autostart-enabled=true
-  '';
+
   
 
 
@@ -123,7 +99,7 @@
         "workspace-7") echo "7" | xsel -i -b && xdotool key super+7 ;;
         "workspace-8") echo "8" | xsel -i -b && xdotool key super+8 ;;
         "workspace-9") echo "9" | xsel -i -b && xdotool key super+9 ;;
-        "workspace-10") echo "0" | xsel -i -b && xdotool key super+0 ;;
+        "workspace-10") echo "10" | xsel -i -b && xdotool key super+0 ;;
         "send-workspace-1") xdotool key super+shift+1 ;;
         "send-workspace-2") xdotool key super+shift+2 ;;
         "send-workspace-3") xdotool key super+shift+3 ;;
@@ -161,51 +137,23 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon based on window class
+      # Function to get app icon based on window class (simplified)
       get_app_icon() {
         local window_class="$1"
         case "$window_class" in
-          *[Ff]irefox*)
-            find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1
-            ;;
-          *[Cc]hrome*|*[Gg]oogle*)
-            find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1
-            ;;
-          *[Kk]itty*)
-            find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1
-            ;;
-          *[Tt]hunar*)
-            find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1
-            ;;
-          *[Vv]im*)
-            find /usr/share/pixmaps /usr/share/icons -name "*vim*" -type f 2>/dev/null | head -1
-            ;;
-          *[Oo]bs*)
-            find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1
-            ;;
-          *[Vv]lc*)
-            find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1
-            ;;
-          *[Ss]potify*)
-            find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1
-            ;;
-          *[Dd]iscord*)
-            find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1
-            ;;
-          *[Cc]ode*|*[Vv]s*)
-            find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1
-            ;;
-          *[Gg]imp*)
-            find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1
-            ;;
-          *[Gg]nome-control*)
-            find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1
-            ;;
-          *)
-            # Try to find generic icon based on class name
-            local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-            find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1
-            ;;
+          *[Ff]irefox*) echo "🌐" ;;
+          *[Cc]hrome*|*[Gg]oogle*) echo "🌐" ;;
+          *[Kk]itty*) echo "💻" ;;
+          *[Tt]hunar*) echo "📁" ;;
+          *[Vv]im*) echo "📝" ;;
+          *[Oo]bs*) echo "📹" ;;
+          *[Vv]lc*) echo "🎬" ;;
+          *[Ss]potify*) echo "🎵" ;;
+          *[Dd]iscord*) echo "💬" ;;
+          *[Cc]ode*|*[Vv]s*) echo "⚡" ;;
+          *[Gg]imp*) echo "🎨" ;;
+          *[Gg]nome-control*) echo "⚙️" ;;
+          *) echo "📱" ;; # Default icon
         esac
       }
       
@@ -217,12 +165,13 @@
       
       # Generate workspace preview
       preview=""
-      for i in {0..9}; do
+      for i in {1..10}; do
         # Get applications on this workspace
         app_icons=""
         if command -v wmctrl >/dev/null 2>&1; then
-          # Get window IDs for this workspace
-          window_ids=$(wmctrl -l 2>/dev/null | awk -v ws="$i" '$2 == ws {print $1}' | head -3 || echo "")
+          # Get window IDs for this workspace (wmctrl uses 0-based indexing, so subtract 1)
+          wmctrl_ws=$((i-1))
+          window_ids=$(wmctrl -l 2>/dev/null | awk -v ws="$wmctrl_ws" '$2 == ws {print $1}' | head -3 || echo "")
           
           if [ -n "$window_ids" ]; then
             # Get icons for each window
@@ -230,15 +179,8 @@
               if [ -n "$window_id" ]; then
                 window_class=$(get_window_class "$window_id")
                 if [ -n "$window_class" ]; then
-                  icon_path=$(get_app_icon "$window_class")
-                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
-                    # Use xmobar's image display capability
-                    app_icons="$app_icons<icon=$icon_path/>"
-                  else
-                    # Fallback to first letter of class name
-                    first_char=$(echo "$window_class" | cut -c1 | tr '[:lower:]' '[:upper:]')
-                    app_icons="$app_icons<fc=#a0aec0>$first_char</fc>"
-                  fi
+                  icon=$(get_app_icon "$window_class")
+                  app_icons="$app_icons$icon"
                 fi
               fi
             done <<< "$window_ids"
@@ -246,26 +188,29 @@
         fi
         
         # Add workspace to preview with highlighting for current workspace
-        if [ "$i" -eq 9 ]; then
-          ws_num="0"
+        ws_num="$i"
+        
+        # Determine the key to press (workspace 10 uses Super+0)
+        if [ "$ws_num" -eq 10 ]; then
+          key="0"
         else
-          ws_num="$((i+1))"
+          key="$ws_num"
         fi
         
-        # Highlight current workspace
-        if [ "$i" -eq "$current_ws" ]; then
+        # Highlight current workspace (current_ws is 0-based, ws_num is 1-based)
+        if [ "$ws_num" -eq "$((current_ws + 1))" ]; then
           # Current workspace - highlighted with underline
           if [ -n "$app_icons" ]; then
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><fn=2>$ws_num[$app_icons]</fn></fc></action> "
+            preview="$preview<action=\`xdotool key super+$key\`><fc=#68d391><fn=2>$ws_num[$app_icons]</fn></fc></action> "
           else
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><fn=2>$ws_num[]</fn></fc></action> "
+            preview="$preview<action=\`xdotool key super+$key\`><fc=#68d391><fn=2>$ws_num[]</fn></fc></action> "
           fi
         else
           # Other workspaces - normal
           if [ -n "$app_icons" ]; then
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#a0aec0>$ws_num[$app_icons]</fc></action> "
+            preview="$preview<action=\`xdotool key super+$key\`><fc=#a0aec0>$ws_num[$app_icons]</fc></action> "
           else
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#4a5568>$ws_num[]</fc></action> "
+            preview="$preview<action=\`xdotool key super+$key\`><fc=#4a5568>$ws_num[]</fc></action> "
           fi
         fi
       done
@@ -370,11 +315,10 @@
           ["test-firefox"]="firefox"
           ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
           ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
-          ["test-xmobar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
+          ["test-xmobar"]="pkill xmobar; sleep 1; xmobar /etc/xmobar/xmobarrc &"
           ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
           ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
           ["debug-kitty-icon"]="find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null | head -5 > /tmp/kitty-icons.txt && notify-send 'Debug' 'Kitty icons saved to /tmp/kitty-icons.txt'"
-          ["test-xmobar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===

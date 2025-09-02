@@ -79,6 +79,7 @@
     xsel      # clipboard utility for XMonad commands
     i3lock    # screen locker (used in omnibar commands)
     xmobar    # status bar for XMonad
+    wmctrl    # for window management and workspace info
     
 
     
@@ -97,6 +98,16 @@
         "workspace-8") echo "8" | xsel -i -b && xdotool key super+8 ;;
         "workspace-9") echo "9" | xsel -i -b && xdotool key super+9 ;;
         "workspace-10") echo "0" | xsel -i -b && xdotool key super+0 ;;
+        "send-workspace-1") xdotool key super+shift+1 ;;
+        "send-workspace-2") xdotool key super+shift+2 ;;
+        "send-workspace-3") xdotool key super+shift+3 ;;
+        "send-workspace-4") xdotool key super+shift+4 ;;
+        "send-workspace-5") xdotool key super+shift+5 ;;
+        "send-workspace-6") xdotool key super+shift+6 ;;
+        "send-workspace-7") xdotool key super+shift+7 ;;
+        "send-workspace-8") xdotool key super+shift+8 ;;
+        "send-workspace-9") xdotool key super+shift+9 ;;
+        "send-workspace-10") xdotool key super+shift+0 ;;
         "close-window") xdotool key super+shift+c ;;
         "split-window") xdotool key super+shift+return ;;
         "fullscreen") xdotool key super+f ;;
@@ -115,6 +126,63 @@
         "quit-xmonad") xdotool key super+shift+q ;;
         *) echo "Unknown command: $1" ;;
       esac
+    '')
+    
+    # Workspace preview script for xmobar
+    (pkgs.writeScriptBin "workspace-preview" ''
+      #!${pkgs.bash}/bin/bash
+      
+      # Get current workspace
+      current_ws=$(xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}')
+      
+      # Generate workspace preview
+      preview=""
+      for i in {0..9}; do
+        # Get window count for this workspace
+        window_count=$(wmctrl -l | awk -v ws="$i" '$2 == ws {count++} END {print count+0}')
+        
+        # Get window titles for this workspace (first 2)
+        window_titles=$(wmctrl -l | awk -v ws="$i" '$2 == ws {print substr($0, index($0,$4))}' | head -2 | tr '\n' ' ' | sed 's/ $//')
+        
+        # Truncate long titles
+        if [ ${#window_titles} -gt 15 ]; then
+          window_titles="''${window_titles:0:12}..."
+        fi
+        
+        # Set colors based on current workspace and window count
+        if [ "$i" -eq "$current_ws" ]; then
+          if [ "$window_count" -gt 0 ]; then
+            icon="<fc=#68d391>●</fc>"
+            color="<fc=#68d391>"
+          else
+            icon="<fc=#68d391>○</fc>"
+            color="<fc=#68d391>"
+          fi
+        else
+          if [ "$window_count" -gt 0 ]; then
+            icon="<fc=#a0aec0>●</fc>"
+            color="<fc=#a0aec0>"
+          else
+            icon="<fc=#4a5568>○</fc>"
+            color="<fc=#4a5568>"
+          fi
+        fi
+        
+        # Add workspace to preview
+        if [ "$i" -eq 9 ]; then
+          ws_num="0"
+        else
+          ws_num="$((i+1))"
+        fi
+        
+        preview="$preview<action=\`xdotool key super+$ws_num\`>$icon $color$ws_num</fc>"
+        if [ -n "$window_titles" ]; then
+          preview="$preview <fc=#718096>($window_titles)</fc>"
+        fi
+        preview="$preview</action> "
+      done
+      
+      echo "$preview"
     '')
     
     # Custom omnibar script with explicit bash dependency
@@ -141,6 +209,18 @@
           ["workspace-8"]="xmonad-cmd workspace-8"
           ["workspace-9"]="xmonad-cmd workspace-9"
           ["workspace-10"]="xmonad-cmd workspace-10"
+          
+          # === SEND TO WORKSPACE ===
+          ["send-to-workspace-1"]="xmonad-cmd send-workspace-1"
+          ["send-to-workspace-2"]="xmonad-cmd send-workspace-2"
+          ["send-to-workspace-3"]="xmonad-cmd send-workspace-3"
+          ["send-to-workspace-4"]="xmonad-cmd send-workspace-4"
+          ["send-to-workspace-5"]="xmonad-cmd send-workspace-5"
+          ["send-to-workspace-6"]="xmonad-cmd send-workspace-6"
+          ["send-to-workspace-7"]="xmonad-cmd send-workspace-7"
+          ["send-to-workspace-8"]="xmonad-cmd send-workspace-8"
+          ["send-to-workspace-9"]="xmonad-cmd send-workspace-9"
+          ["send-to-workspace-10"]="xmonad-cmd send-workspace-10"
           
           # === WINDOW MANAGEMENT ===
           ["close-window"]="xmonad-cmd close-window"
@@ -225,6 +305,23 @@
           ["go to workspace 3"]="workspace-3"
           ["go to workspace 4"]="workspace-4"
           ["go to workspace 5"]="workspace-5"
+          
+          # === SEND TO WORKSPACE ALIASES ===
+          ["send window to workspace 1"]="send-to-workspace-1"
+          ["send window to workspace 2"]="send-to-workspace-2"
+          ["send window to workspace 3"]="send-to-workspace-3"
+          ["send window to workspace 4"]="send-to-workspace-4"
+          ["send window to workspace 5"]="send-to-workspace-5"
+          ["send window to workspace 6"]="send-to-workspace-6"
+          ["send window to workspace 7"]="send-to-workspace-7"
+          ["send window to workspace 8"]="send-to-workspace-8"
+          ["send window to workspace 9"]="send-to-workspace-9"
+          ["send window to workspace 10"]="send-to-workspace-10"
+          ["move window to workspace 1"]="send-to-workspace-1"
+          ["move window to workspace 2"]="send-to-workspace-2"
+          ["move window to workspace 3"]="send-to-workspace-3"
+          ["move window to workspace 4"]="send-to-workspace-4"
+          ["move window to workspace 5"]="send-to-workspace-5"
           
           # === WINDOW MANAGEMENT ===
           ["close window"]="close-window"

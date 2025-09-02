@@ -1,8 +1,8 @@
-Config { font = "xft:Monospace:size=10:antialias=true"
-       , bgColor = "#2d3748"
+Config { font = "xft:Monospace:size=11:antialias=true"
+       , bgColor = "#1a202c"
        , fgColor = "#e2e8f0"
        , position = TopW L 100
-       , lowerOnStart = True
+       , lowerOnStart = False
        , hideOnStart = False
        , allDesktops = True
        , overrideRedirect = True
@@ -10,8 +10,9 @@ Config { font = "xft:Monospace:size=10:antialias=true"
        , persistent = True
        , commands = [ Run Date "%a %b %d, %H:%M" "date" 10
                     , Run StdinReader
+                    , Run Com "workspace-preview" [] "workspace_preview" 2
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%StdinReader% }{ %date%"
+       , template = "%workspace_preview% }{ %StdinReader% }{ %date%"
        }

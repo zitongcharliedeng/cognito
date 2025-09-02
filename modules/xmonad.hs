@@ -12,6 +12,11 @@ import XMonad.Layout.Spacing
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
 import XMonad.Util.SpawnOnce
+import qualified XMonad.StackSet as W
+import XMonad.Layout.ToggleStruts
+import XMonad.Actions.CycleWS
+import XMonad.Actions.WindowGo
+import qualified Data.Map as M
 
 -- Main configuration
 main :: IO ()
@@ -25,6 +30,7 @@ main = xmonad $ docks def
   , manageHook = myManageHook
   , startupHook = myStartupHook
   , logHook = dynamicLogWithPP myPP
+  , mouseBindings = myMouseBindings
   } `additionalKeysP` myKeys
 
 -- Layout configuration
@@ -37,9 +43,10 @@ myLayout = avoidStruts $ spacing 4 $ tiled ||| Mirror tiled ||| Full
 
 -- Manage hook
 myManageHook = composeAll
-  [ className =? "firefox" --> doShift "2"
-  , className =? "thunar" --> doShift "3"
+  [ className =? "firefox" --> doShift "1"
+  , className =? "thunar" --> doShift "1"
   , className =? "kitty" --> doShift "1"
+  , className =? "gnome-control-center" --> doShift "1"
   ]
 
 -- Status bar configuration
@@ -65,4 +72,41 @@ myKeys =
   , ("M1-<Space>", spawn "cognito-omnibar")
   , ("M-S-c", kill)
   , ("M-S-q", spawn "xmonad --recompile && xmonad --restart")
+  , ("M-h", windows W.focusUp)
+  , ("M-l", windows W.focusDown)
+  , ("M-j", windows W.focusUp)
+  , ("M-k", windows W.focusDown)
+  , ("M-S-h", windows W.swapUp)
+  , ("M-S-l", windows W.swapDown)
+  , ("M-S-j", windows W.swapUp)
+  , ("M-S-k", windows W.swapDown)
+  , ("M-f", sendMessage ToggleStruts)
+  , ("M-S-<Return>", spawn "kitty")
+  , ("M-1", windows $ W.greedyView "1")
+  , ("M-2", windows $ W.greedyView "2")
+  , ("M-3", windows $ W.greedyView "3")
+  , ("M-4", windows $ W.greedyView "4")
+  , ("M-5", windows $ W.greedyView "5")
+  , ("M-6", windows $ W.greedyView "6")
+  , ("M-7", windows $ W.greedyView "7")
+  , ("M-8", windows $ W.greedyView "8")
+  , ("M-9", windows $ W.greedyView "9")
+  , ("M-0", windows $ W.greedyView "0")
+  , ("M-S-1", windows $ W.shift "1")
+  , ("M-S-2", windows $ W.shift "2")
+  , ("M-S-3", windows $ W.shift "3")
+  , ("M-S-4", windows $ W.shift "4")
+  , ("M-S-5", windows $ W.shift "5")
+  , ("M-S-6", windows $ W.shift "6")
+  , ("M-S-7", windows $ W.shift "7")
+  , ("M-S-8", windows $ W.shift "8")
+  , ("M-S-9", windows $ W.shift "9")
+  , ("M-S-0", windows $ W.shift "0")
+  ]
+
+-- Mouse bindings for window management
+myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList
+  [ ((modMask, button1), (\w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster))
+  , ((modMask, button2), (\w -> focus w >> windows W.shiftMaster))
+  , ((modMask, button3), (\w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster))
   ]

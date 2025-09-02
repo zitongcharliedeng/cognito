@@ -168,7 +168,7 @@ i.e.
 # Root user configuration
   users.users.root = {
     isNormalUser = false;
-    initialPassword = "root";
+    initialPassword = "root"; TODO find out why the root password is sometimes the same as the one from the NixOS install, but with a different username i.e. "root" instead of the OG nix username.
   };
 ```
 

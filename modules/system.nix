@@ -81,7 +81,6 @@
     bar {
         position top
         status_command i3status
-        tray_output primary
         font pango:monospace 10
     }
   '';

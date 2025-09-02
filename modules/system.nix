@@ -278,7 +278,7 @@
           # === CLIPBOARD ===
           "copy clipboard:xsel -o | xsel -i -b"
           "paste clipboard:xsel -b | xsel -i"
-          "clear clipboard:echo '' | xsel -i -b"
+          "clear clipboard:printf '' | xsel -i -b"
           
           # === TIME & DATE ===
           "show time:notify-send 'Time' \"\$(date '+%H:%M')\""

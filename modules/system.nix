@@ -135,51 +135,23 @@
       # Get current workspace (with fallback)
       current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
       
-      # Function to get app icon path based on window class
-      get_app_icon_path() {
+      # Function to get app icon based on window class (simplified for now)
+      get_app_icon() {
         local window_class="$1"
         case "$window_class" in
-          *[Ff]irefox*)
-            find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1
-            ;;
-          *[Cc]hrome*|*[Gg]oogle*)
-            find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1
-            ;;
-          *[Kk]itty*)
-            find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1
-            ;;
-          *[Tt]hunar*)
-            find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1
-            ;;
-          *[Vv]im*)
-            find /usr/share/pixmaps /usr/share/icons -name "*vim*" -type f 2>/dev/null | head -1
-            ;;
-          *[Oo]bs*)
-            find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1
-            ;;
-          *[Vv]lc*)
-            find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1
-            ;;
-          *[Ss]potify*)
-            find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1
-            ;;
-          *[Dd]iscord*)
-            find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1
-            ;;
-          *[Cc]ode*|*[Vv]s*)
-            find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1
-            ;;
-          *[Gg]imp*)
-            find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1
-            ;;
-          *[Gg]nome-control*)
-            find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1
-            ;;
-          *)
-            # Try to find generic icon based on class name
-            local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
-            find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1
-            ;;
+          *[Ff]irefox*) echo "🌐" ;;
+          *[Cc]hrome*|*[Gg]oogle*) echo "🌐" ;;
+          *[Kk]itty*) echo "💻" ;;
+          *[Tt]hunar*) echo "📁" ;;
+          *[Vv]im*) echo "📝" ;;
+          *[Oo]bs*) echo "📹" ;;
+          *[Vv]lc*) echo "🎬" ;;
+          *[Ss]potify*) echo "🎵" ;;
+          *[Dd]iscord*) echo "💬" ;;
+          *[Cc]ode*|*[Vv]s*) echo "⚡" ;;
+          *[Gg]imp*) echo "🎨" ;;
+          *[Gg]nome-control*) echo "⚙️" ;;
+          *) echo "📱" ;; # Default icon
         esac
       }
       
@@ -204,33 +176,36 @@
               if [ -n "$window_id" ]; then
                 window_class=$(get_window_class "$window_id")
                 if [ -n "$window_class" ]; then
-                  icon_path=$(get_app_icon_path "$window_class")
-                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
-                    # Use xmobar's image display capability
-                    app_icons="$app_icons<icon=$icon_path/>"
-                  else
-                    # Fallback to first letter of class name
-                    first_char=$(echo "$window_class" | cut -c1 | tr '[:lower:]' '[:upper:]')
-                    app_icons="$app_icons<fc=#a0aec0>$first_char</fc>"
-                  fi
+                  icon=$(get_app_icon "$window_class")
+                  app_icons="$app_icons$icon"
                 fi
               fi
             done <<< "$window_ids"
           fi
         fi
         
-        # Add workspace to preview
+        # Add workspace to preview with highlighting for current workspace
         if [ "$i" -eq 9 ]; then
           ws_num="0"
         else
           ws_num="$((i+1))"
         fi
         
-        # Format: workspace_number[icons]
-        if [ -n "$app_icons" ]; then
-          preview="$preview<action=\`xdotool key super+$ws_num\`>$ws_num[$app_icons]</action> "
+        # Highlight current workspace
+        if [ "$i" -eq "$current_ws" ]; then
+          # Current workspace - bold and highlighted
+          if [ -n "$app_icons" ]; then
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><b>$ws_num[$app_icons]</b></fc></action> "
+          else
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><b>$ws_num[]</b></fc></action> "
+          fi
         else
-          preview="$preview<action=\`xdotool key super+$ws_num\`>$ws_num[]</action> "
+          # Other workspaces - normal
+          if [ -n "$app_icons" ]; then
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#a0aec0>$ws_num[$app_icons]</fc></action> "
+          else
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#4a5568>$ws_num[]</fc></action> "
+          fi
         fi
       done
       
@@ -319,6 +294,7 @@
           # === XMONAD CONTROL ===
           ["reload-config"]="xmonad --recompile && xmonad --restart"
           ["restart-xmonad"]="xmonad --restart"
+          ["restart-status-bar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
           
           # === TIME & DATE ===
           ["time"]="notify-send 'Time' \"\$(date '+%H:%M')\""
@@ -333,6 +309,8 @@
           ["test-firefox"]="firefox"
           ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
           ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
+          ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
+          ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -435,6 +413,8 @@
           ["restart xmonad"]="restart-xmonad"
           ["reload xmonad"]="restart-xmonad"
           ["restart window manager"]="restart-xmonad"
+          ["restart status bar"]="restart-status-bar"
+          ["restart xmobar"]="restart-status-bar"
           
           # === TIME & DATE ALIASES ===
           ["what time is it"]="time"

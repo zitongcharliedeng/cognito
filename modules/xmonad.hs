@@ -16,10 +16,11 @@ import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS
 import XMonad.Actions.WindowGo
 import qualified Data.Map as M
+import XMonad.Hooks.EwmhDesktops
 
 -- Main configuration
 main :: IO ()
-main = xmonad $ docks def
+main = xmonad $ ewmh $ docks def
   { modMask = mod4Mask  -- Use Super key as mod
   , terminal = "kitty"
   , borderWidth = 2
@@ -63,7 +64,7 @@ myPP = def
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
-  spawnOnce "xmobar /etc/xmobar/xmobarrc"
+  spawnOnce "sleep 2 && xmobar /etc/xmobar/xmobarrc"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =
@@ -81,6 +82,7 @@ myKeys =
   , ("M-S-k", windows W.swapDown)
   , ("M-f", spawn "notify-send 'Fullscreen' 'Fullscreen toggle not yet implemented'")
   , ("M-S-<Return>", spawn "kitty")
+  , ("M-S-x", spawn "pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &")
   , ("M-1", windows $ W.greedyView "1")
   , ("M-2", windows $ W.greedyView "2")
   , ("M-3", windows $ W.greedyView "3")

@@ -29,15 +29,8 @@
   # Graphical login
   services.xserver.displayManager.lightdm.enable = true;
   
-  # LightDM configuration to auto-fill username as root
-  services.xserver.displayManager.lightdm.settings = {
-    SeatDefaults = {
-      greeter-hide-users = false;
-      user-session = "i3";
-      default-user = "root";
-      greeter-setup-script = "echo 'root' > /tmp/lightdm-username";
-    };
-  };
+  # LightDM basic configuration TODO autofill the root username
+  services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
   
   services.xserver.windowManager.i3 = {
     enable = true;

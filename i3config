@@ -32,8 +32,5 @@ mouse_warping output
 # Workspace behavior
 workspace_auto_back_and_forth yes
 
-# Status bar with i3status
-bar {
-    status_command i3status
-    position top
-}
+# Status bar configuration moved to i3status config file
+# The bar will be automatically created by i3status

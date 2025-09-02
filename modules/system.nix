@@ -88,11 +88,7 @@
     # Workspace behavior
     workspace_auto_back_and_forth yes
 
-    # Bar configuration
-    bar {
-        position top
-        status_command i3status
-    }
+    # No bar configuration - let i3 use defaults
   '';
 
   # Create Apple-style omnibar script
@@ -175,47 +171,9 @@
     fi
   '';
 
-  # Create custom i3status config with omnibar hint
-  environment.etc."i3status.conf".text = ''
-    general {
-        colors = true
-        interval = 5
-    }
-
-    order += "omnibar_hint"
-    order += "disk /"
-    order += "load"
-    order += "memory"
-    order += "tztime local"
-
-    omnibar_hint {
-        format = "🔍 Meta+Space for Omnibar"
-        color = "#007acc"
-    }
-
-    disk "/" {
-        format = "💾 %avail"
-    }
-
-    load {
-        format = "⚡ %1min"
-    }
-
-    memory {
-        format = "🧠 %used/%total"
-        threshold_degraded = "1G"
-        format_degraded = "🧠 %free"
-    }
-
-    tztime local {
-        format = "🕐 %Y-%m-%d %H:%M:%S"
-    }
-  '';
-
   # Make omnibar executable and create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
-    "L+ /root/.config/i3status/config - - - - /etc/i3status.conf"
     "L+ /usr/local/bin/cognito-omnibar - - - - /etc/cognito/omnibar.sh"
   ];
 }

@@ -290,6 +290,7 @@
           "test kitty:kitty"
           "test firefox:firefox"
           "test echo:echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
+          "test touch:touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
       )
       
       # Show commands with rofi
@@ -301,8 +302,12 @@
               echo "Executing: $cmd"
               # Log to a file for debugging
               echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
-              # Execute command directly in the current shell context
+              # Try multiple execution methods
+              echo "Trying direct execution: $cmd" >> /tmp/cognito-omnibar.log
+              # Method 1: Direct execution
               "$cmd" &
+              # Method 2: Via awesome-client as backup
+              awesome-client "awful.spawn('$cmd')" 2>/dev/null &
           fi
       else
           echo "Rofi not found"

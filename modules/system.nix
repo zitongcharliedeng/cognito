@@ -23,7 +23,7 @@
   };
   
   # ============================================================================
-  # DISPLAY MANAGER - i3 + Cognito Omnibar
+  # DISPLAY MANAGER - Awesome WM + Cognito Omnibar
   # ============================================================================
   
   # Graphical login
@@ -32,34 +32,120 @@
   # LightDM basic configuration TODO autofill the root username
   services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
   
-  # Set i3 as the default session (NixOS way)
-  services.xserver.displayManager.defaultSession = "none+i3";
+  # Set Awesome as the default session (NixOS way)
+  services.xserver.displayManager.defaultSession = "none+awesome";
   
 
 
-  # Required for i3status/i3blocks to work properly (from NixOS docs)
-  environment.pathsToLink = [ "/libexec" ];
+  # Enable Awesome WM
+  services.xserver.windowManager.awesome.enable = true;
   
-  # Enable i3lock (from NixOS docs)
-  programs.i3lock.enable = true;
-  
-  # Create minimal Polybar configuration
+  # Create Awesome WM configuration directory and file
   systemd.tmpfiles.rules = [
-    "d /root/.config/polybar 0755 root root -"
-    "L+ /root/.config/polybar/config.ini - - - - ${pkgs.writeText "polybar-minimal" ''
-      [bar/top]
-      width = 100%
-      height = 30
-      background = #000000
-      foreground = #ffffff
+    "d /root/.config/awesome 0755 root root -"
+    "L+ /root/.config/awesome/rc.lua - - - - ${pkgs.writeText "awesome-config" ''
+      -- Cognito OS Awesome WM Configuration
+      -- Migrated from i3 due to bar customization issues with i3 migration script
+      -- Zero keyboard shortcuts - all actions via rofi omnibar
       
-      modules-left = i3
+      local awful = require("awful")
+      local beautiful = require("beautiful")
+      local gears = require("gears")
+      local wibox = require("wibox")
       
-      [module/i3]
-      type = internal/i3
-      format = <label-state>
-      label-focused = %index%
-      label-unfocused = %index%
+      -- Initialize theme
+      beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
+      
+      -- Set wallpaper
+      awful.spawn.with_shell("feh --bg-scale /usr/share/pixmaps/nixos-logo.png")
+      
+      -- Create top status bar
+      local mywibox = awful.wibar({ position = "top", height = 30 })
+      
+      -- Add widgets to the wibox
+      mywibox:setup {
+          layout = wibox.layout.align.horizontal,
+          { -- Left widgets
+              layout = wibox.layout.fixed.horizontal,
+              awful.widget.taglist {
+                  screen  = screen[1],
+                  filter  = awful.widget.taglist.filter.all,
+                  buttons = {},
+              },
+          },
+          { -- Middle widget
+              layout = wibox.layout.flex.horizontal,
+          },
+          { -- Right widgets
+              layout = wibox.layout.fixed.horizontal,
+              wibox.widget.systray(),
+              wibox.widget.textclock(),
+          },
+      }
+      
+      -- Global key bindings (minimal - just for essential functions)
+      local globalkeys = gears.table.join(
+          -- Launch omnibar with Meta+Space
+          awful.key({ "Mod4" }, "space", function() awful.spawn("cognito-omnibar") end,
+                    {description = "Launch Cognito Omnibar", group = "launcher"}),
+          -- Launch omnibar with Alt+Space (alternative)
+          awful.key({ "Mod1" }, "space", function() awful.spawn("cognito-omnibar") end,
+                    {description = "Launch Cognito Omnibar (Alt)", group = "launcher"}),
+          -- Reload config
+          awful.key({ "Mod4", "Control" }, "r", awesome.restart,
+                    {description = "reload awesome", group = "awesome"}),
+          -- Quit awesome
+          awful.key({ "Mod4", "Shift" }, "q", awesome.quit,
+                    {description = "quit awesome", group = "awesome"})
+      )
+      
+      -- Set root keys
+      root.keys(globalkeys)
+      
+      -- Client key bindings (minimal)
+      local clientkeys = gears.table.join(
+          -- Close window
+          awful.key({ "Mod4", "Shift" }, "c", function (c) c:kill() end,
+                    {description = "close", group = "client"})
+      )
+      
+      -- Client buttons (minimal)
+      local clientbuttons = gears.table.join(
+          awful.button({ }, 1, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) end),
+          awful.button({ "Mod4" }, 1, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) awful.mouse.client.move(c) end),
+          awful.button({ "Mod4" }, 3, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) awful.mouse.client.resize(c) end)
+      )
+      
+      -- Set client keys and buttons
+      root.buttons(gears.table.join())
+      
+      -- Rules for new clients
+      awful.rules.rules = {
+          { rule = { }, properties = { border_width = beautiful.border_width,
+                                     border_color = beautiful.border_normal,
+                                     focus = awful.client.focus.filter,
+                                     raise = true,
+                                     keys = clientkeys,
+                                     buttons = clientbuttons,
+                                     screen = awful.screen.preferred,
+                                     placement = awful.placement.no_overlap+awful.placement.no_offscreen
+          }},
+      }
+      
+      -- Signal function to execute when a new client appears
+      client.connect_signal("manage", function (c)
+          if awesome.startup and not c.size_hints.user_position and not c.size_hints.program_position then
+              awful.placement.no_offscreen(c)
+          end
+      end)
+      
+      -- Enable sloppy focus, so that focus follows mouse
+      client.connect_signal("mouse::enter", function(c)
+          c:emit_signal("request::activate", "mouse_enter", {raise = false})
+      end)
+      
+      -- Auto-start applications
+      awful.spawn.with_shell("kitty")
     ''}"
   ];
 
@@ -105,53 +191,53 @@
           "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
           
           # === WORKSPACES (1-10) ===
-          "workspace 1:i3-msg workspace 1"
-          "workspace 2:i3-msg workspace 2"
-          "workspace 3:i3-msg workspace 3"
-          "workspace 4:i3-msg workspace 4"
-          "workspace 5:i3-msg workspace 5"
-          "workspace 6:i3-msg workspace 6"
-          "workspace 7:i3-msg workspace 7"
-          "workspace 8:i3-msg workspace 8"
-          "workspace 9:i3-msg workspace 9"
-          "workspace 10:i3-msg workspace 10"
-          "go to workspace 1:i3-msg workspace 1"
-          "go to workspace 2:i3-msg workspace 2"
-          "go to workspace 3:i3-msg workspace 3"
-          "go to workspace 4:i3-msg workspace 4"
-          "go to workspace 5:i3-msg workspace 5"
+          "workspace 1:awesome-client 'awful.tag.viewonly(tags[1][1])'"
+          "workspace 2:awesome-client 'awful.tag.viewonly(tags[1][2])'"
+          "workspace 3:awesome-client 'awful.tag.viewonly(tags[1][3])'"
+          "workspace 4:awesome-client 'awful.tag.viewonly(tags[1][4])'"
+          "workspace 5:awesome-client 'awful.tag.viewonly(tags[1][5])'"
+          "workspace 6:awesome-client 'awful.tag.viewonly(tags[1][6])'"
+          "workspace 7:awesome-client 'awful.tag.viewonly(tags[1][7])'"
+          "workspace 8:awesome-client 'awful.tag.viewonly(tags[1][8])'"
+          "workspace 9:awesome-client 'awful.tag.viewonly(tags[1][9])'"
+          "workspace 10:awesome-client 'awful.tag.viewonly(tags[1][10])'"
+          "go to workspace 1:awesome-client 'awful.tag.viewonly(tags[1][1])'"
+          "go to workspace 2:awesome-client 'awful.tag.viewonly(tags[1][2])'"
+          "go to workspace 3:awesome-client 'awful.tag.viewonly(tags[1][3])'"
+          "go to workspace 4:awesome-client 'awful.tag.viewonly(tags[1][4])'"
+          "go to workspace 5:awesome-client 'awful.tag.viewonly(tags[1][5])'"
           
           # === WINDOW MANAGEMENT ===
-          "close window:i3-msg kill"
-          "close this window:i3-msg kill"
-          "quit window:i3-msg kill"
-          "split horizontal:i3-msg split h"
-          "split vertical:i3-msg split v"
-          "split horizontally:i3-msg split h"
-          "split vertically:i3-msg split v"
-          "fullscreen:i3-msg fullscreen toggle"
-          "toggle fullscreen:i3-msg fullscreen toggle"
-          "floating window:i3-msg floating toggle"
-          "toggle floating:i3-msg floating toggle"
-          "maximize window:i3-msg fullscreen toggle"
+          "close window:awesome-client 'client.focus:kill()'"
+          "close this window:awesome-client 'client.focus:kill()'"
+          "quit window:awesome-client 'client.focus:kill()'"
+          "split horizontal:awesome-client 'awful.client.setmaster(client.focus)'"
+          "split vertical:awesome-client 'awful.client.setslave(client.focus)'"
+          "split horizontally:awesome-client 'awful.client.setmaster(client.focus)'"
+          "split vertically:awesome-client 'awful.client.setslave(client.focus)'"
+          "fullscreen:awesome-client 'client.focus.fullscreen = not client.focus.fullscreen'"
+          "toggle fullscreen:awesome-client 'client.focus.fullscreen = not client.focus.fullscreen'"
+          "floating window:awesome-client 'client.focus.floating = not client.focus.floating'"
+          "toggle floating:awesome-client 'client.focus.floating = not client.focus.floating'"
+          "maximize window:awesome-client 'client.focus.maximized = not client.focus.maximized'"
           
           # === FOCUS & MOVE ===
-          "focus window left:i3-msg focus left"
-          "focus window right:i3-msg focus right"
-          "focus window up:i3-msg focus up"
-          "focus window down:i3-msg focus down"
-          "move window left:i3-msg move left"
-          "move window right:i3-msg move right"
-          "move window up:i3-msg move up"
-          "move window down:i3-msg move down"
+          "focus window left:awesome-client 'awful.client.focus.bydirection(\"left\")'"
+          "focus window right:awesome-client 'awful.client.focus.bydirection(\"right\")'"
+          "focus window up:awesome-client 'awful.client.focus.bydirection(\"up\")'"
+          "focus window down:awesome-client 'awful.client.focus.bydirection(\"down\")'"
+          "move window left:awesome-client 'awful.client.swap.bydirection(\"left\")'"
+          "move window right:awesome-client 'awful.client.swap.bydirection(\"right\")'"
+          "move window up:awesome-client 'awful.client.swap.bydirection(\"up\")'"
+          "move window down:awesome-client 'awful.client.swap.bydirection(\"down\")'"
           
           # === LAYOUTS ===
-          "layout stacking:i3-msg layout stacking"
-          "layout tabbed:i3-msg layout tabbed"
-          "layout toggle:i3-msg layout toggle split"
-          "stacking layout:i3-msg layout stacking"
-          "tabbed layout:i3-msg layout tabbed"
-          "tile layout:i3-msg layout toggle split"
+          "layout stacking:awesome-client 'awful.layout.set(awful.layout.suit.stack)'"
+          "layout tabbed:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
+          "layout toggle:awesome-client 'awful.layout.inc(1)'"
+          "stacking layout:awesome-client 'awful.layout.set(awful.layout.suit.stack)'"
+          "tabbed layout:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
+          "tile layout:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
           
           # === SYSTEM CONTROL ===
           "shutdown:systemctl poweroff"
@@ -159,11 +245,11 @@
           "power off:systemctl poweroff"
           "reboot:systemctl reboot"
           "restart:systemctl reboot"
-          "logout:i3-msg exit"
-          "log out:i3-msg exit"
-          "exit i3:i3-msg exit"
-          "lock screen:i3lock"
-          "lock:i3lock"
+          "logout:awesome-client 'awesome.quit()'"
+          "log out:awesome-client 'awesome.quit()'"
+          "exit awesome:awesome-client 'awesome.quit()'"
+          "lock screen:awesome-client 'awful.spawn(\"i3lock\")'"
+          "lock:awesome-client 'awful.spawn(\"i3lock\")'"
           
           # === VOLUME CONTROL ===
           "volume up:amixer set Master 5%+"
@@ -181,11 +267,11 @@
           "brightness min:brightnessctl set 10%"
           "brightness 50:brightnessctl set 50%"
           
-          # === i3 CONTROL ===
-          "reload config:i3-msg reload"
-          "restart i3:i3-msg restart"
-          "reload i3:i3-msg reload"
-          "restart window manager:i3-msg restart"
+          # === AWESOME CONTROL ===
+          "reload config:awesome-client 'awesome.restart()'"
+          "restart awesome:awesome-client 'awesome.restart()'"
+          "reload awesome:awesome-client 'awesome.restart()'"
+          "restart window manager:awesome-client 'awesome.restart()'"
           
           # === DEBUG & TEST ===
           "debug:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
@@ -208,74 +294,5 @@
     '')
   ];
 
-  # i3 configuration using the working example pattern
-  services.xserver.windowManager.i3 = {
-    enable = true;
-    package = pkgs.i3-gaps;  # Use i3-gaps like the working example
-    extraPackages = with pkgs; [
-      rofi      # Apple-like omnibar launcher
-      polybar   # Popular status bar (replaces i3's built-in bar)
-      i3lock    # lock screen
-    ];
-    
-    # Main i3 config (including bar configuration)
-    configFile = pkgs.writeText "i3config" ''
-      # Cognito OS i3 Configuration - Apple-style Omnibar Interface
-      # Single keyboard shortcut (Meta+Space) launches omnibar from anywhere
 
-      # Font for window titles
-      font pango:monospace 10
-
-      # Start XDG autostart .desktop files
-      exec --no-startup-id dex --autostart --environment i3
-
-      # Essential services
-      exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-      exec --no-startup-id nm-applet
-
-      # Auto-open terminal for debugging
-      exec --no-startup-id kitty
-
-      # Use Mouse+$mod to drag floating windows to their wanted position
-      floating_modifier Mod4
-
-      # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar (like Apple Spotlight)
-      bindsym Mod4+space exec cognito-omnibar
-      bindsym Mod1+space exec cognito-omnibar
-
-      # Window behavior
-      new_window normal 1
-      new_float normal
-
-      # Focus behavior
-      focus_follows_mouse no
-      mouse_warping output
-
-      # Workspace behavior
-      workspace_auto_back_and_forth yes
-
-      # Window borders and gaps
-      default_border pixel 3
-      default_floating_border pixel 3
-
-      # NOTE: We're using Polybar instead of i3's built-in bar because:
-      # 1. i3's migration script fails on "position top" syntax
-      # 2. The following bar config causes migration script errors:
-      #    bar {
-      #        status_command i3status
-      #        position top
-      #    }
-      # 3. Polybar handles positioning independently and is more popular
-      # 4. No bar block = i3's built-in bar is disabled by default
-      
-      # Explicitly disable i3's built-in bar (no status_command to avoid migration errors)
-      bar {
-          mode hide
-          hidden_state hide
-      }
-      
-      # Launch Polybar with configuration file
-      exec --no-startup-id polybar --config=/root/.config/polybar/config.ini top
-    '';
-  };
 }

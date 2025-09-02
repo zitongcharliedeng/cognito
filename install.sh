@@ -101,7 +101,7 @@ build_system() {
   }
   
   echo "Building system..."
-  sudo nixos-rebuild switch --flake ".#$HOSTNAME"
+  sudo nixos-rebuild switch --flake .#${HOSTNAME}
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
   echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
 }

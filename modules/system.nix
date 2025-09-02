@@ -103,93 +103,30 @@
     # No bar configuration - let i3 use defaults
   '';
 
-  # Create Apple-style omnibar script (executable)
+  # Create simple test omnibar script using writeScriptBin
   environment.etc."cognito/omnibar.sh".source = pkgs.writeScriptBin "cognito-omnibar" ''
     #!/bin/bash
-    # Cognito OS Omnibar - Apple Spotlight-style interface for i3
-    # Launch with Meta+Space from anywhere, or click the status bar
-
-    # Commands database with categories and descriptions
-    declare -A commands=(
-        # Terminal & Apps
-        ["new terminal"]="kitty"
-        ["open terminal"]="kitty"
-        ["terminal"]="kitty"
-        ["file manager"]="thunar"
-        ["web browser"]="firefox"
-        ["text editor"]="vim"
-        ["settings"]="gnome-control-center"
-        
-        # Workspaces
-        ["workspace 1"]="i3-msg workspace 1"
-        ["workspace 2"]="i3-msg workspace 2"
-        ["workspace 3"]="i3-msg workspace 3"
-        ["workspace 4"]="i3-msg workspace 4"
-        ["workspace 5"]="i3-msg workspace 5"
-        ["workspace 6"]="i3-msg workspace 6"
-        ["workspace 7"]="i3-msg workspace 7"
-        ["workspace 8"]="i3-msg workspace 8"
-        ["workspace 9"]="i3-msg workspace 9"
-        ["workspace 10"]="i3-msg workspace 10"
-        
-        # Window Management
-        ["close window"]="i3-msg kill"
-        ["close this window"]="i3-msg kill"
-        ["quit window"]="i3-msg kill"
-        ["split horizontal"]="i3-msg split h"
-        ["split vertical"]="i3-msg split v"
-        ["split horizontally"]="i3-msg split h"
-        ["split vertically"]="i3-msg split v"
-        ["fullscreen"]="i3-msg fullscreen toggle"
-        ["toggle fullscreen"]="i3-msg fullscreen toggle"
-        ["floating window"]="i3-msg floating toggle"
-        ["toggle floating"]="i3-msg floating toggle"
-        
-        # Focus & Move
-        ["focus left"]="i3-msg focus left"
-        ["focus right"]="i3-msg focus right"
-        ["focus up"]="i3-msg focus up"
-        ["focus down"]="i3-msg focus down"
-        ["move left"]="i3-msg move left"
-        ["move right"]="i3-msg move right"
-        ["move up"]="i3-msg move up"
-        ["move down"]="i3-msg move down"
-        
-        # Layouts
-        ["layout stacking"]="i3-msg layout stacking"
-        ["layout tabbed"]="i3-msg layout tabbed"
-        ["layout toggle"]="i3-msg layout toggle split"
-        
-        # System
-        ["reload config"]="i3-msg reload"
-        ["restart i3"]="i3-msg restart"
-        ["exit i3"]="i3-msg exit"
-        ["lock screen"]="i3lock"
-        ["screenshot"]="scrot"
-        
-        # Debug commands
-        ["debug omnibar"]="echo 'Omnibar is working!' && notify-send 'Omnibar Debug' 'Command executed successfully!'"
-        ["test command"]="notify-send 'Test' 'This is a test notification'"
-        ["check path"]="which cognito-omnibar && echo 'Found at:' && which cognito-omnibar"
+    
+    # Simple test commands
+    commands=(
+        "new terminal:kitty"
+        "file manager:thunar"
+        "web browser:firefox"
+        "test rofi:rofi -dmenu -i -p 'Test'"
+        "debug:echo 'Omnibar working!'"
     )
-
-    # Create a more Apple-like interface with rofi (if available) or dmenu
+    
+    # Show commands with rofi
     if command -v rofi >/dev/null 2>&1; then
-        # Use rofi for a more polished Apple-like interface
-        input=$(printf '%s\n' "''${!commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 50 -lines 15)
-
+        input=$(printf '%s\n' "''${commands[@]}" | rofi -dmenu -i -p "🔍 Test Omnibar")
+        
+        if [[ -n "$input" ]]; then
+            cmd=$(echo "$input" | cut -d: -f2)
+            echo "Executing: $cmd"
+            eval "$cmd"
+        fi
     else
-        # Fallback to dmenu with better styling
-        input=$(printf '%s\n' "''${!commands[@]}" | dmenu -i -p "🔍 Cognito Omnibar: " -l 15 -fn "monospace:size=12" -nb "#2d2d2d" -nf "#ffffff" -sb "#007acc" -sf "#ffffff")
-    fi
-
-    # Execute the command if found
-    if [[ -n "$input" && -n "''${commands[$input]}" ]]; then
-        echo "Executing: ''${commands[$input]}"
-        eval "''${commands[$input]}"
-    else
-        echo "No command found for: $input"
-        notify-send "Omnibar Error" "Command not found: $input"
+        echo "Rofi not found"
     fi
   '';
 

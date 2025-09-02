@@ -35,14 +35,7 @@
   # Set i3 as the default session (NixOS way)
   services.xserver.displayManager.defaultSession = "none+i3";
   
-  services.xserver.windowManager.i3 = {
-    enable = true;
-    extraPackages = with pkgs; [
-      rofi      # Apple-like omnibar launcher
-      i3status  # status bar
-      i3lock    # lock screen
-    ];
-  };
+
 
   # Required for i3status/i3blocks to work properly (from NixOS docs)
   environment.pathsToLink = [ "/libexec" ];

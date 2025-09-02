@@ -238,11 +238,13 @@
       default_border pixel 3
       default_floating_border pixel 3
 
-      # Status bar configuration (must be in main config since no separate bar option exists)
-      bar {
-          status_command i3status
-          position top
-      }
+      # Status bar configuration (v4 bars array syntax)
+      bars = [
+        {
+          statusCommand = "i3status";
+          position = "top";
+        }
+      ];
     '';
   };
 }

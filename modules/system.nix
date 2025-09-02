@@ -45,8 +45,21 @@
       ExecStart = "${pkgs.xmobar}/bin/xmobar /etc/xmobar/xmobarrc";
       Restart = "always";
       RestartSec = 5;
+      Environment = "DISPLAY=:0";
     };
   };
+  
+  # Alternative: Create desktop entry for xmobar
+  environment.etc."xdg/autostart/xmobar.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Xmobar
+    Comment=Status bar for XMonad
+    Exec=xmobar /etc/xmobar/xmobarrc
+    Hidden=false
+    NoDisplay=false
+    X-GNOME-Autostart-enabled=true
+  '';
   
 
 
@@ -241,11 +254,11 @@
         
         # Highlight current workspace
         if [ "$i" -eq "$current_ws" ]; then
-          # Current workspace - bold and highlighted
+          # Current workspace - highlighted with underline
           if [ -n "$app_icons" ]; then
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><b>$ws_num[$app_icons]</b></fc></action> "
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><fn=2>$ws_num[$app_icons]</fn></fc></action> "
           else
-            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><b>$ws_num[]</b></fc></action> "
+            preview="$preview<action=\`xdotool key super+$ws_num\`><fc=#68d391><fn=2>$ws_num[]</fn></fc></action> "
           fi
         else
           # Other workspaces - normal
@@ -357,8 +370,11 @@
           ["test-firefox"]="firefox"
           ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
           ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
+          ["test-xmobar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
           ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
           ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
+          ["debug-kitty-icon"]="find /usr/share/pixmaps /usr/share/icons -name '*kitty*' -type f 2>/dev/null | head -5 > /tmp/kitty-icons.txt && notify-send 'Debug' 'Kitty icons saved to /tmp/kitty-icons.txt'"
+          ["test-xmobar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
       )
       
       # === COMMAND ALIASES (Many-to-One Mapping) ===
@@ -478,6 +494,9 @@
           ["test firefox"]="test-firefox"
           ["test echo"]="test-echo"
           ["test touch"]="test-touch"
+          ["test xmobar"]="test-xmobar"
+          ["launch xmobar"]="test-xmobar"
+          ["start xmobar"]="test-xmobar"
       )
       
       # Screenshot commands (complex, so defined separately)

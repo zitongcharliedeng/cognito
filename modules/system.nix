@@ -218,7 +218,7 @@
                   if [ -f "$icon_result" ]; then
                     # Extract app name from icon path for display (xmobar doesn't support <icon> tags)
                     # e.g., /path/to/firefox.svg -> F, /path/to/kitty.svg -> K
-                    local app_name=$(basename "$icon_result" .svg | cut -c1 | tr '[:lower:]' '[:upper:]')
+                    app_name=$(basename "$icon_result" .svg | cut -c1 | tr '[:lower:]' '[:upper:]')
                     app_icons="$app_icons<fc=#68d391>$app_name</fc>"
                   else
                     # Display first letter fallback

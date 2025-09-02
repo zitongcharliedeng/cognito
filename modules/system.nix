@@ -34,6 +34,7 @@
     "d /root/.config/xmobar 0755 root root -"
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
+  environment.etc."polybar/config.ini".text = builtins.readFile ./scripts/polybar-config.ini;
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)
@@ -55,7 +56,7 @@
     rofi      # application launcher for omnibar
     xdotool   # X11 automation tool for omnibar commands
     xsel      # clipboard utility for XMonad commands
-    xmobar    # status bar for XMonad
+    polybar   # modern status bar for XMonad
     wmctrl    # for window management and workspace info
 
     # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent
@@ -63,6 +64,9 @@
     
     # Workspace preview script for xmobar (real app icons)
     (pkgs.writeScriptBin "workspace-preview" (builtins.readFile ./scripts/workspace-preview.sh))
+    
+    # Workspace preview script for polybar
+    (pkgs.writeScriptBin "workspace-preview-polybar" (builtins.readFile ./scripts/workspace-preview-polybar.sh))
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" (builtins.readFile ./scripts/cognito-omnibar.sh))

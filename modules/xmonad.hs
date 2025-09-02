@@ -31,7 +31,7 @@ main = xmonad $ ewmh $ docks def
   , layoutHook = myLayout
   , manageHook = myManageHook
   , startupHook = myStartupHook
-  , logHook = myLogHook
+  , logHook = dynamicLogWithPP myPP
   , mouseBindings = myMouseBindings
   , workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]  -- Explicitly define 10 workspaces (1-10)
   } `additionalKeysP` myKeys
@@ -75,8 +75,7 @@ myLogHook = do
 myStartupHook = do
   spawnOnce "feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'"
   spawnOnce "kitty"
-  spawnOnce "mkfifo /tmp/xmobar-input 2>/dev/null || true"
-  spawnOnce "xmobar /etc/xmobar/xmobarrc < /tmp/xmobar-input &"
+  spawnOnce "sleep 3 && xmobar /etc/xmobar/xmobarrc &"
 
 -- Key bindings (minimal - just for omnibar)
 myKeys =

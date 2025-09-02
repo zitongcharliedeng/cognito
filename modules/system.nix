@@ -77,15 +77,12 @@
     # SINGLE KEYBOARD SHORTCUT - Meta+Space launches omnibar (like Apple Spotlight)
     bindsym Mod4+space exec cognito-omnibar
 
-    # Start i3bar with clickable omnibar launcher
+    # Start i3bar with omnibar hint
     bar {
         position top
         status_command i3status
         tray_output primary
         font pango:monospace 10
-        
-        # Make the bar clickable to launch omnibar
-        bindsym button1 exec cognito-omnibar
     }
   '';
 

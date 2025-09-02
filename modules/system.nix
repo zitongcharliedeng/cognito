@@ -59,9 +59,9 @@
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
     
-    # Custom omnibar script
+    # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" ''
-      #!/bin/bash
+      #!${pkgs.bash}/bin/bash
       
       # Simple test commands
       commands=(

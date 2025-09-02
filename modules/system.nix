@@ -44,7 +44,8 @@
   programs.steam.enable = true;
   programs.steam.gamescopeSession.enable = true;
   programs.gamemode.enable = true;
-
+  # Allow unfree packages (needed for Steam, etc.)
+  nixpkgs.config.allowUnfree = true;
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)

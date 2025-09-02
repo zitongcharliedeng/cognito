@@ -29,17 +29,6 @@
     config = builtins.readFile ./scripts/xmonad.hs;
   };
   
-  # Ensure XMonad session is properly registered
-  services.xserver.displayManager.session = [
-    {
-      name = "xmonad";
-      start = ''
-        ${pkgs.xmonad}/bin/xmonad &
-        waitPID=$!
-      '';
-    }
-  ];
-  
   # Create configuration for xmobar, the status bar for XMonad
   systemd.tmpfiles.rules = [
     "d /root/.config/xmobar 0755 root root -"
@@ -47,11 +36,11 @@
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
   # Gaming:
-  programs.steam.enable = true;
-  programs.steam.gamescopeSession.enable = true;
-  programs.gamemode.enable = true;
-  # Allow unfree packages (needed for Steam, etc.)
-  nixpkgs.config.allowUnfree = true;
+  # programs.steam.enable = true;
+  # programs.steam.gamescopeSession.enable = true;
+  # programs.gamemode.enable = true;
+  # # Allow unfree packages (needed for Steam, etc.)
+  # nixpkgs.config.allowUnfree = true;
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)

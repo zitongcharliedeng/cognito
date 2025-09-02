@@ -11,7 +11,6 @@ import XMonad.Hooks.StatusBar.PP
 import XMonad.Layout.Spacing
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
-import XMonad.Util.UngrabMouse
 import XMonad.Util.SpawnOnce
 
 -- Main configuration

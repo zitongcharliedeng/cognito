@@ -1,0 +1,18 @@
+# i3status configuration file for Cognito OS
+general {
+    output_format = "i3bar"
+    colors = true
+    interval = 5
+}
+
+order += "omnibar_hint"
+order += "tztime local"
+
+omnibar_hint {
+    format = "🔍 Meta+Space for Omnibar"
+    color = "#007acc"
+}
+
+tztime local {
+    format = "%H:%M:%S"
+}

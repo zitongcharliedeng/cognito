@@ -193,73 +193,14 @@
   # COGNITO OMNIBAR CONFIGURATION
   # ============================================================================
 
-  # Generate i3 config with Apple-style omnibar
-  environment.etc."i3/config".text = ''
-    # Cognito OS i3 Configuration - Apple-style Omnibar Interface
-    # Single keyboard shortcut (Meta+Space) launches omnibar from anywhere
 
-    # Font for window titles and bar
-    font pango:monospace 10
 
-    # Start XDG autostart .desktop files
-    exec --no-startup-id dex --autostart --environment i3
-
-    # Essential services
-    exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-    exec --no-startup-id nm-applet
-    
-    # Auto-open terminal for debugging
-    exec --no-startup-id kitty
-
-    # Use Mouse+$mod to drag floating windows to their wanted position
-    floating_modifier Mod4
-
-    # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar (like Apple Spotlight)
-    bindsym Mod4+space exec cognito-omnibar
-    bindsym Mod1+space exec cognito-omnibar
-
-    # Window behavior
-    new_window normal 1
-    new_float normal
-
-    # Focus behavior
-    focus_follows_mouse no
-    mouse_warping output
-
-    # Workspace behavior
-    workspace_auto_back_and_forth yes
-
-    # Status bar with i3status
-    bar {
-        position top
-        status_command i3status
-    }
-  '';
-
-  # Create i3status configuration with omnibar hint
-  environment.etc."i3status.conf".text = ''
-    general {
-        output_format = "i3bar"
-        colors = true
-        interval = 5
-    }
-
-    order += "omnibar_hint"
-    order += "tztime local"
-
-    omnibar_hint {
-        format = "🔍 Meta+Space for Omnibar"
-        color = "#007acc"
-    }
-
-    tztime local {
-        format = "%H:%M:%S"
-    }
-  '';
-
-  # Create config symlinks
+  # Create config symlinks (like your friend's approach)
+  # NOTE: We can't define i3/i3status configs directly in the NixOS configuration
+  # because the i3 migration script fails to handle bar blocks and other directives.
+  # Instead, we create separate config files and symlink them to avoid migration issues.
   systemd.tmpfiles.rules = [
-    "L+ /root/.config/i3/config - - - - /etc/i3/config"
-    "L+ /root/.config/i3status/config - - - - /etc/i3status.conf"
+    "L+ /root/.config/i3/config - - - - ${./i3config}"
+    "L+ /root/.config/i3status/config - - - - ${./i3statusconfig}"
   ];
 }

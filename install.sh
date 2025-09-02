@@ -33,7 +33,7 @@ create_host_dir() {
     if [[ ! -f /etc/nixos/hardware-configuration.nix ]]; then
       echo "❌ Couldn't find /etc/nixos/hardware-configuration.nix"
       echo "Have you installed NixOS on this machine yet?"
-      echo "Run 'sudo nixos-generate-config' to generate the hardware configuration."
+      echo "Run 'sudo nixos-generate-config' to generate the hardware configuration in-case it was deleted."
       exit 1
     fi
 

@@ -195,53 +195,66 @@
     '')
   ];
 
-  # Create i3 config file and symlink it (working approach)
-  systemd.tmpfiles.rules = [
-    "L+ /root/.config/i3/config - - - - ${pkgs.writeText "i3config" ''
-      # Cognito OS i3 Configuration - Apple-style Omnibar Interface
-      # Single keyboard shortcut (Meta+Space) launches omnibar from anywhere
-
-      # Font for window titles and bar
-      font pango:monospace 10
-
-      # Start XDG autostart .desktop files
-      exec --no-startup-id dex --autostart --environment i3
-
-      # Essential services
-      exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-      exec --no-startup-id nm-applet
-
-      # Auto-open terminal for debugging
-      exec --no-startup-id kitty
-
-      # Use Mouse+$mod to drag floating windows to their wanted position
-      floating_modifier Mod4
-
-      # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar (like Apple Spotlight)
-      bindsym Mod4+space exec cognito-omnibar
-      bindsym Mod1+space exec cognito-omnibar
+  # i3 configuration using NixOS-native config approach (avoids migration script issues)
+  services.xserver.windowManager.i3 = {
+    enable = true;
+    extraPackages = with pkgs; [
+      rofi      # Apple-like omnibar launcher
+      i3status  # status bar
+      i3lock    # lock screen
+    ];
+    
+    config = {
+      # Font for window titles
+      fonts = {
+        names = [ "monospace" ];
+        size = 10.0;
+      };
 
       # Window behavior
-      new_window normal 1
-      new_float normal
+      window = {
+        titlebar = false;
+        border = 3;
+        commands = [
+          { command = "floating enable"; criteria = { class = ".*"; }; }
+        ];
+      };
 
       # Focus behavior
-      focus_follows_mouse no
-      mouse_warping output
+      focus = {
+        followMouse = false;
+        mouseWarping = "output";
+      };
 
       # Workspace behavior
-      workspace_auto_back_and_forth yes
+      workspaceAutoBackAndForth = true;
 
-      # Window borders and gaps
-      default_border pixel 3
-      default_floating_border pixel 3
+      # Keybindings
+      keybindings = {
+        # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar
+        "Mod4+space" = "exec cognito-omnibar";
+        "Mod1+space" = "exec cognito-omnibar";
+      };
 
-      # Status bar with i3status at the top (working examples use this syntax)
-      bar {
-          position top
-          status_command i3status
-          font pango:monospace 10
-      }
-    ''}"
-  ];
+      # Startup commands
+      startup = [
+        { command = "dex --autostart --environment i3"; always = true; notification = false; }
+        { command = "xss-lock --transfer-sleep-lock -- i3lock --nofork"; always = true; notification = false; }
+        { command = "nm-applet"; always = true; notification = false; }
+        { command = "kitty"; always = true; notification = false; }
+      ];
+
+      # Status bar configuration (NixOS-native approach)
+      bars = [
+        {
+          position = "top";
+          statusCommand = "${pkgs.i3status}/bin/i3status";
+          fonts = {
+            names = [ "monospace" ];
+            size = 10.0;
+          };
+        }
+      ];
+    };
+  };
 }

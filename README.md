@@ -138,3 +138,25 @@ https://youtu.be/YHm7e3f87iY
 **Step 1:** Install NixOS on the device - no desktop environment needed.
 
 **Step 2:** Go to `/etc/nixos/` and replace all files there with this repo (containing Nix configs), (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install. Or nix run --extra-experimental-features "nix-command flakes" home-manager/release-23.11 -- switch --flake .#cognito
+
+# 🚀 Installation
+
+## 1. Install NixOS
+
+First install NixOS using any graphical ISO image and choosing the No desktop option during installation.
+
+This will auto-generate a hardware-config which acts as a shim layer to run Cognito on your device, and can be used in the install script or replaced with a preset hardware-config, if you have used this device before/ want to override the recommended shim settings, for some odd reason.
+
+## 2. Clone the repo anywhere (usually into ~/)
+
+```bash
+nix-shell -p git
+git clone https://github.com/Frost-Phoenix/nixos-config
+cd nixos-config
+```
+
+## 3. Use and follow install script
+
+```bash
+./install.sh
+```

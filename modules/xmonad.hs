@@ -6,6 +6,7 @@ import XMonad
 import XMonad.Config.Desktop
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 import XMonad.Layout.Spacing
@@ -13,7 +14,6 @@ import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
 import XMonad.Util.SpawnOnce
 import qualified XMonad.StackSet as W
-import XMonad.Layout.ToggleStruts
 import XMonad.Actions.CycleWS
 import XMonad.Actions.WindowGo
 import qualified Data.Map as M
@@ -80,7 +80,7 @@ myKeys =
   , ("M-S-l", windows W.swapDown)
   , ("M-S-j", windows W.swapUp)
   , ("M-S-k", windows W.swapDown)
-  , ("M-f", sendMessage ToggleStruts)
+  , ("M-f", spawn "notify-send 'Fullscreen' 'Fullscreen toggle not yet implemented'")
   , ("M-S-<Return>", spawn "kitty")
   , ("M-1", windows $ W.greedyView "1")
   , ("M-2", windows $ W.greedyView "2")

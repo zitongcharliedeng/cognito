@@ -110,7 +110,7 @@
         "send-workspace-10") xdotool key super+shift+0 ;;
         "close-window") xdotool key super+shift+c ;;
         "split-window") xdotool key super+shift+return ;;
-        "fullscreen") xdotool key super+f ;;
+        "fullscreen") notify-send "Fullscreen" "Fullscreen toggle not yet implemented" ;;
         "toggle-float") xdotool key super+shift+space ;;
         "focus-left") xdotool key super+h ;;
         "focus-right") xdotool key super+l ;;

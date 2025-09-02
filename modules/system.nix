@@ -353,9 +353,7 @@
           # === DEBUG & TEST ===
           ["debug"]="echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
           ["test"]="notify-send 'Test' 'This is a test notification'"
-          ["debug simple icon test"]="debug-simple-icon-test"
-          ["debug test loghook"]="debug-test-loghook"
-          ["restart xmobar"]="restart-xmobar"
+
 
           ["check-rofi"]="rofi -dmenu -i -p 'Rofi Test'"
           ["test-kitty"]="kitty"
@@ -499,6 +497,10 @@
           ["debug window class"]="debug-window-class"
           ["debug icon theme"]="debug-icon-theme"
           ["debug workspace preview"]="debug-workspace-preview"
+          ["debug simple icon test"]="debug-simple-icon-test"
+          ["debug test loghook"]="debug-test-loghook"
+          ["restart xmobar"]="restart-xmobar"
+          ["debug omnibar arrays"]="echo 'Debugging omnibar arrays...' > /tmp/omnibar-debug.txt && echo 'cmd_definitions keys:' >> /tmp/omnibar-debug.txt && for key in \"''${!cmd_definitions[@]}\"; do echo \"  $key\" >> /tmp/omnibar-debug.txt; done && echo 'cmd_aliases keys:' >> /tmp/omnibar-debug.txt && for key in \"''${!cmd_aliases[@]}\"; do echo \"  $key\" >> /tmp/omnibar-debug.txt; done && notify-send 'Debug' 'Omnibar arrays saved to /tmp/omnibar-debug.txt'"
       )
       
       # Screenshot commands (complex, so defined separately)

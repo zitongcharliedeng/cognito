@@ -32,24 +32,8 @@ mouse_warping output
 # Workspace behavior
 workspace_auto_back_and_forth yes
 
-# Status bar with i3status at the top (like your friend's working config)
+# Status bar with i3status at the top
 bar {
     status_command i3status
     position top
-    font pango:monospace 10
-    separator_symbol " "
-    colors {
-        background #222333
-        statusline #ffffff
-        separator #ffffff
-        focused_workspace  #4c7899 #2B5489 #ffffff
-        active_workspace   #333333 #5f676a #ffffff
-        inactive_workspace #192331 #111111 #888888
-        urgent_workspace   #D32F2F #900000 #ffffff
-        binding_mode       #D32F2F #900000 #ffffff
-    }
-    padding 3px 0
-    tray_output primary
-    tray_padding 5px
-    workspace_min_width 50
 }

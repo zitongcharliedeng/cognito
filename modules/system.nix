@@ -113,14 +113,10 @@
           "maximize window:i3-msg fullscreen toggle"
           
           # === FOCUS & MOVE ===
-          "focus left:i3-msg focus left"
-          "focus right:i3-msg focus right"
-          "focus up:i3-msg focus up"
-          "focus down:i3-msg focus down"
-          "move left:i3-msg move left"
-          "move right:i3-msg move right"
-          "move up:i3-msg move up"
-          "move down:i3-msg move down"
+          "focus window left:i3-msg focus left"
+          "focus window right:i3-msg focus right"
+          "focus window up:i3-msg focus up"
+          "focus window down:i3-msg focus down"
           "move window left:i3-msg move left"
           "move window right:i3-msg move right"
           "move window up:i3-msg move up"

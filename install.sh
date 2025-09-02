@@ -4,6 +4,7 @@ set -euo pipefail
 # Path to your repo — change this if your repo lives elsewhere
 REPO_PATH="/etc/nixos"
 
+# TODO rename hosts to be hardware-shims
 print_header() {
   echo "=== Cognito Installer ==="
   echo "This will set up a new host or reuse an existing one."
@@ -52,7 +53,7 @@ create_host_dir() {
   # ⚠️ If you need device-specific quirks (e.g. mic LED fix),
   # put them here — NOT in hardware-configuration.nix.
   # 
-  # Note: Common system features (SSH, X server, basic packages, users)
+  # Note: System-agnostic features (SSH, X server, basic packages, users)
   # are automatically included via the flake.nix configuration.
 }
 EOF

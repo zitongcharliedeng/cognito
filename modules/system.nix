@@ -58,6 +58,33 @@
     firefox   # web browser
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
+    
+    # Custom omnibar script
+    (pkgs.writeScriptBin "cognito-omnibar" ''
+      #!/bin/bash
+      
+      # Simple test commands
+      commands=(
+          "new terminal:kitty"
+          "file manager:thunar"
+          "web browser:firefox"
+          "test rofi:rofi -dmenu -i -p 'Test'"
+          "debug:echo 'Omnibar working!'"
+      )
+      
+      # Show commands with rofi
+      if command -v rofi >/dev/null 2>&1; then
+          input=$(printf '%s\n' "''${commands[@]}" | rofi -dmenu -i -p "🔍 Test Omnibar")
+          
+          if [[ -n "$input" ]]; then
+              cmd=$(echo "$input" | cut -d: -f2)
+              echo "Executing: $cmd"
+              eval "$cmd"
+          fi
+      else
+          echo "Rofi not found"
+      fi
+    '')
   ];
 
   # ============================================================================
@@ -103,38 +130,8 @@
     # No bar configuration - let i3 use defaults
   '';
 
-  # Create simple test omnibar script using writeScriptBin
-  environment.etc."cognito/omnibar.sh".source = pkgs.writeScriptBin "cognito-omnibar" ''
-    #!/bin/bash
-    
-    # Simple test commands
-    commands=(
-        "new terminal:kitty"
-        "file manager:thunar"
-        "web browser:firefox"
-        "test rofi:rofi -dmenu -i -p 'Test'"
-        "debug:echo 'Omnibar working!'"
-    )
-    
-    # Show commands with rofi
-    if command -v rofi >/dev/null 2>&1; then
-        input=$(printf '%s\n' "''${commands[@]}" | rofi -dmenu -i -p "🔍 Test Omnibar")
-        
-        if [[ -n "$input" ]]; then
-            cmd=$(echo "$input" | cut -d: -f2)
-            echo "Executing: $cmd"
-            eval "$cmd"
-        fi
-    else
-        echo "Rofi not found"
-    fi
-  '';
-
   # Create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
-    "L+ /usr/bin/cognito-omnibar - - - - /etc/cognito/omnibar.sh"
   ];
-  
-  # Omnibar script will be made executable via tmpfiles
 }

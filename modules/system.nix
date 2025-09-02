@@ -77,10 +77,29 @@
     # SINGLE KEYBOARD SHORTCUT - Meta+Space launches omnibar (like Apple Spotlight)
     bindsym Mod4+space exec cognito-omnibar
 
-    # Start i3bar
+    # Window behavior
+    new_window normal 1
+    new_float normal
+
+    # Focus behavior
+    focus_follows_mouse no
+    mouse_warping output
+
+    # Workspace behavior
+    workspace_auto_back_and_forth yes
+
+    # Bar configuration
     bar {
         position top
         status_command i3status
+        colors {
+            background #2f343f
+            statusline #ffffff
+            separator #666666
+            focused_background #285577
+            focused_statusline #ffffff
+            focused_separator #285577
+        }
     }
   '';
 

@@ -165,6 +165,25 @@ bash ./install.sh
 
 **Important:** The Cognito OS configuration uses `root` as the primary user, but the password will be the same as your NixOS installer sudo password (not the username from the installer).
 
+## 🔐 NixOS Password Philosophy
+
+**Why This Behavior is Actually Good Design:**
+
+NixOS intentionally uses the same password across your system for several important reasons:
+
+- **🔒 Consistent Security Model** - One password to rule them all, reducing attack vectors
+- **🧠 Human Memory Friendly** - No need to remember multiple passwords for the same system
+- **⚡ Streamlined Authentication** - Same credentials work everywhere (sudo, login, services)
+- **🛡️ Reduced Password Fatigue** - Prevents users from creating weak passwords just to remember them
+- **🔧 System Integration** - The installer password becomes your system's root of trust
+
+**The `initialPassword` Setting:**
+- Only works during **first-time system installation** (`nixos-install`)
+- **Cannot override** existing user passwords after installation
+- This is **intended behavior** - NixOS wants you to use the installer password consistently
+
+**Best Practice:** Use a strong, memorable password during NixOS installation - it becomes your system's master password.
+
 ## Hardware Agnostic Design
 
 Cognito OS is designed to be completely hardware agnostic. All packages and configurations work on any machine that can run NixOS:

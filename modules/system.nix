@@ -28,6 +28,17 @@
   
   # Graphical login
   services.xserver.displayManager.lightdm.enable = true;
+  
+  # LightDM configuration to auto-fill username as root
+  services.xserver.displayManager.lightdm.settings = {
+    SeatDefaults = {
+      greeter-hide-users = false;
+      user-session = "i3";
+      default-user = "root";
+      greeter-setup-script = "echo 'root' > /tmp/lightdm-username";
+    };
+  };
+  
   services.xserver.windowManager.i3 = {
     enable = true;
     extraPackages = with pkgs; [
@@ -44,6 +55,9 @@
     vim
     htop
     tmux
+    neofetch  # system info display
+    bat       # better cat with syntax highlighting
+    fd        # better find command
     # Display manager packages
     kitty     # hardware-agnostic terminal
     scrot     # screenshot tool
@@ -160,6 +174,7 @@
     if command -v rofi >/dev/null 2>&1; then
         # Use rofi for a more polished Apple-like interface
         input=$(printf '%s\n' "''${!commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 50 -lines 15)
+
     else
         # Fallback to dmenu with better styling
         input=$(printf '%s\n' "''${!commands[@]}" | dmenu -i -p "🔍 Cognito Omnibar: " -l 15 -fn "monospace:size=12" -nb "#2d2d2d" -nf "#ffffff" -sb "#007acc" -sf "#ffffff")
@@ -174,6 +189,11 @@
   # Make omnibar executable and create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
-    "L+ /usr/local/bin/cognito-omnibar - - - - /etc/cognito/omnibar.sh"
+    "L+ /usr/bin/cognito-omnibar - - - - /etc/cognito/omnibar.sh"
   ];
+  
+  # Make omnibar script executable
+  system.activationScripts.makeOmnibarExecutable = ''
+    chmod +x /etc/cognito/omnibar.sh
+  '';
 }

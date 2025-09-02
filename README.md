@@ -54,7 +54,7 @@ e.g. --flake /etc/nixos#my-blue-laptop.
 Day to day:
 Always rebuild using the host flag for the current machine.
 
-Lack of home-manager or flake-parts is inspired by sioodmy/dotfiles. I am a noob, but his explanations had good minimialistic jazz to it I had to try it! 
+Minimalist approach inspired by sioodmy/dotfiles. I am a noob, but his explanations had good minimalistic jazz to it I had to try it! 
 
 # Purpose of this operating system and CUJs
 
@@ -137,7 +137,7 @@ https://youtu.be/YHm7e3f87iY
 
 **Step 1:** Install NixOS on the device - no desktop environment needed.
 
-**Step 2:** Go to `/etc/nixos/` and replace all files there with this repo (containing Nix configs), (ie., ~/nix-config) where `flake.nix` and home.nix is, and apply the configuration using a terminal in that directory and running the command `home-manager switch --flake`. Home-manager is defined inline from our config smartly by the command without needing its own initial install. Or nix run --extra-experimental-features "nix-command flakes" home-manager/release-23.11 -- switch --flake .#cognito
+**Step 2:** Go to `/etc/nixos/` and replace all files there with this repo (containing Nix configs), (ie., ~/nix-config) where `flake.nix` is, and apply the configuration using a terminal in that directory and running the command `nixos-rebuild switch --flake .#HOSTNAME`
 
 # 🚀 Installation
 

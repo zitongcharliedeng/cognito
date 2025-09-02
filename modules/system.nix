@@ -145,7 +145,7 @@
         window_titles=$(wmctrl -l | awk -v ws="$i" '$2 == ws {print substr($0, index($0,$4))}' | head -2 | tr '\n' ' ' | sed 's/ $//')
         
         # Truncate long titles
-        if [ ${#window_titles} -gt 15 ]; then
+        if [ ''${#window_titles} -gt 15 ]; then
           window_titles="''${window_titles:0:12}..."
         fi
         

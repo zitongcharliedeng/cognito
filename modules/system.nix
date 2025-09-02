@@ -56,8 +56,8 @@
       -- Initialize theme
       beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
       
-      -- Set wallpaper
-      awful.spawn.with_shell("feh --bg-scale /usr/share/pixmaps/nixos-logo.png")
+      -- Set wallpaper (use a solid color if nixos-logo.png doesn't exist)
+      awful.spawn.with_shell("feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'")
       
       -- Create top status bar
       local mywibox = awful.wibar({ position = "top", height = 30 })
@@ -144,8 +144,8 @@
           c:emit_signal("request::activate", "mouse_enter", {raise = false})
       end)
       
-      -- Auto-start applications
-      awful.spawn.with_shell("kitty")
+      -- Auto-start applications with delay to ensure Awesome is fully loaded
+      awful.spawn.with_shell("sleep 2 && kitty")
     ''}"
   ];
 
@@ -169,6 +169,11 @@
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)
     brightnessctl # for brightness control
+    # Awesome WM dependencies
+    rofi      # application launcher for omnibar
+    feh       # wallpaper setter
+    awesome   # awesome-client command
+    i3lock    # screen locker (used in omnibar commands)
     
 
     

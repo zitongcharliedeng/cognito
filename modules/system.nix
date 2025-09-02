@@ -1,5 +1,5 @@
 { config, pkgs, ... }:
-
+# TODO rename home/ folder to really be system or hardware agnostic or main
 {
   # ============================================================================
   # CORE SYSTEM CONFIGURATION (Hardware Agnostic)
@@ -46,9 +46,9 @@
     # Display manager packages
     kitty     # hardware-agnostic terminal
     scrot     # screenshot tool
-    thunar    # file manager
+    xfce.thunar  # file manager
     firefox   # web browser
-    gnome-control-center # settings
+    gnome.gnome-control-center # settings
   ];
 
   # ============================================================================

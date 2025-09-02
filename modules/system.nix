@@ -4,108 +4,60 @@
   # ============================================================================
   # CORE SYSTEM CONFIGURATION (Hardware Agnostic)
   # ============================================================================
-  
-  # SSH service
   services.openssh.enable = true;
-  
-  # X server
   services.xserver.enable = true;
   services.xserver.displayManager.startx.enable = true;
-  
-  # Auto-login for root (useful for headless/VM setups)
   services.getty.extraArgs = [ "--autologin" "root" ];
-  
-  # Root user configuration
   users.users.root = {
     isNormalUser = false;
     # Note: Password is the same as your NixOS installer sudo password
-    # The initialPassword setting is ignored in this context
+    # The initialPassword setting is would be ignored in this context after install.sh runs
   };
   
   # ============================================================================
-  # DISPLAY MANAGER - Awesome WM + Cognito Omnibar
+  # DISPLAY MANAGER - XMonad on X11, with Rofi Omnibar for no-memorized shortcuts
   # ============================================================================
   
-  # Graphical login
+  # Graphical login screen
   services.xserver.displayManager.lightdm.enable = true;
-  
-  # LightDM basic configuration TODO autofill the root username
   services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
   
-  # Set XMonad as the default session (NixOS way)
-  services.xserver.displayManager.defaultSession = "none+xmonad";
-  
-  # GTK icon theme configuration (based on real NixOS configs)
-  # This is necessary because Nix doesn't automatically register app icons in a central location
-  # Desktop environments need icon themes to find icons for system UI elements and app fallbacks
-  environment.etc."xdg/gtk-3.0/settings.ini".text = ''
-    [Settings]
-    gtk-icon-theme-name=Papirus
-    gtk-theme-name=Adwaita
-  '';
-
-
-
-  # Enable XMonad, tried i3 and awesome to no avail
+  services.xserver.displayManager.defaultSession = "none+xmonad"; # tried i3 and awesome to no avail
   services.xserver.windowManager.xmonad = {
     enable = true;
     enableContribAndExtras = true;
     config = builtins.readFile ./xmonad.hs;
   };
   
-  # Create xmobar configuration
+  # Create configuration for xmobar, the status bar for XMonad
   systemd.tmpfiles.rules = [
     "d /root/.config/xmobar 0755 root root -"
   ];
-  
-  # Create xmobar config file using environment.etc
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./xmobarrc;
 
-  # System packages (all hardware agnostic)
+  # ============================================================================
+  # SYSTEM PACKAGES (all hardware agnostic)
+  # ============================================================================
   environment.systemPackages = with pkgs; [
-    # Core tools
     git
     vim
     htop
     tmux
-    neofetch  # system info display
-    bat       # better cat with syntax highlighting
-    fd        # better find command
-    # Display manager packages
     kitty     # hardware-agnostic terminal
     scrot     # screenshot tool
     xclip     # clipboard utility
-    xfce.thunar  # file manager
+    xfce.thunar  # file manager and explorer
     firefox   # web browser
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)
     brightnessctl # for brightness control
-    # XMonad WM dependencies
     rofi      # application launcher for omnibar
-    feh       # wallpaper setter
     xdotool   # X11 automation tool for omnibar commands
     xsel      # clipboard utility for XMonad commands
-    i3lock    # screen locker (used in omnibar commands)
     xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
-    
-    # Icon themes and packages (based on real NixOS configs)
-    # IMPORTANT: Nix's immutable store means app icons are scattered across different paths
-    # Even though apps come with their own icons, Nix doesn't automatically register them
-    # in a central location that desktop environments can find. Icon themes provide:
-    # 1. Centralized icon lookup for system UI elements (folders, tray, notifications)
-    # 2. Fallback icons when app icons aren't found or properly registered
-    # 3. Visual consistency across the entire desktop environment
-    # This is a limitation of Nix's package management - we need icon packs as a workaround
-    hicolor-icon-theme  # base icon theme (required fallback)
-    papirus-icon-theme  # comprehensive icon theme with app icons
-    gnome.adwaita-icon-theme  # GNOME default icons
-    arc-icon-theme      # modern icon theme
-    tango-icon-theme    # classic icon theme
-    
 
-    
     # XMonad command helper script
     (pkgs.writeScriptBin "xmonad-cmd" ''
       #!${pkgs.bash}/bin/bash
@@ -265,264 +217,81 @@
     (pkgs.writeScriptBin "cognito-omnibar" ''
       #!${pkgs.bash}/bin/bash
       
-      # === COMMAND DEFINITIONS (DRY - Single Source of Truth) ===
-      declare -A cmd_definitions=(
+      # === SIMPLE DIRECT COMMANDS (One Entry Per Action) ===
+      commands=(
           # === APPLICATIONS ===
-          ["kitty"]="kitty"
-          ["thunar"]="thunar"
-          ["firefox"]="firefox"
-          ["vim"]="vim"
-          ["gnome-control-center"]="gnome-control-center"
+          "open kitty in new window:kitty"
+          "open thunar in new window:thunar"
+          "open firefox in new window:firefox"
+          "open vim in new window:vim"
+          "open settings in new window:gnome-control-center"
           
           # === WORKSPACES ===
-          ["workspace-1"]="xmonad-cmd workspace-1"
-          ["workspace-2"]="xmonad-cmd workspace-2"
-          ["workspace-3"]="xmonad-cmd workspace-3"
-          ["workspace-4"]="xmonad-cmd workspace-4"
-          ["workspace-5"]="xmonad-cmd workspace-5"
-          ["workspace-6"]="xmonad-cmd workspace-6"
-          ["workspace-7"]="xmonad-cmd workspace-7"
-          ["workspace-8"]="xmonad-cmd workspace-8"
-          ["workspace-9"]="xmonad-cmd workspace-9"
-          ["workspace-10"]="xmonad-cmd workspace-10"
-          
-          # === SEND TO WORKSPACE ===
-          ["send-to-workspace-1"]="xmonad-cmd send-workspace-1"
-          ["send-to-workspace-2"]="xmonad-cmd send-workspace-2"
-          ["send-to-workspace-3"]="xmonad-cmd send-workspace-3"
-          ["send-to-workspace-4"]="xmonad-cmd send-workspace-4"
-          ["send-to-workspace-5"]="xmonad-cmd send-workspace-5"
-          ["send-to-workspace-6"]="xmonad-cmd send-workspace-6"
-          ["send-to-workspace-7"]="xmonad-cmd send-workspace-7"
-          ["send-to-workspace-8"]="xmonad-cmd send-workspace-8"
-          ["send-to-workspace-9"]="xmonad-cmd send-workspace-9"
-          ["send-to-workspace-10"]="xmonad-cmd send-workspace-10"
+          "switch to workspace 1:xmonad-cmd workspace-1"
+          "switch to workspace 2:xmonad-cmd workspace-2"
+          "switch to workspace 3:xmonad-cmd workspace-3"
+          "switch to workspace 4:xmonad-cmd workspace-4"
+          "switch to workspace 5:xmonad-cmd workspace-5"
+          "switch to workspace 6:xmonad-cmd workspace-6"
+          "switch to workspace 7:xmonad-cmd workspace-7"
+          "switch to workspace 8:xmonad-cmd workspace-8"
+          "switch to workspace 9:xmonad-cmd workspace-9"
+          "switch to workspace 10:xmonad-cmd workspace-10"
+          "send window to workspace 1:xmonad-cmd send-workspace-1"
+          "send window to workspace 2:xmonad-cmd send-workspace-2"
+          "send window to workspace 3:xmonad-cmd send-workspace-3"
+          "send window to workspace 4:xmonad-cmd send-workspace-4"
+          "send window to workspace 5:xmonad-cmd send-workspace-5"
+          "send window to workspace 6:xmonad-cmd send-workspace-6"
+          "send window to workspace 7:xmonad-cmd send-workspace-7"
+          "send window to workspace 8:xmonad-cmd send-workspace-8"
+          "send window to workspace 9:xmonad-cmd send-workspace-9"
+          "send window to workspace 10:xmonad-cmd send-workspace-10"
           
           # === WINDOW MANAGEMENT ===
-          ["close-window"]="xmonad-cmd close-window"
-          ["split-window"]="xmonad-cmd split-window"
-          ["fullscreen"]="xmonad-cmd fullscreen"
-          ["toggle-float"]="xmonad-cmd toggle-float"
+          "close window:xmonad-cmd close-window"
+          "split window:xmonad-cmd split-window"
+          "toggle fullscreen:xmonad-cmd fullscreen"
+          "toggle float:xmonad-cmd toggle-float"
+          "focus left:xmonad-cmd focus-left"
+          "focus right:xmonad-cmd focus-right"
+          "focus up:xmonad-cmd focus-up"
+          "focus down:xmonad-cmd focus-down"
+          "move window left:xmonad-cmd move-left"
+          "move window right:xmonad-cmd move-right"
+          "move window up:xmonad-cmd move-up"
+          "move window down:xmonad-cmd move-down"
+          "toggle layout:xmonad-cmd layout-toggle"
           
-          # === FOCUS & MOVE ===
-          ["focus-left"]="xmonad-cmd focus-left"
-          ["focus-right"]="xmonad-cmd focus-right"
-          ["focus-up"]="xmonad-cmd focus-up"
-          ["focus-down"]="xmonad-cmd focus-down"
-          ["move-left"]="xmonad-cmd move-left"
-          ["move-right"]="xmonad-cmd move-right"
-          ["move-up"]="xmonad-cmd move-up"
-          ["move-down"]="xmonad-cmd move-down"
+          # === SYSTEM ===
+          "restart xmonad:xmonad-cmd quit-xmonad"
+          "lock screen:i3lock -c 000000"
+          "suspend:systemctl suspend"
+          "shutdown:systemctl poweroff"
+          "reboot:systemctl reboot"
           
-          # === LAYOUTS ===
-          ["layout-stack"]="xmonad-cmd layout-stack"
-          ["layout-tab"]="xmonad-cmd layout-tab"
-          ["layout-toggle"]="xmonad-cmd layout-toggle"
+          # === SCREENSHOTS ===
+          "take screenshot:scrot -d 1 ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
+          "screenshot window:scrot -s ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
+          "screenshot area:scrot -s ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
           
-          # === SYSTEM CONTROL ===
-          ["shutdown"]="systemctl poweroff"
-          ["reboot"]="systemctl reboot"
-          ["logout"]="xmonad-cmd quit-xmonad"
-          ["lock"]="i3lock"
-          
-          # === VOLUME CONTROL ===
-          ["volume-up"]="amixer set Master 5%+"
-          ["volume-down"]="amixer set Master 5%-"
-          ["volume-mute"]="amixer set Master toggle"
-          ["volume-unmute"]="amixer set Master unmute"
-          ["volume-50"]="amixer set Master 50%"
-          ["volume-100"]="amixer set Master 100%"
-          
-          # === BRIGHTNESS CONTROL ===
-          ["brightness-up"]="brightnessctl set 5%+"
-          ["brightness-down"]="brightnessctl set 5%-"
-          ["brightness-max"]="brightnessctl set 100%"
-          ["brightness-min"]="brightnessctl set 10%"
-          ["brightness-50"]="brightnessctl set 50%"
-          
-          # === XMONAD CONTROL ===
-          ["reload-config"]="xmonad --recompile && xmonad --restart"
-          ["restart-xmonad"]="xmonad --restart"
-          ["restart-status-bar"]="pkill xmobar && sleep 1 && xmobar /etc/xmobar/xmobarrc &"
+          # === CLIPBOARD ===
+          "copy clipboard:xsel -o | xsel -i -b"
+          "paste clipboard:xsel -b | xsel -i"
+          "clear clipboard:echo '' | xsel -i -b"
           
           # === TIME & DATE ===
-          ["time"]="notify-send 'Time' \"\$(date '+%H:%M')\""
-          ["date"]="notify-send 'Date' \"\$(date '+%A, %B %d, %Y')\""
-          ["datetime"]="notify-send 'Date & Time' \"\$(date '+%A, %B %d, %Y at %H:%M')\""
+          "show time:notify-send 'Time' \"\$(date '+%H:%M')\""
+          "show date:notify-send 'Date' \"\$(date '+%A, %B %d, %Y')\""
+          "show datetime:notify-send 'Date & Time' \"\$(date '+%A, %B %d, %Y at %H:%M')\""
           
           # === DEBUG & TEST ===
-          ["debug"]="echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
-          ["test"]="notify-send 'Test' 'This is a test notification'"
-
-
-          ["check-rofi"]="rofi -dmenu -i -p 'Rofi Test'"
-          ["test-kitty"]="kitty"
-          ["test-firefox"]="firefox"
-          ["test-echo"]="echo 'Command execution test' && notify-send 'Test' 'Command executed successfully'"
-          ["test-touch"]="touch /tmp/omnibar-test-file && notify-send 'Test' 'File created successfully'"
-          ["test-xmobar"]="pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc &"
-          ["debug-windows"]="wmctrl -l > /tmp/windows.txt && notify-send 'Debug' 'Window list saved to /tmp/windows.txt'"
-          ["debug-workspace"]="xprop -root _NET_CURRENT_DESKTOP && notify-send 'Debug' 'Current workspace info shown in terminal'"
-          ["debug-window-class"]="wmctrl -l | head -5 > /tmp/window-classes.txt && notify-send 'Debug' 'Window classes saved to /tmp/window-classes.txt'"
-          ["debug-icon-theme"]="echo 'Testing icon theme lookup...' > /tmp/icon-theme.txt && echo 'GTK Icon Theme:' >> /tmp/icon-theme.txt && grep 'gtk-icon-theme-name=' /etc/xdg/gtk-3.0/settings.ini 2>/dev/null >> /tmp/icon-theme.txt && echo 'Papirus theme icons:' >> /tmp/icon-theme.txt && find /nix/store /run/current-system/sw/share /usr/share -path '*/icons/Papirus/*' -name '*kitty*' -o -name '*firefox*' 2>/dev/null | head -3 >> /tmp/icon-theme.txt && echo 'Fallback test: Kitty->K, Firefox->F' >> /tmp/icon-theme.txt && notify-send 'Debug' 'Icon theme lookup saved to /tmp/icon-theme.txt'"
-          ["debug-workspace-preview"]="echo 'Debugging workspace preview...' > /tmp/workspace-debug.txt && echo 'wmctrl output:' >> /tmp/workspace-debug.txt && wmctrl -l >> /tmp/workspace-debug.txt && echo 'Current workspace:' >> /tmp/workspace-debug.txt && xprop -root _NET_CURRENT_DESKTOP >> /tmp/workspace-debug.txt && echo 'Workspace preview output:' >> /tmp/workspace-debug.txt && workspace-preview >> /tmp/workspace-debug.txt && notify-send 'Debug' 'Workspace preview debug saved to /tmp/workspace-debug.txt'"
-          ["debug-icon-detection"]="echo 'Testing icon detection for kitty...' > /tmp/icon-detection.txt && echo 'Testing get_app_icon function:' >> /tmp/icon-detection.txt && echo 'Kitty result:' >> /tmp/icon-detection.txt && (cd /tmp && bash -c 'source /run/current-system/sw/bin/workspace-preview && get_app_icon kitty test') >> /tmp/icon-detection.txt 2>&1 && echo 'Firefox result:' >> /tmp/icon-detection.txt && (cd /tmp && bash -c 'source /run/current-system/sw/bin/workspace-preview && get_app_icon firefox test') >> /tmp/icon-detection.txt 2>&1 && echo 'Available kitty icons:' >> /tmp/icon-detection.txt && find /nix/store -name '*kitty*' -type f 2>/dev/null | grep -E '\\.(png|svg|ico)$' | head -5 >> /tmp/icon-detection.txt && notify-send 'Debug' 'Icon detection debug saved to /tmp/icon-detection.txt'"
-          ["debug-simple-icon-test"]="echo 'Simple icon test:' && echo 'Testing kitty icon lookup...' && find /nix/store -name '*kitty*' -type f 2>/dev/null | grep -E '\\.(png|svg|ico)$' | head -3 && echo 'Testing firefox icon lookup...' && find /nix/store -name '*firefox*' -type f 2>/dev/null | grep -E '\\.(png|svg|ico)$' | head -3"
-          ["debug-test-loghook"]="echo 'Testing logHook manually...' && echo '1[K] 2[] 3[] 4[] 5[] 6[] 7[] 8[] 9[] 10[] }{ <fc=#68d391>Manual Test</fc> | <fc=#a0aec0>META+SPACE</fc>' > /tmp/xmobar-input && notify-send 'Debug' 'Manual logHook test sent to xmobar'"
-          ["restart-xmobar"]="pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc & && notify-send 'Debug' 'Xmobar restarted'"
-
-
+          "debug omnibar:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
+          "test notification:notify-send 'Test' 'This is a test notification'"
+          "restart xmobar:pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc &"
+          "debug simple icon test:kitty -e bash -c 'echo \"Simple icon test:\"; echo \"Testing kitty icon lookup...\"; find /nix/store -name \"*kitty*\" -type f 2>/dev/null | grep -E \"\\\\.(png|svg|ico)$\" | head -3; echo \"Testing firefox icon lookup...\"; find /nix/store -name \"*firefox*\" -type f 2>/dev/null | grep -E \"\\\\.(png|svg|ico)$\" | head -3; echo \"Press Enter to close\"; read'"
+          "debug omnibar arrays:kitty -e bash -c 'echo \"Debugging omnibar arrays...\"; echo \"All commands:\"; for cmd in \"''${commands[@]}\"; do echo \"  \$cmd\"; done; echo \"Press Enter to close\"; read'"
       )
-      
-      # === COMMAND ALIASES (Many-to-One Mapping) ===
-      declare -A cmd_aliases=(
-          # === APPLICATIONS ===
-          ["new terminal"]="kitty"
-          ["terminal"]="kitty"
-          ["file manager"]="thunar"
-          ["browser"]="firefox"
-          ["web browser"]="firefox"
-          ["text editor"]="vim"
-          ["settings"]="gnome-control-center"
-          
-          # === WORKSPACES ===
-          ["workspace 1"]="workspace-1"
-          ["workspace 2"]="workspace-2"
-          ["workspace 3"]="workspace-3"
-          ["workspace 4"]="workspace-4"
-          ["workspace 5"]="workspace-5"
-          ["workspace 6"]="workspace-6"
-          ["workspace 7"]="workspace-7"
-          ["workspace 8"]="workspace-8"
-          ["workspace 9"]="workspace-9"
-          ["workspace 10"]="workspace-10"
-          ["go to workspace 1"]="workspace-1"
-          ["go to workspace 2"]="workspace-2"
-          ["go to workspace 3"]="workspace-3"
-          ["go to workspace 4"]="workspace-4"
-          ["go to workspace 5"]="workspace-5"
-          
-          # === SEND TO WORKSPACE ALIASES ===
-          ["send window to workspace 1"]="send-to-workspace-1"
-          ["send window to workspace 2"]="send-to-workspace-2"
-          ["send window to workspace 3"]="send-to-workspace-3"
-          ["send window to workspace 4"]="send-to-workspace-4"
-          ["send window to workspace 5"]="send-to-workspace-5"
-          ["send window to workspace 6"]="send-to-workspace-6"
-          ["send window to workspace 7"]="send-to-workspace-7"
-          ["send window to workspace 8"]="send-to-workspace-8"
-          ["send window to workspace 9"]="send-to-workspace-9"
-          ["send window to workspace 10"]="send-to-workspace-10"
-          ["move window to workspace 1"]="send-to-workspace-1"
-          ["move window to workspace 2"]="send-to-workspace-2"
-          ["move window to workspace 3"]="send-to-workspace-3"
-          ["move window to workspace 4"]="send-to-workspace-4"
-          ["move window to workspace 5"]="send-to-workspace-5"
-          
-          # === WINDOW MANAGEMENT ===
-          ["close window"]="close-window"
-          ["close this window"]="close-window"
-          ["quit window"]="close-window"
-          ["split horizontal"]="split-window"
-          ["split vertical"]="split-window"
-          ["split horizontally"]="split-window"
-          ["split vertically"]="split-window"
-          ["toggle fullscreen"]="fullscreen"
-          ["floating window"]="toggle-float"
-          ["toggle floating"]="toggle-float"
-          ["maximize window"]="fullscreen"
-          
-          # === FOCUS & MOVE ===
-          ["focus window left"]="focus-left"
-          ["focus window right"]="focus-right"
-          ["focus window up"]="focus-up"
-          ["focus window down"]="focus-down"
-          ["move window left"]="move-left"
-          ["move window right"]="move-right"
-          ["move window up"]="move-up"
-          ["move window down"]="move-down"
-          
-          # === LAYOUTS ===
-          ["layout stacking"]="layout-stack"
-          ["layout tabbed"]="layout-tab"
-          ["stacking layout"]="layout-stack"
-          ["tabbed layout"]="layout-tab"
-          ["tile layout"]="layout-tab"
-          
-          # === SYSTEM CONTROL ===
-          ["shut down"]="shutdown"
-          ["power off"]="shutdown"
-          ["restart"]="reboot"
-          ["log out"]="logout"
-          ["exit xmonad"]="logout"
-          ["lock screen"]="lock"
-          
-          # === VOLUME CONTROL ===
-          ["volume mute"]="volume-mute"
-          ["mute"]="volume-mute"
-          ["unmute"]="volume-unmute"
-          ["volume 50"]="volume-50"
-          ["volume 100"]="volume-100"
-          
-          # === BRIGHTNESS CONTROL ===
-          ["brightness max"]="brightness-max"
-          ["brightness min"]="brightness-min"
-          ["brightness 50"]="brightness-50"
-          
-          # === XMONAD CONTROL ===
-          ["reload config"]="reload-config"
-          ["restart xmonad"]="restart-xmonad"
-          ["reload xmonad"]="restart-xmonad"
-          ["restart window manager"]="restart-xmonad"
-          ["restart status bar"]="restart-status-bar"
-          ["restart xmobar"]="restart-status-bar"
-          
-          # === TIME & DATE ALIASES ===
-          ["what time is it"]="time"
-          ["current time"]="time"
-          ["what date is it"]="date"
-          ["current date"]="date"
-          ["date and time"]="datetime"
-          ["current datetime"]="datetime"
-          
-          # === DEBUG & TEST ===
-          ["check rofi"]="check-rofi"
-          ["test kitty"]="test-kitty"
-          ["test firefox"]="test-firefox"
-          ["test echo"]="test-echo"
-          ["test touch"]="test-touch"
-          ["test xmobar"]="test-xmobar"
-          ["launch xmobar"]="test-xmobar"
-          ["start xmobar"]="test-xmobar"
-          ["debug window class"]="debug-window-class"
-          ["debug icon theme"]="debug-icon-theme"
-          ["debug workspace preview"]="debug-workspace-preview"
-          ["debug simple icon test"]="debug-simple-icon-test"
-          ["debug test loghook"]="debug-test-loghook"
-          ["restart xmobar"]="restart-xmobar"
-          ["debug omnibar arrays"]="echo 'Debugging omnibar arrays...' > /tmp/omnibar-debug.txt && echo 'cmd_definitions keys:' >> /tmp/omnibar-debug.txt && for key in \"''${!cmd_definitions[@]}\"; do echo \"  $key\" >> /tmp/omnibar-debug.txt; done && echo 'cmd_aliases keys:' >> /tmp/omnibar-debug.txt && for key in \"''${!cmd_aliases[@]}\"; do echo \"  $key\" >> /tmp/omnibar-debug.txt; done && notify-send 'Debug' 'Omnibar arrays saved to /tmp/omnibar-debug.txt'"
-      )
-      
-      # Screenshot commands (complex, so defined separately)
-      screenshot_cmd="scrot -d 1 ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
-      screenshot_window_cmd="scrot -s ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
-      screenshot_area_cmd="scrot -s ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-\$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
-      
-      # === BUILD COMMAND LIST (Many-to-One Resolution) ===
-      commands=()
-      
-      # Process aliases and resolve to actual commands
-      for alias in "''${!cmd_aliases[@]}"; do
-          cmd_key="''${cmd_aliases[$alias]}"
-          if [[ -n "''${cmd_definitions[$cmd_key]}" ]]; then
-              commands+=("$alias:''${cmd_definitions[$cmd_key]}")
-          fi
-      done
-      
-      # Add screenshot commands
-      commands+=("screenshot:$screenshot_cmd")
-      commands+=("screenshot window:$screenshot_window_cmd")
-      commands+=("screenshot area:$screenshot_area_cmd")
       
       # Show commands with rofi
       if command -v rofi >/dev/null 2>&1; then

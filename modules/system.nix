@@ -32,122 +32,23 @@
   # LightDM basic configuration TODO autofill the root username
   services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
   
-  # Set Awesome as the default session (NixOS way)
-  services.xserver.displayManager.defaultSession = "none+awesome";
+  # Set XMonad as the default session (NixOS way)
+  services.xserver.displayManager.defaultSession = "none+xmonad";
   
 
 
-  # Enable Awesome WM with custom configuration
-  services.xserver.windowManager.awesome = {
+  # Enable XMonad, tried i3 and awesome to no avail
+  services.xserver.windowManager.xmonad = {
     enable = true;
-    luaModules = with pkgs.luaPackages; [];
-    config = ''
-      -- Cognito OS Awesome WM Configuration
-      -- Migrated from i3 due to bar customization issues with i3 migration script
-      -- Zero keyboard shortcuts - all actions via rofi omnibar
-      
-      local awful = require("awful")
-      local beautiful = require("beautiful")
-      local gears = require("gears")
-      local wibox = require("wibox")
-      
-      -- Initialize theme
-      beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-      
-      -- Set wallpaper (use a solid color if nixos-logo.png doesn't exist)
-      awful.spawn.with_shell("feh --bg-scale /usr/share/pixmaps/nixos-logo.png || feh --bg-fill '#2d3748'")
-      
-      -- Create top status bar
-      local mywibox = awful.wibar({ position = "top", height = 30 })
-      
-      -- Add widgets to the wibox
-      mywibox:setup {
-          layout = wibox.layout.align.horizontal,
-          { -- Left widgets
-              layout = wibox.layout.fixed.horizontal,
-              awful.widget.taglist {
-                  screen  = screen[1],
-                  filter  = awful.widget.taglist.filter.all,
-                  buttons = {},
-              },
-          },
-          { -- Middle widget
-              layout = wibox.layout.flex.horizontal,
-          },
-          { -- Right widgets
-              layout = wibox.layout.fixed.horizontal,
-              wibox.widget.systray(),
-              wibox.widget.textclock(),
-          },
-      }
-      
-      -- Global key bindings (minimal - just for essential functions)
-      local globalkeys = gears.table.join(
-          -- Launch omnibar with Meta+Space
-          awful.key({ "Mod4" }, "space", function() awful.spawn("cognito-omnibar") end,
-                    {description = "Launch Cognito Omnibar", group = "launcher"}),
-          -- Launch omnibar with Alt+Space (alternative)
-          awful.key({ "Mod1" }, "space", function() awful.spawn("cognito-omnibar") end,
-                    {description = "Launch Cognito Omnibar (Alt)", group = "launcher"}),
-          -- Reload config
-          awful.key({ "Mod4", "Control" }, "r", awesome.restart,
-                    {description = "reload awesome", group = "awesome"}),
-          -- Quit awesome
-          awful.key({ "Mod4", "Shift" }, "q", awesome.quit,
-                    {description = "quit awesome", group = "awesome"})
-      )
-      
-      -- Set root keys
-      root.keys(globalkeys)
-      
-      -- Client key bindings (minimal)
-      local clientkeys = gears.table.join(
-          -- Close window
-          awful.key({ "Mod4", "Shift" }, "c", function (c) c:kill() end,
-                    {description = "close", group = "client"})
-      )
-      
-      -- Client buttons (minimal)
-      local clientbuttons = gears.table.join(
-          awful.button({ }, 1, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) end),
-          awful.button({ "Mod4" }, 1, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) awful.mouse.client.move(c) end),
-          awful.button({ "Mod4" }, 3, function (c) c:emit_signal("request::activate", "mouse_click", {raise = true}) awful.mouse.client.resize(c) end)
-      )
-      
-      -- Set client keys and buttons
-      root.buttons(gears.table.join())
-      
-      -- Rules for new clients
-      awful.rules.rules = {
-          { rule = { }, properties = { border_width = beautiful.border_width,
-                                     border_color = beautiful.border_normal,
-                                     focus = awful.client.focus.filter,
-                                     raise = true,
-                                     keys = clientkeys,
-                                     buttons = clientbuttons,
-                                     screen = awful.screen.preferred,
-                                     placement = awful.placement.no_overlap+awful.placement.no_offscreen
-          }},
-      }
-      
-      -- Signal function to execute when a new client appears
-      client.connect_signal("manage", function (c)
-          if awesome.startup and not c.size_hints.user_position and not c.size_hints.program_position then
-              awful.placement.no_offscreen(c)
-          end
-      end)
-      
-      -- Auto-start applications after Awesome is fully loaded
-      awesome.connect_signal("startup", function()
-          awful.spawn.with_shell("kitty")
-      end)
-      
-      -- Enable sloppy focus, so that focus follows mouse
-      client.connect_signal("mouse::enter", function(c)
-          c:emit_signal("request::activate", "mouse_enter", {raise = false})
-      end)
-    '';
+    enableContribAndExtras = true;
+    config = builtins.readFile ./xmonad.hs;
   };
+  
+  # Create xmobar configuration
+  systemd.tmpfiles.rules = [
+    "d /root/.config/xmobar 0755 root root -"
+    "L+ /root/.config/xmobar/xmobarrc - - - - ${builtins.readFile ./xmobarrc}"
+  ];
 
   # System packages (all hardware agnostic)
   environment.systemPackages = with pkgs; [
@@ -169,13 +70,50 @@
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)
     brightnessctl # for brightness control
-    # Awesome WM dependencies
+    # XMonad WM dependencies
     rofi      # application launcher for omnibar
     feh       # wallpaper setter
-    awesome   # awesome-client command
+    xdotool   # X11 automation tool for omnibar commands
+    xsel      # clipboard utility for XMonad commands
     i3lock    # screen locker (used in omnibar commands)
+    xmobar    # status bar for XMonad
     
 
+    
+    # XMonad command helper script
+    (pkgs.writeScriptBin "xmonad-cmd" ''
+      #!${pkgs.bash}/bin/bash
+      
+      case "$1" in
+        "workspace-1") echo "1" | xsel -i -b && xdotool key super+1 ;;
+        "workspace-2") echo "2" | xsel -i -b && xdotool key super+2 ;;
+        "workspace-3") echo "3" | xsel -i -b && xdotool key super+3 ;;
+        "workspace-4") echo "4" | xsel -i -b && xdotool key super+4 ;;
+        "workspace-5") echo "5" | xsel -i -b && xdotool key super+5 ;;
+        "workspace-6") echo "6" | xsel -i -b && xdotool key super+6 ;;
+        "workspace-7") echo "7" | xsel -i -b && xdotool key super+7 ;;
+        "workspace-8") echo "8" | xsel -i -b && xdotool key super+8 ;;
+        "workspace-9") echo "9" | xsel -i -b && xdotool key super+9 ;;
+        "workspace-10") echo "0" | xsel -i -b && xdotool key super+0 ;;
+        "close-window") xdotool key super+shift+c ;;
+        "split-window") xdotool key super+shift+return ;;
+        "fullscreen") xdotool key super+f ;;
+        "toggle-float") xdotool key super+shift+space ;;
+        "focus-left") xdotool key super+h ;;
+        "focus-right") xdotool key super+l ;;
+        "focus-up") xdotool key super+k ;;
+        "focus-down") xdotool key super+j ;;
+        "move-left") xdotool key super+shift+h ;;
+        "move-right") xdotool key super+shift+l ;;
+        "move-up") xdotool key super+shift+k ;;
+        "move-down") xdotool key super+shift+j ;;
+        "layout-stack") xdotool key super+shift+s ;;
+        "layout-tab") xdotool key super+shift+t ;;
+        "layout-toggle") xdotool key super+space ;;
+        "quit-xmonad") xdotool key super+shift+q ;;
+        *) echo "Unknown command: $1" ;;
+      esac
+    '')
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" ''
@@ -196,53 +134,53 @@
           "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
           
           # === WORKSPACES (1-10) ===
-          "workspace 1:awesome-client 'awful.tag.viewonly(tags[1][1])'"
-          "workspace 2:awesome-client 'awful.tag.viewonly(tags[1][2])'"
-          "workspace 3:awesome-client 'awful.tag.viewonly(tags[1][3])'"
-          "workspace 4:awesome-client 'awful.tag.viewonly(tags[1][4])'"
-          "workspace 5:awesome-client 'awful.tag.viewonly(tags[1][5])'"
-          "workspace 6:awesome-client 'awful.tag.viewonly(tags[1][6])'"
-          "workspace 7:awesome-client 'awful.tag.viewonly(tags[1][7])'"
-          "workspace 8:awesome-client 'awful.tag.viewonly(tags[1][8])'"
-          "workspace 9:awesome-client 'awful.tag.viewonly(tags[1][9])'"
-          "workspace 10:awesome-client 'awful.tag.viewonly(tags[1][10])'"
-          "go to workspace 1:awesome-client 'awful.tag.viewonly(tags[1][1])'"
-          "go to workspace 2:awesome-client 'awful.tag.viewonly(tags[1][2])'"
-          "go to workspace 3:awesome-client 'awful.tag.viewonly(tags[1][3])'"
-          "go to workspace 4:awesome-client 'awful.tag.viewonly(tags[1][4])'"
-          "go to workspace 5:awesome-client 'awful.tag.viewonly(tags[1][5])'"
+          "workspace 1:xmonad-cmd workspace-1"
+          "workspace 2:xmonad-cmd workspace-2"
+          "workspace 3:xmonad-cmd workspace-3"
+          "workspace 4:xmonad-cmd workspace-4"
+          "workspace 5:xmonad-cmd workspace-5"
+          "workspace 6:xmonad-cmd workspace-6"
+          "workspace 7:xmonad-cmd workspace-7"
+          "workspace 8:xmonad-cmd workspace-8"
+          "workspace 9:xmonad-cmd workspace-9"
+          "workspace 10:xmonad-cmd workspace-10"
+          "go to workspace 1:xmonad-cmd workspace-1"
+          "go to workspace 2:xmonad-cmd workspace-2"
+          "go to workspace 3:xmonad-cmd workspace-3"
+          "go to workspace 4:xmonad-cmd workspace-4"
+          "go to workspace 5:xmonad-cmd workspace-5"
           
           # === WINDOW MANAGEMENT ===
-          "close window:awesome-client 'client.focus:kill()'"
-          "close this window:awesome-client 'client.focus:kill()'"
-          "quit window:awesome-client 'client.focus:kill()'"
-          "split horizontal:awesome-client 'awful.client.setmaster(client.focus)'"
-          "split vertical:awesome-client 'awful.client.setslave(client.focus)'"
-          "split horizontally:awesome-client 'awful.client.setmaster(client.focus)'"
-          "split vertically:awesome-client 'awful.client.setslave(client.focus)'"
-          "fullscreen:awesome-client 'client.focus.fullscreen = not client.focus.fullscreen'"
-          "toggle fullscreen:awesome-client 'client.focus.fullscreen = not client.focus.fullscreen'"
-          "floating window:awesome-client 'client.focus.floating = not client.focus.floating'"
-          "toggle floating:awesome-client 'client.focus.floating = not client.focus.floating'"
-          "maximize window:awesome-client 'client.focus.maximized = not client.focus.maximized'"
+          "close window:xmonad-cmd close-window"
+          "close this window:xmonad-cmd close-window"
+          "quit window:xmonad-cmd close-window"
+          "split horizontal:xmonad-cmd split-window"
+          "split vertical:xmonad-cmd split-window"
+          "split horizontally:xmonad-cmd split-window"
+          "split vertically:xmonad-cmd split-window"
+          "fullscreen:xmonad-cmd fullscreen"
+          "toggle fullscreen:xmonad-cmd fullscreen"
+          "floating window:xmonad-cmd toggle-float"
+          "toggle floating:xmonad-cmd toggle-float"
+          "maximize window:xmonad-cmd fullscreen"
           
           # === FOCUS & MOVE ===
-          "focus window left:awesome-client 'awful.client.focus.bydirection(\"left\")'"
-          "focus window right:awesome-client 'awful.client.focus.bydirection(\"right\")'"
-          "focus window up:awesome-client 'awful.client.focus.bydirection(\"up\")'"
-          "focus window down:awesome-client 'awful.client.focus.bydirection(\"down\")'"
-          "move window left:awesome-client 'awful.client.swap.bydirection(\"left\")'"
-          "move window right:awesome-client 'awful.client.swap.bydirection(\"right\")'"
-          "move window up:awesome-client 'awful.client.swap.bydirection(\"up\")'"
-          "move window down:awesome-client 'awful.client.swap.bydirection(\"down\")'"
+          "focus window left:xmonad-cmd focus-left"
+          "focus window right:xmonad-cmd focus-right"
+          "focus window up:xmonad-cmd focus-up"
+          "focus window down:xmonad-cmd focus-down"
+          "move window left:xmonad-cmd move-left"
+          "move window right:xmonad-cmd move-right"
+          "move window up:xmonad-cmd move-up"
+          "move window down:xmonad-cmd move-down"
           
           # === LAYOUTS ===
-          "layout stacking:awesome-client 'awful.layout.set(awful.layout.suit.stack)'"
-          "layout tabbed:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
-          "layout toggle:awesome-client 'awful.layout.inc(1)'"
-          "stacking layout:awesome-client 'awful.layout.set(awful.layout.suit.stack)'"
-          "tabbed layout:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
-          "tile layout:awesome-client 'awful.layout.set(awful.layout.suit.tile)'"
+          "layout stacking:xmonad-cmd layout-stack"
+          "layout tabbed:xmonad-cmd layout-tab"
+          "layout toggle:xmonad-cmd layout-toggle"
+          "stacking layout:xmonad-cmd layout-stack"
+          "tabbed layout:xmonad-cmd layout-tab"
+          "tile layout:xmonad-cmd layout-tab"
           
           # === SYSTEM CONTROL ===
           "shutdown:systemctl poweroff"
@@ -250,11 +188,11 @@
           "power off:systemctl poweroff"
           "reboot:systemctl reboot"
           "restart:systemctl reboot"
-          "logout:awesome-client 'awesome.quit()'"
-          "log out:awesome-client 'awesome.quit()'"
-          "exit awesome:awesome-client 'awesome.quit()'"
-          "lock screen:awesome-client 'awful.spawn(\"i3lock\")'"
-          "lock:awesome-client 'awful.spawn(\"i3lock\")'"
+          "logout:xmonad-cmd quit-xmonad"
+          "log out:xmonad-cmd quit-xmonad"
+          "exit xmonad:xmonad-cmd quit-xmonad"
+          "lock screen:i3lock"
+          "lock:i3lock"
           
           # === VOLUME CONTROL ===
           "volume up:amixer set Master 5%+"
@@ -272,11 +210,11 @@
           "brightness min:brightnessctl set 10%"
           "brightness 50:brightnessctl set 50%"
           
-          # === AWESOME CONTROL ===
-          "reload config:awesome-client 'awesome.restart()'"
-          "restart awesome:awesome-client 'awesome.restart()'"
-          "reload awesome:awesome-client 'awesome.restart()'"
-          "restart window manager:awesome-client 'awesome.restart()'"
+          # === XMONAD CONTROL ===
+          "reload config:xmonad --recompile && xmonad --restart"
+          "restart xmonad:xmonad --restart"
+          "reload xmonad:xmonad --restart"
+          "restart window manager:xmonad --restart"
           
           # === DEBUG & TEST ===
           "debug:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"

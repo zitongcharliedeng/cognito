@@ -1,0 +1,17 @@
+Config { font = "xft:Monospace:size=10:antialias=true"
+       , bgColor = "#2d3748"
+       , fgColor = "#e2e8f0"
+       , position = TopW L 100
+       , lowerOnStart = True
+       , hideOnStart = False
+       , allDesktops = True
+       , overrideRedirect = True
+       , pickBroadest = False
+       , persistent = True
+       , commands = [ Run Date "%a %b %d, %H:%M" "date" 10
+                    , Run StdinReader
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%StdinReader% }{ %date%"
+       }

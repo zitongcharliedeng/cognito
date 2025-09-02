@@ -57,6 +57,7 @@
     xfce.thunar  # file manager
     firefox   # web browser
     gnome.gnome-control-center # settings
+    libnotify # for notifications (debug commands)
   ];
 
   # ============================================================================
@@ -77,12 +78,16 @@
     # Essential services
     exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
     exec --no-startup-id nm-applet
+    
+    # Debug: Auto-open terminal for troubleshooting
+    exec --no-startup-id kitty
 
     # Use Mouse+$mod to drag floating windows to their wanted position
     floating_modifier Mod4
 
-    # SINGLE KEYBOARD SHORTCUT - Meta+Space launches omnibar (like Apple Spotlight)
+    # THE ONLY KEYBOARD SHORTCUTS - Meta+Space or Alt+Space launches omnibar (like Apple Spotlight)
     bindsym Mod4+space exec cognito-omnibar
+    bindsym Mod1+space exec cognito-omnibar
 
     # Window behavior
     new_window normal 1
@@ -99,7 +104,7 @@
   '';
 
   # Create Apple-style omnibar script (executable)
-  environment.etc."cognito/omnibar.sh".source = pkgs.writeScriptBin "omnibar" ''
+  environment.etc."cognito/omnibar.sh".source = pkgs.writeScriptBin "cognito-omnibar" ''
     #!/bin/bash
     # Cognito OS Omnibar - Apple Spotlight-style interface for i3
     # Launch with Meta+Space from anywhere, or click the status bar
@@ -161,6 +166,11 @@
         ["exit i3"]="i3-msg exit"
         ["lock screen"]="i3lock"
         ["screenshot"]="scrot"
+        
+        # Debug commands
+        ["debug omnibar"]="echo 'Omnibar is working!' && notify-send 'Omnibar Debug' 'Command executed successfully!'"
+        ["test command"]="notify-send 'Test' 'This is a test notification'"
+        ["check path"]="which cognito-omnibar && echo 'Found at:' && which cognito-omnibar"
     )
 
     # Create a more Apple-like interface with rofi (if available) or dmenu
@@ -175,7 +185,11 @@
 
     # Execute the command if found
     if [[ -n "$input" && -n "''${commands[$input]}" ]]; then
+        echo "Executing: ''${commands[$input]}"
         eval "''${commands[$input]}"
+    else
+        echo "No command found for: $input"
+        notify-send "Omnibar Error" "Command not found: $input"
     fi
   '';
 

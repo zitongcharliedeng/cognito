@@ -98,8 +98,8 @@
     # No bar configuration - let i3 use defaults
   '';
 
-  # Create Apple-style omnibar script
-  environment.etc."cognito/omnibar.sh".text = ''
+  # Create Apple-style omnibar script (executable)
+  environment.etc."cognito/omnibar.sh".source = pkgs.writeScriptBin "omnibar" ''
     #!/bin/bash
     # Cognito OS Omnibar - Apple Spotlight-style interface for i3
     # Launch with Meta+Space from anywhere, or click the status bar
@@ -179,14 +179,11 @@
     fi
   '';
 
-  # Make omnibar executable and create config symlinks
+  # Create config symlinks
   systemd.tmpfiles.rules = [
     "L+ /root/.config/i3/config - - - - /etc/i3/config"
     "L+ /usr/bin/cognito-omnibar - - - - /etc/cognito/omnibar.sh"
   ];
   
-  # Make omnibar script executable
-  system.activationScripts.makeOmnibarExecutable = ''
-    chmod +x /etc/cognito/omnibar.sh
-  '';
+  # Omnibar script will be made executable via tmpfiles
 }

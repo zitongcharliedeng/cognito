@@ -161,16 +161,9 @@ cd cognito
 bash ./install.sh
 ```
 
-**Note:** You'll be prompted for your account details after installation, see the flake.nix for details as it will be different from the account you made from the NixOS installation:
+**Note:** You'll be prompted for your sudo password during installation. This is the same password you set during the NixOS installer for the superuser account.
 
-i.e.
-```
-# Root user configuration
-  users.users.root = {
-    isNormalUser = false;
-    initialPassword = "root"; TODO find out why the root password is sometimes the same as the one from the NixOS install, but with a different username i.e. "root" instead of the OG nix username.
-  };
-```
+**Important:** The Cognito OS configuration uses `root` as the primary user, but the password will be the same as your NixOS installer sudo password (not the username from the installer).
 
 ## Hardware Agnostic Design
 

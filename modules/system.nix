@@ -18,7 +18,8 @@
   # Root user configuration
   users.users.root = {
     isNormalUser = false;
-    initialPassword = "root";
+    # Note: Password is the same as your NixOS installer sudo password
+    # The initialPassword setting is ignored in this context
   };
   
   # ============================================================================

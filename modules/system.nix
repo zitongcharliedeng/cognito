@@ -34,7 +34,28 @@
     "d /root/.config/xmobar 0755 root root -"
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
-  environment.etc."polybar/config.ini".text = builtins.readFile ./scripts/polybar-config.ini;
+  
+  # Polybar configuration (minimal)
+  environment.etc."polybar/config.ini".text = ''
+    [bar/main]
+    monitor = 
+    width = 100%
+    height = 30
+    background = #1a202c
+    foreground = #e2e8f0
+    font-0 = "Monospace:size=12"
+    modules-left = workspace-preview
+    modules-right = window-title
+
+    [module/workspace-preview]
+    type = custom/script
+    exec = workspace-preview-polybar
+    interval = 2
+
+    [module/window-title]
+    type = internal/xwindow
+    label = %title%
+  '';
 
   # ============================================================================
   # SYSTEM PACKAGES (all hardware agnostic)

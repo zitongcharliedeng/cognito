@@ -105,6 +105,10 @@ build_system() {
   echo "Debug: Available hosts in flake:"
   nix flake show --extra-experimental-features "nix-command flakes" | grep -A 10 "nixosConfigurations" || echo "No nixosConfigurations found"
   echo ""
+  echo "Debug: Committing new host configuration to Git..."
+  git add hosts/${HOSTNAME}/
+  git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
+  
   echo "Debug: Running nixos-rebuild with verbose output..."
   sudo nixos-rebuild switch --flake .#${HOSTNAME} --verbose
   echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."

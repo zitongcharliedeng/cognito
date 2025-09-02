@@ -47,8 +47,10 @@
   # Create xmobar configuration
   systemd.tmpfiles.rules = [
     "d /root/.config/xmobar 0755 root root -"
-    "L+ /root/.config/xmobar/xmobarrc - - - - ${builtins.readFile ./xmobarrc}"
   ];
+  
+  # Create xmobar config file using environment.etc
+  environment.etc."xmobar/xmobarrc".text = builtins.readFile ./xmobarrc;
 
   # System packages (all hardware agnostic)
   environment.systemPackages = with pkgs; [

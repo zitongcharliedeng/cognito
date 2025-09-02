@@ -27,7 +27,7 @@ main = xmonad $ withSB mySB def
   } `additionalKeysP` myKeys
 
 -- Status bar configuration
-mySB = statusBarProp "xmobar ~/.config/xmobar/xmobarrc" (pure myPP)
+mySB = statusBarProp "xmobar /etc/xmobar/xmobarrc" (pure myPP)
 
 -- Layout configuration
 myLayout = avoidStruts $ spacing 4 $ tiled ||| Mirror tiled ||| Full

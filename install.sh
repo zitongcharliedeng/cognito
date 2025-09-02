@@ -60,6 +60,10 @@ create_host_dir() {
   # Hostname ties this config to the device
   networking.hostName = "${HOSTNAME}";
 
+  # Bootloader configuration (will be overridden by hardware-configuration.nix if needed)
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "nodev";  # Will be set by hardware-configuration.nix
+
   # ⚠️ If you need device-specific quirks (e.g. mic LED fix),
   # put them here — NOT in hardware-configuration.nix.
   # 

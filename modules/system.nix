@@ -128,43 +128,94 @@
       esac
     '')
     
-    # Workspace preview script for xmobar
+    # Workspace preview script for xmobar (real app icons)
     (pkgs.writeScriptBin "workspace-preview" ''
       #!${pkgs.bash}/bin/bash
       
-      # Get current workspace
-      current_ws=$(xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}')
+      # Get current workspace (with fallback)
+      current_ws=$(xprop -root _NET_CURRENT_DESKTOP 2>/dev/null | awk '{print $3}' || echo "0")
+      
+      # Function to get app icon path based on window class
+      get_app_icon_path() {
+        local window_class="$1"
+        case "$window_class" in
+          *[Ff]irefox*)
+            find /usr/share/pixmaps /usr/share/icons -name "*firefox*" -type f 2>/dev/null | head -1
+            ;;
+          *[Cc]hrome*|*[Gg]oogle*)
+            find /usr/share/pixmaps /usr/share/icons -name "*chrome*" -o -name "*google*" -type f 2>/dev/null | head -1
+            ;;
+          *[Kk]itty*)
+            find /usr/share/pixmaps /usr/share/icons -name "*kitty*" -type f 2>/dev/null | head -1
+            ;;
+          *[Tt]hunar*)
+            find /usr/share/pixmaps /usr/share/icons -name "*thunar*" -type f 2>/dev/null | head -1
+            ;;
+          *[Vv]im*)
+            find /usr/share/pixmaps /usr/share/icons -name "*vim*" -type f 2>/dev/null | head -1
+            ;;
+          *[Oo]bs*)
+            find /usr/share/pixmaps /usr/share/icons -name "*obs*" -type f 2>/dev/null | head -1
+            ;;
+          *[Vv]lc*)
+            find /usr/share/pixmaps /usr/share/icons -name "*vlc*" -type f 2>/dev/null | head -1
+            ;;
+          *[Ss]potify*)
+            find /usr/share/pixmaps /usr/share/icons -name "*spotify*" -type f 2>/dev/null | head -1
+            ;;
+          *[Dd]iscord*)
+            find /usr/share/pixmaps /usr/share/icons -name "*discord*" -type f 2>/dev/null | head -1
+            ;;
+          *[Cc]ode*|*[Vv]s*)
+            find /usr/share/pixmaps /usr/share/icons -name "*code*" -o -name "*vscode*" -type f 2>/dev/null | head -1
+            ;;
+          *[Gg]imp*)
+            find /usr/share/pixmaps /usr/share/icons -name "*gimp*" -type f 2>/dev/null | head -1
+            ;;
+          *[Gg]nome-control*)
+            find /usr/share/pixmaps /usr/share/icons -name "*control*" -o -name "*settings*" -type f 2>/dev/null | head -1
+            ;;
+          *)
+            # Try to find generic icon based on class name
+            local class_lower=$(echo "$window_class" | tr '[:upper:]' '[:lower:]')
+            find /usr/share/pixmaps /usr/share/icons -name "*$class_lower*" -type f 2>/dev/null | head -1
+            ;;
+        esac
+      }
+      
+      # Function to get window class from window ID
+      get_window_class() {
+        local window_id="$1"
+        xprop -id "$window_id" WM_CLASS 2>/dev/null | awk -F'"' '{print $4}' || echo ""
+      }
       
       # Generate workspace preview
       preview=""
       for i in {0..9}; do
-        # Get window count for this workspace
-        window_count=$(wmctrl -l | awk -v ws="$i" '$2 == ws {count++} END {print count+0}')
-        
-        # Get window titles for this workspace (first 2)
-        window_titles=$(wmctrl -l | awk -v ws="$i" '$2 == ws {print substr($0, index($0,$4))}' | head -2 | tr '\n' ' ' | sed 's/ $//')
-        
-        # Truncate long titles
-        if [ ''${#window_titles} -gt 15 ]; then
-          window_titles="''${window_titles:0:12}..."
-        fi
-        
-        # Set colors based on current workspace and window count
-        if [ "$i" -eq "$current_ws" ]; then
-          if [ "$window_count" -gt 0 ]; then
-            icon="<fc=#68d391>●</fc>"
-            color="<fc=#68d391>"
-          else
-            icon="<fc=#68d391>○</fc>"
-            color="<fc=#68d391>"
-          fi
-        else
-          if [ "$window_count" -gt 0 ]; then
-            icon="<fc=#a0aec0>●</fc>"
-            color="<fc=#a0aec0>"
-          else
-            icon="<fc=#4a5568>○</fc>"
-            color="<fc=#4a5568>"
+        # Get applications on this workspace
+        app_icons=""
+        if command -v wmctrl >/dev/null 2>&1; then
+          # Get window IDs for this workspace
+          window_ids=$(wmctrl -l 2>/dev/null | awk -v ws="$i" '$2 == ws {print $1}' | head -3 || echo "")
+          
+          if [ -n "$window_ids" ]; then
+            # Get icons for each window
+            while IFS= read -r window_id; do
+              if [ -n "$window_id" ]; then
+                window_class=$(get_window_class "$window_id")
+                if [ -n "$window_class" ]; then
+                  icon_path=$(get_app_icon_path "$window_class")
+                  if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then
+                    # Use xmobar's image display capability
+                    app_icons="$app_icons<icon=$icon_path/>"
+                  else
+                    # Fallback to first letter of class name
+                    first_char=$(echo "$window_class" | cut -c1 | tr '[:lower:]' '[:upper:]')
+                    app_icons="$app_icons<fc=#a0aec0>$first_char</fc>"
+                  fi
+                fi
+              fi
+            done <<< "$window_ids"
           fi
         fi
         
@@ -175,11 +226,12 @@
           ws_num="$((i+1))"
         fi
         
-        preview="$preview<action=\`xdotool key super+$ws_num\`>$icon $color$ws_num</fc>"
-        if [ -n "$window_titles" ]; then
-          preview="$preview <fc=#718096>($window_titles)</fc>"
+        # Format: workspace_number[icons]
+        if [ -n "$app_icons" ]; then
+          preview="$preview<action=\`xdotool key super+$ws_num\`>$ws_num[$app_icons]</action> "
+        else
+          preview="$preview<action=\`xdotool key super+$ws_num\`>$ws_num[]</action> "
         fi
-        preview="$preview</action> "
       done
       
       echo "$preview"
@@ -267,6 +319,11 @@
           # === XMONAD CONTROL ===
           ["reload-config"]="xmonad --recompile && xmonad --restart"
           ["restart-xmonad"]="xmonad --restart"
+          
+          # === TIME & DATE ===
+          ["time"]="notify-send 'Time' \"\$(date '+%H:%M')\""
+          ["date"]="notify-send 'Date' \"\$(date '+%A, %B %d, %Y')\""
+          ["datetime"]="notify-send 'Date & Time' \"\$(date '+%A, %B %d, %Y at %H:%M')\""
           
           # === DEBUG & TEST ===
           ["debug"]="echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
@@ -378,6 +435,14 @@
           ["restart xmonad"]="restart-xmonad"
           ["reload xmonad"]="restart-xmonad"
           ["restart window manager"]="restart-xmonad"
+          
+          # === TIME & DATE ALIASES ===
+          ["what time is it"]="time"
+          ["current time"]="time"
+          ["what date is it"]="date"
+          ["current date"]="date"
+          ["date and time"]="datetime"
+          ["current datetime"]="datetime"
           
           # === DEBUG & TEST ===
           ["check rofi"]="check-rofi"

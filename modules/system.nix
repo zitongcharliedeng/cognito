@@ -67,6 +67,7 @@
     xsel      # clipboard utility for XMonad commands
     xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
+    xlock     # screen lock utility
     papirus-icon-theme  # Single icon theme for applications
 
     # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent
@@ -77,6 +78,9 @@
     
     # Custom omnibar script with explicit bash dependency
     (pkgs.writeScriptBin "cognito-omnibar" (builtins.readFile ./scripts/cognito-omnibar.sh))
+    
+    # Custom rofi mode script
+    (pkgs.writeScriptBin "custom-actions-mode" (builtins.readFile ./scripts/custom-actions-mode.sh))
   ];
 
 

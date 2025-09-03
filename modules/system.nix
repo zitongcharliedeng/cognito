@@ -36,6 +36,7 @@
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
   # Gaming:
+  nixpkgs.config.allowUnfree = true;
   programs.steam.enable = true;
   # programs.steam.gamescopeSession.enable = true;
   # programs.gamemode.enable = true;

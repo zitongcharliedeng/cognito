@@ -41,7 +41,7 @@ commands=(
     "toggle layout:xmonad-cmd layout-toggle"
     
     "restart xmonad:xmonad-cmd quit-xmonad"
-    "lock screen:xlock -mode blank"
+    "lock screen:loginctl lock-session"
     "suspend:systemctl suspend"
     "shutdown:systemctl poweroff"
     "reboot:systemctl reboot"

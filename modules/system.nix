@@ -67,7 +67,6 @@
     xsel      # clipboard utility for XMonad commands
     xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
-    xlock     # screen lock utility
     papirus-icon-theme  # Single icon theme for applications
 
     # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent

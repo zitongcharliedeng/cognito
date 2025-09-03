@@ -18,7 +18,7 @@ discover_applications() {
                 
                 # Extract app info from desktop file
                 local name=$(grep "^Name=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
-                local exec=$(grep "^Exec=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2 | cut -d' ' -f1)
+                local exec_full=$(grep "^Exec=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
                 local icon=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
                 local no_display=$(grep "^NoDisplay=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
                 local hidden=$(grep "^Hidden=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
@@ -27,10 +27,10 @@ discover_applications() {
                 [[ "$no_display" == "true" || "$hidden" == "true" ]] && continue
                 
                 # Skip if no name or exec
-                [[ -z "$name" || -z "$exec" ]] && continue
+                [[ -z "$name" || -z "$exec_full" ]] && continue
                 
-                # Clean up exec command (remove %U, %F, etc.)
-                exec=$(echo "$exec" | sed 's/%[a-zA-Z]//g' | xargs)
+                # Clean up exec command (remove %U, %F, etc.) and get first word
+                local exec=$(echo "$exec_full" | sed 's/%[a-zA-Z]//g' | xargs | cut -d' ' -f1)
                 
                 # Find icon in Papirus icon pack (single source of truth)
                 local icon_path=""

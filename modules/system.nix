@@ -7,12 +7,23 @@
   services.openssh.enable = true;
   services.xserver.enable = true;
   services.xserver.displayManager.startx.enable = true;
-  services.getty.extraArgs = [ "--autologin" "root" ];
+  services.getty.extraArgs = [ "--autologin" "ulysses" ];
+  
+  # Root user (for system administration)
   users.users.root = {
     isNormalUser = false;
     # Note: Password is the same as your NixOS installer sudo password
-    # The initialPassword setting is would be ignored in this context after install.sh runs
   };
+  
+  # Regular user for daily use and running things like steam without root implicitly for safety
+  users.users.ulysses = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
+    initialPassword = "ulysses";
+  };
+  
+  # Enable sudo for wheel group (ulysses user)
+  security.sudo.enable = true;
   
   # ============================================================================
   # DISPLAY MANAGER - XMonad on X11, with Rofi Omnibar for no-memorized shortcuts
@@ -31,7 +42,7 @@
   
   # Create configuration for xmobar, the status bar for XMonad
   systemd.tmpfiles.rules = [
-    "d /root/.config/xmobar 0755 root root -"
+    "d /home/ulysses/.config/xmobar 0755 ulysses users -"
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
@@ -57,7 +68,7 @@
     scrot     # screenshot tool
     xclip     # clipboard utility
     xfce.thunar  # file manager and explorer
-    chromium   # web browser
+    zen-browser   # web browser
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)

@@ -68,7 +68,7 @@
     scrot     # screenshot tool
     xclip     # clipboard utility
     xfce.thunar  # file manager and explorer
-    zen-browser   # web browser
+    firefox   # web browser
     gnome.gnome-control-center # settings
     libnotify # for notifications (debug commands)
     alsa-utils # for volume control (amixer)

@@ -40,10 +40,7 @@
     config = builtins.readFile ./scripts/xmonad.hs;
   };
   
-  # Create configuration for xmobar, the status bar for XMonad
-  systemd.tmpfiles.rules = [
-    "d /home/ulysses/.config/xmobar 0755 ulysses users -"
-  ];
+  # Xmobar configuration will be created automatically by the user
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
   # Gaming:

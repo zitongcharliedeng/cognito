@@ -1,12 +1,64 @@
 
+# Function to discover installed applications and find their icons
+discover_applications() {
+    local apps=()
+    
+    # Find all installed applications from desktop files (NixOS paths)
+    local app_dirs=(
+        "/run/current-system/sw/share/applications"
+        "/nix/store/*/share/applications"
+        "/home/*/.local/share/applications"
+    )
+    
+    for dir in "${app_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            while IFS= read -r -d '' desktop_file; do
+                # Skip hidden files
+                [[ "$(basename "$desktop_file")" =~ ^\..* ]] && continue
+                
+                # Extract app info from desktop file
+                local name=$(grep "^Name=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+                local exec=$(grep "^Exec=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2 | cut -d' ' -f1)
+                local icon=$(grep "^Icon=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+                local no_display=$(grep "^NoDisplay=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+                local hidden=$(grep "^Hidden=" "$desktop_file" 2>/dev/null | head -1 | cut -d'=' -f2)
+                
+                # Skip if hidden or no display
+                [[ "$no_display" == "true" || "$hidden" == "true" ]] && continue
+                
+                # Skip if no name or exec
+                [[ -z "$name" || -z "$exec" ]] && continue
+                
+                # Clean up exec command (remove %U, %F, etc.)
+                exec=$(echo "$exec" | sed 's/%[a-zA-Z]//g' | xargs)
+                
+                # Find icon in Papirus icon pack (single source of truth)
+                local icon_path=""
+                if [[ -n "$icon" ]]; then
+                    local papirus_icon=$(find /nix/store -path "*/papirus-icon-theme/*/apps/$icon.png" 2>/dev/null | head -1)
+                    if [[ -z "$papirus_icon" ]]; then
+                        papirus_icon=$(find /nix/store -path "*/papirus-icon-theme/*/apps/$icon.svg" 2>/dev/null | head -1)
+                    fi
+                    if [[ -n "$papirus_icon" ]]; then
+                        icon_path="$papirus_icon"
+                    fi
+                fi
+                
+                # Add to apps array
+                apps+=("open $name in new window:$exec:$icon_path")
+                
+            done < <(find "$dir" -name "*.desktop" -print0 2>/dev/null)
+        fi
+    done
+    
+    # Remove duplicates and sort
+    printf '%s\n' "${apps[@]}" | sort -u
+}
+
 # === SIMPLE DIRECT COMMANDS (One Entry Per Action) ===
 commands=(
-    # === APPLICATIONS ===
-    "open kitty in new window:kitty"
-    "open thunar in new window:thunar"
-    "open firefox in new window:firefox"
-    "open vim in new window:vim"
-    "open settings in new window:gnome-control-center"
+    # === APPLICATIONS (Auto-discovered) ===
+    $(discover_applications)
     
     # === WORKSPACES ===
     "switch to workspace 1:xmonad-cmd workspace-1"
@@ -47,15 +99,15 @@ commands=(
     
     # === SYSTEM ===
     "restart xmonad:xmonad-cmd quit-xmonad"
-    "lock screen:i3lock -c 000000"
+    "lock screen:xlock -mode blank"
     "suspend:systemctl suspend"
     "shutdown:systemctl poweroff"
     "reboot:systemctl reboot"
     
     # === SCREENSHOTS ===
-    "take screenshot:scrot -d 1 ~/screenshot-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
-    "screenshot window:scrot -s ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
-    "screenshot area:scrot -s ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < ~/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
+    "take screenshot:scrot -d 1 /tmp/screenshot-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < /tmp/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Saved and copied to clipboard'"
+    "screenshot window:scrot -s /tmp/screenshot-window-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < /tmp/screenshot-window-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Window screenshot saved and copied'"
+    "screenshot area:scrot -s /tmp/screenshot-area-$(date +%Y%m%d-%H%M%S).png && xclip -selection clipboard -t image/png < /tmp/screenshot-area-$(date +%Y%m%d-%H%M%S).png && notify-send 'Screenshot' 'Area screenshot saved and copied'"
     
     # === CLIPBOARD ===
     "copy clipboard:xsel -o | xsel -i -b"
@@ -77,15 +129,47 @@ commands=(
 
 # Show commands with rofi
 if command -v rofi >/dev/null 2>&1; then
-    input=$(printf '%s\n' "${commands[@]}" | rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 60 -lines 20)
+    # Create a temporary file for rofi with icons
+    local rofi_input=$(mktemp)
+    
+    # Process commands and add icons where possible
+    for cmd in "${commands[@]}"; do
+        local display_name=$(echo "$cmd" | cut -d: -f1)
+        local exec_cmd=$(echo "$cmd" | cut -d: -f2)
+        local icon_path=$(echo "$cmd" | cut -d: -f3)
+        
+        # Use icon if available, otherwise no icon
+        if [[ -n "$icon_path" && -f "$icon_path" ]]; then
+            echo "$icon_path	$display_name" >> "$rofi_input"
+        else
+            echo "	$display_name" >> "$rofi_input"
+        fi
+    done
+    
+    input=$(rofi -dmenu -i -p "🔍 Cognito Omnibar" -width 60 -lines 20 < "$rofi_input" | cut -f2-)
+    rm -f "$rofi_input"
     
     if [[ -n "$input" ]]; then
-        cmd=$(echo "$input" | cut -d: -f2)
-        echo "Executing: $cmd"
-        # Log to a file for debugging
-        echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
-        # Execute command directly in current shell context
-        eval "$cmd" &
+        # Find the original command from our commands array
+        cmd=""
+        for original_cmd in "${commands[@]}"; do
+            # Handle both old format (2 fields) and new format (3 fields)
+            local cmd_display=$(echo "$original_cmd" | cut -d: -f1)
+            if [[ "$cmd_display" == "$input" ]]; then
+                cmd=$(echo "$original_cmd" | cut -d: -f2)
+                break
+            fi
+        done
+        
+        if [[ -n "$cmd" ]]; then
+            echo "Executing: $cmd"
+            # Log to a file for debugging
+            echo "$(date): Executing command: $cmd" >> /tmp/cognito-omnibar.log
+            # Execute command directly in current shell context
+            eval "$cmd" &
+        else
+            echo "Command not found for: $input"
+        fi
     fi
 else
     echo "Rofi not found"

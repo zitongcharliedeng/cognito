@@ -35,8 +35,10 @@
   ];
   environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
   
+
+  
   # Gaming:
-  # programs.steam.enable = true;
+  programs.steam.enable = true;
   # programs.steam.gamescopeSession.enable = true;
   # programs.gamemode.enable = true;
   # # Allow unfree packages (needed for Steam, etc.)
@@ -66,6 +68,9 @@
     xsel      # clipboard utility for XMonad commands
     xmobar    # status bar for XMonad
     wmctrl    # for window management and workspace info
+    
+    # Icon themes
+    papirus-icon-theme  # Single icon theme for applications
 
     # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent
     (pkgs.writeScriptBin "xmonad-cmd" (builtins.readFile ./scripts/xmonad-cmd.sh))

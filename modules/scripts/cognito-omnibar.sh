@@ -56,9 +56,12 @@ discover_applications() {
 }
 
 # === SIMPLE DIRECT COMMANDS (One Entry Per Action) ===
+# Get discovered applications
+discovered_apps=($(discover_applications 2>/dev/null || echo ""))
+
 commands=(
     # === APPLICATIONS (Auto-discovered) ===
-    $(discover_applications)
+    "${discovered_apps[@]}"
     
     # === WORKSPACES ===
     "switch to workspace 1:xmonad-cmd workspace-1"
@@ -123,8 +126,8 @@ commands=(
     "debug omnibar:echo 'Omnibar working!' && notify-send 'Debug' 'Omnibar is functional'"
     "test notification:notify-send 'Test' 'This is a test notification'"
     "restart xmobar:pkill xmobar 2>/dev/null || true; sleep 1; xmobar /etc/xmobar/xmobarrc &"
-    "debug simple icon test:kitty -e bash -c 'echo \"Simple icon test:\"; echo \"Testing kitty icon lookup...\"; find /nix/store -name \"*kitty*\" -type f 2>/dev/null | grep -E \"\\\\.(png|svg|ico)$\" | head -3; echo \"Testing firefox icon lookup...\"; find /nix/store -name \"*firefox*\" -type f 2>/dev/null | grep -E \"\\\\.(png|svg|ico)$\" | head -3; echo \"Press Enter to close\"; read'"
-    "debug omnibar arrays:kitty -e bash -c 'echo \"Debugging omnibar arrays...\"; echo \"All commands:\"; for cmd in \"${commands[@]}\"; do echo \"  \$cmd\"; done; echo \"Press Enter to close\"; read'"
+    "debug omnibar script:kitty -e bash -c 'echo \"Testing omnibar script...\"; echo \"Script location:\"; which cognito-omnibar; echo \"Script syntax:\"; bash -n /nix/store/*/bin/cognito-omnibar 2>&1 || echo \"Syntax check failed\"; echo \"Press Enter to close\"; read'"
+    "debug discovered apps:kitty -e bash -c 'echo \"Discovered applications:\"; discover_applications | head -10; echo \"Press Enter to close\"; read'"
 )
 
 # Show commands with rofi

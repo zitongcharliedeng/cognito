@@ -18,8 +18,31 @@ list_hosts() {
 }
 
 get_host() {
-  echo -n "Enter hostname for hardware-shim (existing or create new): "
-  read -r HOSTNAME
+  while true; do
+    echo -n "Enter hostname for hardware-shim (existing or create new): "
+    read -r HOSTNAME
+    
+    # Validate hostname is not empty
+    if [[ -z "$HOSTNAME" ]]; then
+      echo "❌ Hostname cannot be empty. Please enter a valid hostname."
+      continue
+    fi
+    
+    # Validate hostname contains only valid characters (alphanumeric, hyphens, underscores)
+    if [[ ! "$HOSTNAME" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+      echo "❌ Hostname can only contain letters, numbers, hyphens, and underscores."
+      continue
+    fi
+    
+    # Validate hostname doesn't start or end with hyphen
+    if [[ "$HOSTNAME" =~ ^-|-$ ]]; then
+      echo "❌ Hostname cannot start or end with a hyphen."
+      continue
+    fi
+    
+    echo "✔ Using hostname: $HOSTNAME"
+    break
+  done
 }
 
 create_host_dir() {

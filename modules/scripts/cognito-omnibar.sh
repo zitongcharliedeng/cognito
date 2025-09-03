@@ -133,13 +133,13 @@ commands=(
 # Show commands with rofi
 if command -v rofi >/dev/null 2>&1; then
     # Create a temporary file for rofi with icons
-    local rofi_input=$(mktemp)
+    rofi_input=$(mktemp)
     
     # Process commands and add icons where possible
     for cmd in "${commands[@]}"; do
-        local display_name=$(echo "$cmd" | cut -d: -f1)
-        local exec_cmd=$(echo "$cmd" | cut -d: -f2)
-        local icon_path=$(echo "$cmd" | cut -d: -f3)
+        display_name=$(echo "$cmd" | cut -d: -f1)
+        exec_cmd=$(echo "$cmd" | cut -d: -f2)
+        icon_path=$(echo "$cmd" | cut -d: -f3)
         
         # Use icon if available, otherwise no icon
         if [[ -n "$icon_path" && -f "$icon_path" ]]; then
@@ -157,7 +157,7 @@ if command -v rofi >/dev/null 2>&1; then
         cmd=""
         for original_cmd in "${commands[@]}"; do
             # Handle both old format (2 fields) and new format (3 fields)
-            local cmd_display=$(echo "$original_cmd" | cut -d: -f1)
+            cmd_display=$(echo "$original_cmd" | cut -d: -f1)
             if [[ "$cmd_display" == "$input" ]]; then
                 cmd=$(echo "$original_cmd" | cut -d: -f2)
                 break

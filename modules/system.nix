@@ -27,7 +27,7 @@
   services.greetd.enable = true;
   services.greetd.settings = {
     default_session = {
-      command = "Hyprland";
+      command = "Hyprland -c /etc/hypr/hyprland.conf";
       user = "ulysses";
     };
   };
@@ -73,5 +73,28 @@
   environment.etc."xdg/waybar/style.css".text = ''
   * { font-family: "Inter", "JetBrainsMono", sans-serif; font-size: 12px; }
   #workspaces button.active { color: #ffffff; background: #3a3a3a; }
+  '';
+
+  environment.etc."hypr/hyprland.conf".text = ''
+  monitor=,preferred,auto,auto
+  env = XCURSOR_SIZE,24
+  exec-once = waybar &
+  exec-once = rofi -show drun
+  input {
+    kb_layout = us
+  }
+  general {
+    gaps_in = 6
+    gaps_out = 12
+    border_size = 2
+    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+    col.inactive_border = rgba(00000088)
+  }
+  $mod = SUPER
+  bind = $mod,SPACE,exec,rofi -show drun
+  bind = $mod,RETURN,exec,kitty
+  bind = $mod,Q,killactive
+  bind = $mod,M,exit
+  bind = $mod,F,fullscreen,1
   '';
 }

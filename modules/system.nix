@@ -58,6 +58,17 @@
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
     git vim htop tmux
+    (pkgs.writeShellScriptBin "cognito-omnibar" ''
+    #!/bin/sh
+    CHOICE=$(printf "%s\n" "Apps" "Open Terminal" "Close Active Window" "Toggle Fullscreen" "Exit Hyprland" | rofi -dmenu -i -p "Omnibar")
+    case "$CHOICE" in
+      "Apps") rofi -show drun ;;
+      "Open Terminal") kitty ;;
+      "Close Active Window") hyprctl dispatch killactive ;;
+      "Toggle Fullscreen") hyprctl dispatch fullscreen 1 ;;
+      "Exit Hyprland") hyprctl dispatch exit ;;
+    esac
+    '')
   ];
 
   environment.etc."xdg/waybar/config.jsonc".text = ''
@@ -76,22 +87,25 @@
   '';
 
   environment.etc."hypr/hyprland.conf".text = ''
-  monitor=,preferred,auto,auto
+  monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
   exec-once = waybar &
-  exec-once = rofi -show drun
   input {
     kb_layout = us
   }
   general {
-    gaps_in = 6
-    gaps_out = 12
+    gaps_in = 2
+    gaps_out = 2
     border_size = 2
     col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
     col.inactive_border = rgba(00000088)
   }
+  decoration {
+    rounding = 0
+    drop_shadow = false
+  }
   $mod = SUPER
-  bind = $mod,SPACE,exec,rofi -show drun
+  bind = $mod,SPACE,exec,cognito-omnibar
   bind = $mod,RETURN,exec,kitty
   bind = $mod,Q,killactive
   bind = $mod,M,exit

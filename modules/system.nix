@@ -15,7 +15,7 @@
   users.users.ulysses = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
-    initialPassword = "ulysses";
+    initialPassword = "password";
   };
 
   security.sudo.enable = true;
@@ -23,6 +23,14 @@
   services.xserver.enable = false;
 
   programs.hyprland.enable = true;
+
+  services.greetd.enable = true;
+  services.greetd.settings = {
+    default_session = {
+      command = "Hyprland";
+      user = "ulysses";
+    };
+  };
 
   hardware.graphics = {
     enable = true;

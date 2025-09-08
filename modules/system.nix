@@ -40,6 +40,15 @@
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
 
+  fonts = {
+    fontconfig.enable = true;
+    packages = with pkgs; [
+      jetbrains-mono
+      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    ];
+    defaultFonts.monospace = [ "JetBrains Mono" "JetBrainsMono Nerd Font Mono" ];
+  };
+
   programs.steam = {
     enable = true;
     gamescopeSession.enable = true;
@@ -83,7 +92,7 @@
   }
   '';
   environment.etc."xdg/waybar/style.css".text = ''
-  * { font-family: "Inter", "JetBrainsMono", sans-serif; font-size: 12px; }
+  * { font-family: "JetBrains Mono", "JetBrainsMono Nerd Font Mono", monospace; font-size: 12px; }
   #workspaces button.active { color: #ffffff; background: #3a3a3a; }
   '';
 
@@ -95,15 +104,12 @@
     kb_layout = us
   }
   general {
-    gaps_in = 2
-    gaps_out = 2
-    border_size = 2
-    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-    col.inactive_border = rgba(00000088)
-  }
-  decoration {
-    rounding = 0
-    drop_shadow = false
+    gaps_in = 2 # Hyperland Default is 5 ಠ_ಠ
+    gaps_out = 2 # Hyperland Default is 20 ಠ_ಠ
+    border_size = 2 # Hyperland Default is 2 ಠ_ಠ
+    # Hyperland does not guarantee the same default colors in new releases.
+    col.active_border = rgba(ffffffff) # White
+    col.inactive_border = rgba(808080ff) # 50% Grey
   }
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -111,5 +117,12 @@
   bind = $mod,Q,killactive
   bind = $mod,M,exit
   bind = $mod,F,fullscreen,1
+  '';
+
+  environment.etc."xdg/kitty/kitty.conf".text = ''
+  font_family JetBrainsMono Nerd Font Mono
+  bold_font JetBrainsMono Nerd Font Mono Bold
+  italic_font JetBrainsMono Nerd Font Mono Italic
+  bold_italic_font JetBrainsMono Nerd Font Mono Bold Italic
   '';
 }

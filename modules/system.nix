@@ -44,7 +44,7 @@
     waybar hyprpaper rofi-wayland
     obs-studio mangohud protonup
     wl-clipboard grim slurp
-    kitty xfce.thunar firefox gnome.gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
+    kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
     git vim htop tmux
   ];
 

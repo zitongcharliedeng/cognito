@@ -2,6 +2,7 @@
 # Regression: autologin removed; XMonad/xmobar and custom rofi modes removed; X11 tools replaced by Wayland equivalents (wl-clipboard, grim, slurp); VMs often require 3D acceleration for Hyprland; hyprlock omitted on nixpkgs 23.11.
 {
   services.openssh.enable = true;
+  systemd.oomd.enable = false;
 
   nixpkgs.config.allowUnfree = true;
 

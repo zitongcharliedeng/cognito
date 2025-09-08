@@ -130,7 +130,7 @@ https://youtu.be/YHm7e3f87iY
 - Modules of my OS reflect how my own human brain abstracts concepts e.g. Basal Ganglia -> Calendar and TickTick integrations, Hippocampus -> RemNote spaced repetition queues, Neocortex -> Long-term NAS storages.
   - As a result, maybe my home screen can be a graphical diagram of a brain, and I click on whatever section of the digital brain I want to access to get there.
 - Network based bi-linking - imitate the brain and read more about interesting concepts like supermemo.guru
-- Minimal dependencies needed, hardware agnostic as it can be - this ie rules out using wayland or sway in favour of i3, we cant have propietary drivers and software only some types of hardware can run, if a machine can install nixOS, it can run my set up. :fire:
+- Wayland-first (Hyprland + Waybar + Rofi-Wayland) with minimal dependencies and broad hardware support; XDG portals for Wayland integration.
 - 
   
 # Installation guide for a TDE ontop of the current, non-NixOS distro
@@ -139,6 +139,12 @@ https://youtu.be/YHm7e3f87iY
 
 **Step 2:** Go to `/etc/nixos/` and replace all files there with this repo (containing Nix configs), (ie., ~/nix-config) where `flake.nix` is, and apply the configuration using a terminal in that directory and running the command `nixos-rebuild switch --flake .#HOSTNAME`
 
+## Prerequisites
+
+- Laptop/desktop from roughly the last decade (≈2014+) with a GPU (integrated or discrete) supporting 3D acceleration (OpenGL 3.3+).
+- This covers ~99% of machines I would install Cognito on and is considered hardware-agnostic for this project.
+- For VMs, ensure 3D acceleration is enabled (see Wayland in VMs).
+
 # 🚀 Installation
 
 ## 1. Install NixOS
@@ -146,6 +152,8 @@ https://youtu.be/YHm7e3f87iY
 First install NixOS using any graphical ISO image and choosing the No desktop option during installation.
 
 This will auto-generate a hardware-config which acts as a shim layer to run Cognito on your device, and can be used in the install script or replaced with a preset hardware-config, if you have used this device before/ want to override the recommended shim settings, for some odd reason.
+
+TODO add note about true paste macro since tty doesnt have access to clipboard, even with spice VM clipboard sync.
 
 ## 2. Clone the repo anywhere (usually into ~/)
 
@@ -186,9 +194,17 @@ NixOS intentionally uses the same password across your system for several import
 
 ## Hardware Agnostic Design
 
-Cognito OS is designed to be completely hardware agnostic. All packages and configurations work on any machine that can run NixOS:
+Cognito OS is designed to be as hardware agnostic as practical. Core stack is Wayland-first:
 
-- **X11-based** - Uses the most compatible display protocol (works on 99.9% of NixOS hardware, any realistic PC machine, unlike chud microcontrollers)
-- **No proprietary drivers** - Pure open-source stack
-- **Maximum compatibility** - Works on any NixOS-compatible machine, from embedded devices to servers
-- **Minimal dependencies** - Only essential, hardware-agnostic packages
+- **Wayland-first** (Hyprland + Waybar + Rofi-Wayland)
+- **XDG portals** enabled for Wayland apps, screen sharing, and Steam integration
+- **Maximum compatibility** on modern GPUs; unfree packages enabled for Steam and certain GPUs as needed
+- **Minimal dependencies** focusing on essential, broadly compatible packages
+
+## Wayland in VMs
+
+- Enable 3D acceleration. For KVM/QEMU (virt-manager): Video = Virtio, 3D acceleration = on, Display = SPICE, OpenGL = on.
+- GNOME Boxes uses KVM with virtio-gpu and usually works out of the box for Hyprland.
+- X11 apps run under Xwayland.
+- If the VM lacks 3D, Hyprland may not start or will be slow; prefer KVM/QEMU or bare metal.
+- Note: virt-manager defaults often have 3D acceleration off; explicitly enable the settings above or Hyprland will not start.

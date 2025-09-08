@@ -1,94 +1,63 @@
 { config, pkgs, ... }:
-# TODO rename home/ folder to really be system or hardware agnostic or main
+# Regression: autologin removed; XMonad/xmobar and custom rofi modes removed; X11 tools replaced by Wayland equivalents (wl-clipboard, grim, slurp); VMs often require 3D acceleration for Hyprland.
 {
-  # ============================================================================
-  # CORE SYSTEM CONFIGURATION (Hardware Agnostic)
-  # ============================================================================
   services.openssh.enable = true;
-  services.xserver.enable = true;
-  services.xserver.displayManager.startx.enable = true;
-  services.getty.extraArgs = [ "--autologin" "ulysses" ];
-  
-  # Root user (for system administration)
-  users.users.root = {
-    isNormalUser = false;
-    # Note: Password is the same as your NixOS installer sudo password
-  };
-  
-  # Regular user for daily use and running things like steam without root implicitly for safety
+
+  nixpkgs.config.allowUnfree = true;
+
+  users.users.root.isNormalUser = false;
+
   users.users.ulysses = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
     initialPassword = "ulysses";
   };
-  
-  # Enable sudo for wheel group (ulysses user)
+
   security.sudo.enable = true;
-  
-  # ============================================================================
-  # DISPLAY MANAGER - XMonad on X11, with Rofi Omnibar for no-memorized shortcuts
-  # ============================================================================
-  
-  # Graphical login screen
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.displayManager.lightdm.greeters.gtk.indicators = [ "hostname" "clock" "session" ];
-  # TODO make a new lightdm config for the new greeter with a default user, maybe switch to a different greeter
-  services.xserver.displayManager.defaultSession = "none+xmonad"; # tried i3 and awesome to no avail
-  services.xserver.windowManager.xmonad = {
+
+  services.xserver.enable = false;
+
+  programs.hyprland.enable = true;
+
+  hardware.opengl.enable = true;
+  hardware.opengl.driSupport = true;
+  hardware.opengl.driSupport32Bit = true;
+
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
+
+  programs.steam = {
     enable = true;
-    enableContribAndExtras = true;
-    config = builtins.readFile ./scripts/xmonad.hs;
+    gamescopeSession.enable = true;
   };
-  
-  # Xmobar configuration will be created automatically by the user
-  environment.etc."xmobar/xmobarrc".text = builtins.readFile ./scripts/xmobarrc;
-  
-  # Gaming:
-  nixpkgs.config.allowUnfree = true;
-  programs.steam.enable = true;
-  # programs.steam.gamescopeSession.enable = true;
-  # programs.gamemode.enable = true;
-  # # Allow unfree packages (needed for Steam, etc.)
-  # nixpkgs.config.allowUnfree = true;
+  programs.gamemode.enable = true;
 
-  # ============================================================================
-  # SYSTEM PACKAGES (all hardware agnostic)
-  # ============================================================================
+  environment.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/ulysses/.steam/root/compatibilitytools.d";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    NIXOS_OZONE_WL = "1";
+  };
+
   environment.systemPackages = with pkgs; [
-    protonup
-    mangohud
-    git
-    vim
-    htop
-    tmux
-    kitty     # hardware-agnostic terminal
-    scrot     # screenshot tool
-    xclip     # clipboard utility
-    xfce.thunar  # file manager and explorer
-    firefox   # web browser
-    gnome.gnome-control-center # settings
-    libnotify # for notifications (debug commands)
-    alsa-utils # for volume control (amixer)
-    brightnessctl # for brightness control
-    rofi      # application launcher for omnibar
-    xdotool   # X11 automation tool for omnibar commands
-    xsel      # clipboard utility for XMonad commands
-    xmobar    # status bar for XMonad
-    wmctrl    # for window management and workspace info
-    papirus-icon-theme  # Single icon theme for applications
-
-    # XMonad command helper script TODO make shortcuts here and the omnibar sot actions link to be consistent
-    (pkgs.writeScriptBin "xmonad-cmd" (builtins.readFile ./scripts/xmonad-cmd.sh))
-    
-    # Workspace preview script for xmobar (real app icons)
-    (pkgs.writeScriptBin "workspace-preview" (builtins.readFile ./scripts/workspace-preview.sh))
-    
-    # Custom omnibar script with explicit bash dependency
-    (pkgs.writeScriptBin "cognito-omnibar" (builtins.readFile ./scripts/cognito-omnibar.sh))
-    
-    # Custom rofi mode script
-    (pkgs.writeScriptBin "custom-actions-mode" (builtins.readFile ./scripts/custom-actions-mode.sh))
+    waybar hyprpaper hyprlock rofi-wayland
+    obs-studio mangohud protonup
+    wl-clipboard grim slurp
+    kitty xfce.thunar firefox gnome.gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
+    git vim htop tmux
   ];
 
-
+  environment.etc."xdg/waybar/config.jsonc".text = ''
+  {
+    "layer": "top",
+    "position": "top",
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "battery", "custom/omnibar"],
+    "custom/omnibar": { "format": "[ META+SPACE → Omnibar ]" }
+  }
+  '';
+  environment.etc."xdg/waybar/style.css".text = ''
+  * { font-family: "Inter", "JetBrainsMono", sans-serif; font-size: 12px; }
+  #workspaces button.active { color: #ffffff; background: #3a3a3a; }
+  '';
 }

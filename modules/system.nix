@@ -1,5 +1,5 @@
 { config, pkgs, ... }:
-# Regression: autologin removed; XMonad/xmobar and custom rofi modes removed; X11 tools replaced by Wayland equivalents (wl-clipboard, grim, slurp); VMs often require 3D acceleration for Hyprland.
+# Regression: autologin removed; XMonad/xmobar and custom rofi modes removed; X11 tools replaced by Wayland equivalents (wl-clipboard, grim, slurp); VMs often require 3D acceleration for Hyprland; hyprlock omitted on nixpkgs 23.11.
 {
   services.openssh.enable = true;
 
@@ -39,7 +39,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    waybar hyprpaper hyprlock rofi-wayland
+    waybar hyprpaper rofi-wayland
     obs-studio mangohud protonup
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome.gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme

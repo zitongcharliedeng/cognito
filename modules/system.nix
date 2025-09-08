@@ -40,13 +40,19 @@
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
 
+  # Noto is the best practical base with broad symbol coverage ("no more tofu").
+  # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
+  # Fallback will use non-mono Noto families when a glyph is missing.
+  let fontFamily = "Noto Sans Mono"; in
   fonts = {
     fontconfig.enable = true;
     packages = with pkgs; [
-      jetbrains-mono
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      noto-fonts
+      noto-fonts-cjk
+      noto-fonts-emoji
     ];
-    defaultFonts.monospace = [ "JetBrains Mono" "JetBrainsMono Nerd Font Mono" ];
+    defaultFonts.monospace = [ fontFamily ];
+    defaultFonts.emoji = [ "Noto Color Emoji" ];
   };
 
   programs.steam = {
@@ -92,7 +98,7 @@
   }
   '';
   environment.etc."xdg/waybar/style.css".text = ''
-  * { font-family: "JetBrains Mono", "JetBrainsMono Nerd Font Mono", monospace; font-size: 12px; }
+  * { font-family: "${fontFamily}", monospace; font-size: 12px; }
   #workspaces button.active { color: #ffffff; background: #3a3a3a; }
   '';
 
@@ -120,9 +126,13 @@
   '';
 
   environment.etc."xdg/kitty/kitty.conf".text = ''
-  font_family JetBrainsMono Nerd Font Mono
-  bold_font JetBrainsMono Nerd Font Mono Bold
-  italic_font JetBrainsMono Nerd Font Mono Italic
-  bold_italic_font JetBrainsMono Nerd Font Mono Bold Italic
+  font_family ${fontFamily}
+  bold_font ${fontFamily} Bold
+  italic_font ${fontFamily} Italic
+  bold_italic_font ${fontFamily} Bold Italic
+  '';
+
+  environment.etc."xdg/rofi/config.rasi".text = ''
+  configuration { font: "${fontFamily} 12"; }
   '';
 }

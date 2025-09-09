@@ -97,9 +97,17 @@ in
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
     # Minimal inline overlay via rofi message (keeps config tiny and robust)
-    MESG=$(printf '<span font_desc="%s 12">[ 1 ]  Box A    [ 2 ]  Box B    [ 3 ]  Box C    [ 4 ]  Box D</span>\n<span>%s  •  placeholder</span>' "${fontFamily}" "$(date '+%H:%M')")
+    MESG=$(printf '<span font_desc="%s 12">status row (WIP)</span>' "${fontFamily}")
 
-    menu="[Box] A (Terminal)\n[Box] B (Terminal)\n[Box] C (Terminal)\n[Box] D (Terminal)\n""Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
+    # Launch a small header UI that persists while the main omnibar is open.
+    ( while :; do
+        SEL=$(printf "Box A\nBox B\nBox C\nBox D\n" | rofi -dmenu -theme /etc/xdg/rofi/cognito-header.rasi -p "")
+        [ -n "$SEL" ] && kitty &
+        # If the main omnibar is not running, exit this loop
+        pgrep -f 'rofi .*cognito\.rasi' >/dev/null || break
+      done ) &
+
+    menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG" -markup -theme /etc/xdg/rofi/cognito.rasi)
@@ -148,29 +156,40 @@ in
     '')
   ];
 
-  # Rofi theme: larger window, semi-transparent background, message ABOVE input,
-  # 4-column-like header achieved with monospaced markup in the message.
+  # Rofi theme: larger window, semi-transparent background, message ABOVE input.
   environment.etc."xdg/rofi/cognito.rasi".text = ''
   configuration { show-icons: false; }
   * { font: "${fontFamily} 12"; }
   window {
     width: 900px;
     height: 520px;
-    background-color: rgba(0,0,0,0.55);
+    background-color: rgba(0,0,0,0.5);
     border-radius: 8px;
   }
   mainbox { children: [ message, inputbar, listview ]; background-color: transparent; }
   listview {
-    columns: 4;
+    columns: 1;
     spacing: 8px;
     cycle: true;
     background-color: transparent;
   }
   element { padding: 12px 16px; border-radius: 6px; background-color: transparent; }
-  element selected { background-color: rgba(255,255,255,10%); }
+  element selected { background-color: rgba(255,255,255,0.12); }
+  element-text, element-icon, textbox, inputbar, prompt, message { color: #ffffff; }
   message { padding: 10px 12px; background-color: transparent; }
-  textbox { background-color: transparent; }
   inputbar { padding: 8px 12px; background-color: transparent; }
+  '';
+
+  # Header theme: 4 columns, semi-transparent, no input (pure buttons)
+  environment.etc."xdg/rofi/cognito-header.rasi".text = ''
+  configuration { show-icons: false; }
+  * { font: "${fontFamily} 12"; }
+  window { width: 900px; height: 80px; background-color: rgba(0,0,0,0.5); border-radius: 8px; location: north; }
+  mainbox { children: [ listview ]; }
+  listview { columns: 4; spacing: 10px; background-color: transparent; }
+  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.08); }
+  element selected { background-color: rgba(255,255,255,0.18); }
+  element-text { color: #ffffff; }
   '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired

@@ -58,7 +58,12 @@
   }
   
   # When any app is fullscreen on a workspace, remove gaps and borders
-  workspace = f[0], gapsin:0, gapsout:0  # f[0] targets workspaces with fullscreen active
+  workspace = f[1], gapsin:0, gapsout:0  # f[1] targets workspaces with maximized windows
+  # NOTE: f[0] (fullscreen) doesn't work, but f[1] (maximized) does work
+  # HYPOTHESIS: Some apps or Hyprland versions may interpret fullscreen states as maximized
+  # instead of true fullscreen, or there may be Wayland protocol differences in how
+  # fullscreen state is detected. f[1] works because maximized windows are more reliably
+  # detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
   windowrulev2 = noborder,fullscreen:1
   
   # Eww bar rules

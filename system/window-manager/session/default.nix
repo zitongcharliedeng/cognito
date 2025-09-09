@@ -17,6 +17,13 @@ let
     fi
     exec Hyprland -c "$CONFIG_PATH"
   '';
+  wallpaperCandidates = [
+    ../assets/wallpapers/wallpaper.png
+    ../assets/wallpapers/wallpaper.jpg
+    ../assets/wallpapers/wallpaper.jpeg
+  ];
+  chosenWallpapers = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
+  wallpaperPath = if chosenWallpapers == [] then ./assets/wallpapers/wallpaper.png else builtins.head chosenWallpapers;
 in
 {
   options = {
@@ -34,4 +41,20 @@ in
     environment.systemPackages = [ hyprStart ];
     cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
   };
+
+    # Create Hyprland session target for systemd user services
+  systemd.user.targets.hyprland-session = {
+    description = "Hyprland session";
+    unitConfig = {
+      StopWhenUnneeded = false;
+    };
+  };
+
+
+  # Hyprpaper wallpaper config; replace the path with your PNG if desired
+  environment.etc."hypr/hyprpaper.conf".text = ''
+  preload = ${wallpaperPath}
+  wallpaper = ,${wallpaperPath}
+  ipc = off
+  '';
 }

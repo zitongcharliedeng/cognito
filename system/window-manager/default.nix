@@ -34,4 +34,31 @@
     createHome = true;
   };
   users.groups.greeter = {};
+
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
+  };
+
+  environment.etc."hypr/hyprland.conf".text = ''
+  monitor=,1920x1080@60,auto,1  # TODO make this auto-detect
+  env = XCURSOR_SIZE,24  # TODO make this custom
+  exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
+  exec-once = start-hyprland-session
+  input {
+    kb_layout = us
+  }
+  general {
+    gaps_in = 2 # Hyperland Default is 5 ಠ_ಠ
+    gaps_out = 2 # Hyperland Default is 20 ಠ_ಠ
+    border_size = 2 # Hyperland Default is 2 ಠ_ಠ
+    # Hyperland does not guarantee the same default colors in new releases.
+    col.active_border = rgba(ffffffff) # White
+    col.inactive_border = rgba(000000ff) # Black
+  }
+  # Hide borders when a window is fullscreen
+  windowrulev2 = noborder,fullscreen:1  # TODO: check if working
+  $mod = SUPER
+  bind = $mod,SPACE,exec,cognito-omnibar
+  bind = $mod,RETURN,exec,kitty
+  '';
 }

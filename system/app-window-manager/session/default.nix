@@ -40,21 +40,20 @@ in
     # Use pixman only when virtualized; keep GPU acceleration on bare metal.
     environment.systemPackages = [ hyprStart ];
     cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
-  };
 
     # Create Hyprland session target for systemd user services
-  systemd.user.targets.hyprland-session = {
-    description = "Hyprland session";
-    unitConfig = {
-      StopWhenUnneeded = false;
+    systemd.user.targets.hyprland-session = {
+      description = "Hyprland session";
+      unitConfig = {
+        StopWhenUnneeded = false;
+      };
     };
+
+    # Hyprpaper wallpaper config; replace the path with your PNG if desired
+    environment.etc."hypr/hyprpaper.conf".text = ''
+    preload = ${wallpaperPath}
+    wallpaper = ,${wallpaperPath}
+    ipc = off
+    '';
   };
-
-
-  # Hyprpaper wallpaper config; replace the path with your PNG if desired
-  environment.etc."hypr/hyprpaper.conf".text = ''
-  preload = ${wallpaperPath}
-  wallpaper = ,${wallpaperPath}
-  ipc = off
-  '';
 }

@@ -11,16 +11,21 @@ let
   '';
 in
 {
-  # Hyprland session launcher with VM-safe renderer selection.
-  # In VMs, virgl/virtio 3D can stall wlroots compositors (random freezes).
-  # Use pixman only when virtualized; keep GPU acceleration on bare metal.
-  environment.systemPackages = [ hyprStart ];
-  options.cognito.hyprland.startCmd = lib.mkOption {
-    type = lib.types.str;
-    readOnly = true;
-    description = "Command to start Hyprland session with VM-safe renderer selection.";
+  options = {
+    cognito.hyprland.startCmd = lib.mkOption {
+      type = lib.types.str;
+      readOnly = true;
+      description = "Command to start Hyprland session with VM-safe renderer selection.";
+    };
   };
-  config.cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
+
+  config = {
+    # Hyprland session launcher with VM-safe renderer selection.
+    # In VMs, virgl/virtio 3D can stall wlroots compositors (random freezes).
+    # Use pixman only when virtualized; keep GPU acceleration on bare metal.
+    environment.systemPackages = [ hyprStart ];
+    cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
+  };
 }
 
 

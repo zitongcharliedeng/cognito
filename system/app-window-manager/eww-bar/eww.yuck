@@ -1,6 +1,6 @@
-(defvar workspaces :int 10)
-(defvar time :string "00:00")
-(defvar date :string "00-00-0000")
+(defvar workspaces 10)
+(defvar time "00:00")
+(defvar date "00-00-0000")
 
 (defpoll time :interval "1s" "date '+%H:%M'")
 (defpoll date :interval "60s" "date '+%d-%m-%Y'")

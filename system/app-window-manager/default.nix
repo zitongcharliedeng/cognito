@@ -56,8 +56,10 @@
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
-  # Hide borders when a window is fullscreen
-  windowrulev2 = noborder,fullscreen:1  # TODO: check if working
+  # Fullscreen rules - zero gaps and borders
+  windowrulev2 = noborder,fullscreen:1
+  windowrulev2 = gaps out 0,fullscreen:1
+  windowrulev2 = gaps in 0,fullscreen:1
   
   # Eww bar rules
   windowrulev2 = float, class:^(eww)$

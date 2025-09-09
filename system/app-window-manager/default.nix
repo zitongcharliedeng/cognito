@@ -1,4 +1,12 @@
-{ config, pkgs, ... }:
+{ config, pkgs, mynixui, ... }:
+
+let
+  startEww = pkgs.writeShellScriptBin "start-eww" ''
+    # Wait for daemon to be ready, then open window
+    sleep 3
+    eww open window -c ${mynixui}/eww &
+  '';
+in
 {
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./eww-bar/default.nix ];
   services.xserver.enable = false;  # We are using Wayland, not X11.
@@ -44,7 +52,7 @@
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
-  exec-once = sleep 2 && eww daemon -c ${mynixui}/eww
+  exec-once = sleep 2 && ${startEww}/bin/start-eww
   input {
     kb_layout = us
   }

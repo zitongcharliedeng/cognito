@@ -8,8 +8,8 @@ let
 in
 {
   imports = [ 
-    ./window-manager/default.nix
-    ./windows/default.nix
+    ./app-window-manager/default.nix
+    ./apps/default.nix
   ];
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.

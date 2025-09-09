@@ -16,6 +16,7 @@
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
+
     # Ensure eww daemon is running and expand to brain-mode bar
     ''${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     sleep 0.5
@@ -75,7 +76,7 @@
         fi
         ;;
     esac
-    '''))
+    '')
 
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh
@@ -84,26 +85,26 @@
     sleep 1
     ''${pkgs.eww}/bin/eww open bar
     echo "Eww bar should now be visible at the top"
-    '''))
+    '')
 
     (pkgs.writeShellScriptBin "eww-daemon" ''
     #!/bin/sh
     # Eww daemon wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
     exec ''${pkgs.eww}/bin/eww daemon
-    '''))
+    '')
 
     (pkgs.writeShellScriptBin "eww-open" ''
     #!/bin/sh
     # Eww open wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
     exec ''${pkgs.eww}/bin/eww "$@"
-    '''))
+    ''')
 
     (pkgs.writeShellScriptBin "start-hyprland-session" ''
     #!/bin/sh
     # Start Hyprland session target for systemd services
     systemctl --user start hyprland-session.target
-    '''))
+    '')
   ];
 }

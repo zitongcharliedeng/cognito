@@ -113,6 +113,13 @@ in
 
   environment.etc."xdg/waybar/config.jsonc".text = ''
   {
+      "hyprland/workspaces": {
+      "all-outputs": true,
+      "disable-scroll": true,
+      "sort-by-number": true,
+      "on-click": "hyprctl dispatch workspace %d",
+      "persistent-workspaces": { "*": [1,2,3,4,5,6,7,8,9,10] }
+    },
     "layer": "top",
     "position": "top",
     "modules-left": ["hyprland/workspaces"],
@@ -120,29 +127,17 @@ in
     "modules-right": ["custom/mode", "pulseaudio", "network", "battery", "custom/omnibar"],
     "custom/mode": { "exec": "sh -c '[ \"$WLR_RENDERER\" = pixman ] && echo \"Pixman (VM)\" || echo \"Wayland GL\"'", "interval": 0, "tooltip": false },
     "clock": { "format": "{:%H:%M}" },
-
     "network": {
       "format-wifi": "{signalStrength}%",
-      "format-ethernet": "eth",
+      "format-ethernet": "ethrnt",
       "format-disconnected": "offline",
       "tooltip": false
     },
-
     "pulseaudio": {
       "format": "{volume}%",
       "format-muted": "muted"
     },
-
     "battery": { "format": "{capacity}%" },
-
-    "hyprland/workspaces": {
-      "all-outputs": true,
-      "disable-scroll": true,
-      "sort-by-number": true,
-      "on-click": "hyprctl dispatch workspace %d",
-      "persistent-workspaces": { "*": [1,2,3,4,5,6,7,8,9,10] }
-    },
-
     "custom/omnibar": { "format": "[ META+SPACE → Omnibar ]", "tooltip": false }
   }
   '';

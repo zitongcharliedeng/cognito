@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./session/default.nix ./omnibar-mode/default.nix ];
+  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./eww-bar/default.nix ];
   services.xserver.enable = false;  # We are using Wayland, not X11.
   # 3D acceleration for Wayland. See README.md for more details.
   hardware.graphics = {
@@ -44,6 +44,7 @@
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
+  exec-once = sleep 2 && eww open bar
   input {
     kb_layout = us
   }
@@ -57,6 +58,12 @@
   }
   # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1  # TODO: check if working
+  
+  # Eww bar rules
+  windowrulev2 = float, class:^(eww)$
+  windowrulev2 = nofocus, class:^(eww)$
+  windowrulev2 = workspace 1, class:^(eww)$
+  
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
   bind = $mod,RETURN,exec,kitty

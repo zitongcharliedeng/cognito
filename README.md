@@ -15,7 +15,7 @@ flowchart LR
     C[my nixos config]
     C -->|outputs| D[cognito/]
     D -->|subfolder| E[user/]
-    C -->|outputs| G[hardware-shims/]
+    C -->|outputs| G[system-hardware-shims/]
 
     D -->|manages| H[base OS config]
     E -->|manages| I[user environment]
@@ -44,7 +44,7 @@ Keep in mind the _modules/ directory is just custom made pkgs that I CBA to uplo
 
 On a new device i.e. my-blue-laptop:
 Install NixOS normally → you’ll get a hardware-configuration.nix.
-Drop that into hosts/<hostname>/.
+Drop that into system-hardware-shims/<hostname>/.
 Update flake.nix so this host is listed in nixosConfigurations.
 On an existing device:
 Pull everything from your GitHub repo into /etc/nixos.

@@ -83,7 +83,7 @@
         fi
         ;;
     esac
-    '')
+    ''')
 
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh

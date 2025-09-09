@@ -9,14 +9,14 @@
     let
       system = "x86_64-linux";
 
-      # Discover all host configs programmatically inside ./hosts/
-      hosts = builtins.attrNames (builtins.readDir ./hosts);
+      # Discover all host configs programmatically inside ./system-hardware-shims/
+      hosts = builtins.attrNames (builtins.readDir ./system-hardware-shims);
 
       mkHost = name: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           ./system/default.nix
-          ./hosts/${name}/configuration.nix
+          ./system-hardware-shims/${name}/configuration.nix
         ];
       };
     in {

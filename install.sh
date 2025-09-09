@@ -4,7 +4,6 @@ set -euo pipefail
 # Path to your repo — use current directory for flake-based setup
 REPO_PATH="$(pwd)"
 
-# TODO rename hosts to be hardware-shims
 print_header() {
   echo "=== Cognito Installer ==="
   echo "This will set up a new host or reuse an existing one."
@@ -27,8 +26,8 @@ setup_sudo_once() {
 }
 
 list_hosts() {
-  echo "Existing hosts:"
-  ls -1 "$REPO_PATH/hosts" || echo "(none yet)"
+  echo "Existing hardware shims:"
+  ls -1 "$REPO_PATH/system-hardware-shims" || echo "(none yet)"
   echo
 }
 
@@ -61,7 +60,7 @@ get_host() {
 }
 
 create_host_dir() {
-  HOST_DIR="$REPO_PATH/hosts/$HOSTNAME"
+  HOST_DIR="$REPO_PATH/system-hardware-shims/$HOSTNAME"
   
   # Create directory if it doesn't exist
   if [[ ! -d "$HOST_DIR" ]]; then
@@ -140,12 +139,12 @@ build_system() {
   }
   
   echo "Building system..."
-  echo "Committing new host configuration to Git (required for flake builds)..."
+  echo "Committing new hardware shim configuration to Git (required for flake builds)..."
   # Set temporary Git identity to avoid annoying prompts
   git config user.email "nixos@cognito.local" 2>/dev/null || true
   git config user.name "Cognito NixOS" 2>/dev/null || true
-  git add hosts/${HOSTNAME}/
-  git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
+  git add system-hardware-shims/${HOSTNAME}/
+  git commit -m "Add ${HOSTNAME} hardware shim configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
   # Prompt once right before the long build, then keep sudo alive
   if sudo -A sh -c "nixos-rebuild switch --flake .#${HOSTNAME} && systemctl reboot"; then

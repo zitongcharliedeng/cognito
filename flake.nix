@@ -3,9 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    mynixui.url = "github:eureka-cpu/mynixui";
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs = { self, nixpkgs, mynixui, ... }:
     let
       system = "x86_64-linux";
 

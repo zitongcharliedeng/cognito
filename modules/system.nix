@@ -102,7 +102,7 @@ in
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
-    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG")
+    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG" -markup -theme /etc/xdg/rofi/cognito.rasi)
 
     case "$CHOICE" in
       "Apps") rofi -show drun ;;
@@ -145,6 +145,28 @@ in
     esac
     '')
   ];
+
+  # Rofi theme: larger window, 2-column grid, semi-transparent background
+  environment.etc."xdg/rofi/cognito.rasi".text = ''
+  configuration { show-icons: false; }
+  * { font: "${fontFamily} 12"; }
+  window {
+    width: 900px;
+    height: 520px;
+    transparency: "real";
+    background-color: rgba(0,0,0,60%);
+    border-radius: 8px;
+  }
+  listview {
+    columns: 2;
+    spacing: 8px;
+    cycle: true;
+  }
+  element { padding: 12px 16px; border-radius: 6px; }
+  element selected { background-color: rgba(255,255,255,10%); }
+  message { padding: 8px 12px; }
+  inputbar { padding: 8px 12px; }
+  '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''

@@ -4,6 +4,15 @@ let
   # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
   # Fallback will use non-mono Noto families when a glyph is missing.
   fontFamily = "Noto Sans Mono";
+  lib = pkgs.lib;
+  wallpaperCandidates = [
+    ./assets/wallpapers/wallpaper.png
+    ./assets/wallpapers/wallpaper.jpg
+    ./assets/wallpapers/wallpaper.jpeg
+  ];
+  chosenWallpapers = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
+  wallpaperPath = if chosenWallpapers == [] then ./assets/wallpapers/wallpaper.png else builtins.head chosenWallpapers;
+  wallpaperExt = "." + (lib.last (lib.splitString "." (builtins.baseNameOf wallpaperPath)));
 in
 {
   imports = [ ./hyprland/session.nix ];
@@ -79,14 +88,19 @@ in
 
   # TODO add vm tools to develop NixOS in NixOS or figure out the dry-run NixOS changes with failsafe of rebooting without saving the changes to git. Dry running switch command i think it is called - add this action to the omnibar, with a NixOS icon. Same with the other common NixOS commands.
   environment.systemPackages = with pkgs; [
-    ironbar hyprpaper rofi-wayland
+    hyprpaper rofi-wayland eww
     obs-studio mangohud protonup
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
-    git vim htop tmux
+    git htop
 
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
+    # Start eww overlay with clock while omnibar is open
+    EWWCFG=/etc/eww
+    eww -c "$EWWCFG" daemon 2>/dev/null || true
+    eww -c "$EWWCFG" open --toggle omnibar_overlay
+
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
@@ -108,8 +122,43 @@ in
         fi
         ;;
     esac
+    # Close overlay
+    eww -c "$EWWCFG" close omnibar_overlay || true
     '')
   ];
+
+  environment.etc."eww/eww.yuck".text = ''
+  (defwindow omnibar_overlay
+    :geometry (geometry :x "50%" :y "8%" :anchor "top center" :width 420)
+    :stacking "fg"
+    :exclusive false
+    (box :class "omnibar-overlay"
+      :orientation "v"
+      :spacing 6
+      (box :halign "center" (label :class "clock" :text time))
+      (box :halign "center" (label :class "date"  :text date))
+    ))
+
+  (defpoll time :interval "1s" "date +%H:%M")
+  (defpoll date :interval "30s" "date +%a %d %b")
+  '';
+  environment.etc."eww/eww.scss".text = ''
+  .omnibar-overlay { background: rgba(0,0,0,0.6); padding: 10px 14px; border-radius: 8px; }
+  .clock { font-size: 28px; font-weight: 600; }
+  .date  { font-size: 14px; opacity: .9; }
+  '';
+
+  # Hyprpaper wallpaper config; replace the path with your PNG if desired
+  environment.etc."hypr/hyprpaper.conf".text = ''
+  preload = /etc/xdg/backgrounds/wallpaper${wallpaperExt}
+  wallpaper = ,/etc/xdg/backgrounds/wallpaper${wallpaperExt}
+  ipc = off
+  '';
+
+  # Map repository wallpaper into /etc if present (supports .png/.jpg/.jpeg)
+  environment.etc = lib.optionalAttrs (builtins.pathExists wallpaperPath) {
+    "xdg/backgrounds/wallpaper${wallpaperExt}".source = wallpaperPath;
+  };
 
   environment.etc."ironbar/config.toml".text = ''
   [bar]
@@ -152,7 +201,7 @@ in
   environment.etc."hypr/hyprland.conf".text = ''
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
-  exec-once = ironbar &
+  exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   input {
     kb_layout = us
   }

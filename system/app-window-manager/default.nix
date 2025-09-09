@@ -44,7 +44,7 @@
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
-  exec-once = sleep 2 && eww open window
+  exec-once = sleep 2 && eww daemon -c ${mynixui}/eww
   input {
     kb_layout = us
   }

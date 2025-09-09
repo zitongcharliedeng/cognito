@@ -56,10 +56,10 @@
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
-  # Fullscreen rules - zero gaps and borders
-  windowrulev2 = bordersize 0,fullscreen:1
-  windowrulev2 = gapsin 0,fullscreen:1
-  windowrulev2 = gapsout 0,fullscreen:1
+  # Fullscreen rules - zero borders only
+  # Note: Hyprland doesn't support gap rules in windowrulev2
+  # Gaps are controlled by general settings and workspace rules
+  windowrulev2 = noborder,fullscreen:1
   
   # Eww bar rules
   windowrulev2 = float, class:^(eww)$

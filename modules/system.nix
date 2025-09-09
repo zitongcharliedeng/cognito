@@ -295,7 +295,6 @@ in
     :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
     :struts (struts :side "top" :distance 40)
-    :reserve (struts :side "top" :distance 40)
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
 
@@ -305,7 +304,6 @@ in
     :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
     :struts (struts :side "top" :distance 320)
-    :reserve (struts :side "top" :distance 320)
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)
       (status_row)))
@@ -346,16 +344,14 @@ in
     };
   };
 
-  # Start eww daemon only
+  # Start eww daemon only - simplified approach
   systemd.user.services.eww = {
     description = "Eww daemon";
-    wantedBy = [ "hyprland-session.target" ];
-    partOf = [ "hyprland-session.target" ];
+    wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon";
-      Restart = "on-failure";
-      RestartSec = 5;
-      Environment = "WAYLAND_DISPLAY=wayland-1";
+      Restart = "always";
+      RestartSec = 2;
     };
   };
 

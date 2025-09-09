@@ -159,15 +159,12 @@ in
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''
-  preload = /etc/xdg/backgrounds/wallpaper${wallpaperExt}
-  wallpaper = ,/etc/xdg/backgrounds/wallpaper${wallpaperExt}
+  preload = ${wallpaperPath}
+  wallpaper = ,${wallpaperPath}
   ipc = off
   '';
 
-  # Map repository wallpaper into /etc if present (supports .png/.jpg/.jpeg)
-  environment.etc = lib.optionalAttrs (builtins.pathExists wallpaperPath) {
-    "xdg/backgrounds/wallpaper${wallpaperExt}".source = wallpaperPath;
-  };
+  # Removed duplicate environment.etc assignment; hyprpaper reads the store path directly
 
   environment.etc."ironbar/config.toml".text = ''
   [bar]

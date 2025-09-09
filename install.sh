@@ -9,6 +9,12 @@ print_header() {
   echo "=== Cognito Installer ==="
   echo "This will set up a new host or reuse an existing one."
   echo
+  # Ask for sudo up-front to cache credentials
+  if sudo -v; then
+    # Keep sudo alive while the script runs
+    ( while true; do sleep 60; sudo -n true 2>/dev/null || exit; done ) &
+    SUDO_KEEPALIVE_PID=$!
+  fi
 }
 
 list_hosts() {
@@ -155,6 +161,8 @@ main() {
   get_host
   create_host_dir
   build_system
+  # Stop keepalive if running
+  if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true; fi
 }
 
 main

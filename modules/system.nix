@@ -111,11 +111,14 @@ in
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     # Ensure eww daemon is running and expand to brain-mode bar
     ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
+    sleep 0.5
     ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
+    sleep 0.2
     ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
       ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
+      sleep 0.2
       ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
     trap cleanup EXIT
@@ -231,13 +234,13 @@ in
   # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1
   
-  # Hide eww bar when window is fullscreen
+  # Configure eww bar behavior
   windowrulev2 = float,class:^(eww)$
   windowrulev2 = move 0 0,class:^(eww)$
   windowrulev2 = nofocus,class:^(eww)$
   windowrulev2 = noinitialfocus,class:^(eww)$
   windowrulev2 = pin,class:^(eww)$
-  windowrulev2 = fakefullscreen,class:^(eww)$
+  windowrulev2 = nofullscreenrequest,class:^(eww)$
 
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -282,7 +285,7 @@ in
     :exclusive true
     :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
-    :reserve (struts :side "top" :distance 40)
+    :struts (struts :side "top" :distance 40)
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
 
@@ -291,7 +294,7 @@ in
     :exclusive true
     :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
-    :reserve (struts :side "top" :distance 320)
+    :struts (struts :side "top" :distance 320)
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)
       (status_row)))

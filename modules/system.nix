@@ -167,41 +167,39 @@ in
   # Rofi theme: larger window, semi-transparent background, message ABOVE input.
   environment.etc."xdg/rofi/cognito.rasi".text = ''
   configuration { show-icons: false; }
-  * { font: "${fontFamily} 12"; }
-  window {
-    width: 900px;
-    height: 520px;
-    background-color: rgba(20,20,20,0.5);
-    border-radius: 8px;
+  * {
+    font: "${fontFamily} 12";
+    bg: rgba(20,20,20,0.50);
+    fg: #ECEFF1;
+    selbg: rgba(255,255,255,0.14);
+    selfg: #FFFFFF;
   }
+  window { background-color: @bg; width: 900px; height: 520px; border-radius: 8px; }
   mainbox { children: [ message, inputbar, listview ]; background-color: transparent; }
-  listview {
-    columns: 1;
-    lines: 12;
-    spacing: 6px;
-    background-color: transparent;
-    scrollbar: false;
-  }
-  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.04); }
-  element normal { background-color: rgba(255,255,255,0.04); }
-  element selected { background-color: rgba(255,255,255,0.18); }
-  element-text { color: #f2f2f2; }
-  element selected element-text { color: #ffffff; }
-  message { padding: 8px 12px; background-color: transparent; }
-  inputbar { padding: 8px 12px; background-color: rgba(0,0,0,0.40); border-radius: 6px; }
-  prompt, textbox, element-icon { color: #f2f2f2; }
+  message { padding: 8px 12px; text-color: @fg; background-color: transparent; }
+  inputbar { padding: 8px 12px; background-color: rgba(0,0,0,0.35); border-radius: 6px; }
+  prompt, textbox, element-icon { text-color: @fg; }
+  listview { columns: 1; lines: 12; spacing: 6px; background-color: transparent; scrollbar: false; }
+  element { padding: 10px 12px; border-radius: 6px; }
+  element normal { background-color: transparent; text-color: @fg; }
+  element selected { background-color: @selbg; text-color: @selfg; }
   '';
 
-  # Header theme: fixed 4 columns; small bar at top
+  # Header theme: fixed 4 columns; small bar at top (clickable buttons)
   environment.etc."xdg/rofi/cognito-header.rasi".text = ''
   configuration { show-icons: false; }
-  * { font: "${fontFamily} 12"; }
-  window { width: 900px; height: 90px; background-color: rgba(20,20,20,0.6); border-radius: 8px; location: north; }
+  * {
+    font: "${fontFamily} 12";
+    bg: rgba(20,20,20,0.65);
+    fg: #FFFFFF;
+    selbg: rgba(255,255,255,0.18);
+  }
+  window { background-color: @bg; width: 900px; height: 90px; border-radius: 8px; location: north; }
   mainbox { children: [ listview ]; }
   listview { columns: 4; lines: 1; spacing: 10px; background-color: transparent; scrollbar: false; fixed-height: true; }
-  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(48,48,48,0.8); }
-  element selected { background-color: rgba(80,80,80,0.9); }
-  element-text { color: #ffffff; }
+  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.08); }
+  element selected { background-color: @selbg; text-color: @fg; }
+  element-text { text-color: @fg; }
   '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired

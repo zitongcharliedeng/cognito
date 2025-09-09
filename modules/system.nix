@@ -271,12 +271,14 @@ in
   .brain:hover { background: $tile-hover; }
   '';
 
+  # Create symlink so eww finds config in /etc/eww via default ~/.config/eww path
+  environment.etc."xdg/eww".source = "/etc/eww";
+  
   # Start eww at login and open the normal bar
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      Environment = "EWW_CONFIG_DIR=/etc/eww";
       ExecStart = "${pkgs.eww}/bin/eww daemon";
       ExecStartPost = "${pkgs.eww}/bin/eww open bar";
       Restart = "on-failure";

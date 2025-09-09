@@ -151,6 +151,24 @@ in
   ];
 
   # Eww daemon as user service to ensure overlays show reliably at login
+  # TODO: Reintroduce clock/hint/workspace previews in the eww overlay.
+  # For now, keep a minimal placeholder window that proves the plumbing works.
+  environment.etc."eww/eww.yuck".text = ''
+  (defwindow omnibar_overlay
+    :geometry (geometry :x "50%" :y "8%" :anchor "top center")
+    :stacking "fg"
+    :exclusive false
+    (box :class "placeholder"
+      (label :text "placeholder")))
+  '';
+
+  environment.etc."eww/eww.scss".text = ''
+  .placeholder { background: rgba(0,0,0,0.6); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+  '';
+
+  # Remove now-unneeded workspace preview helper
+  environment.etc."eww/ws-preview.sh".text = "";
+
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "default.target" ];
@@ -159,54 +177,6 @@ in
       Restart = "on-failure";
     };
   };
-
-  environment.etc."eww/ws-preview.sh".text = ''
-  #!/usr/bin/env bash
-  set -euo pipefail
-  active_ws=$(hyprctl -j monitors | jq 'map(select(.focused==true))[0].activeWorkspace.id')
-  hyprctl -j workspaces | jq --argjson active "$active_ws" '
-    sort_by(.id) | map({id:.id, name:(.name // (.id|tostring)), active:(.id==$active)})
-  '
-  '';
-
-  environment.etc."eww/eww.yuck".text = ''
-  (defwindow omnibar_overlay
-    :geometry (geometry :x "50%" :y "8%" :anchor "top center" :width 480)
-    :stacking "fg"
-    :exclusive false
-    (box :class "omnibar-overlay"
-      :orientation "v"
-      :spacing 8
-      (box :halign "center" (label :class "clock" :text time))
-      (box :halign "center" (label :class "date"  :text date))
-      (box :class "workspaces" :orientation "h" :spacing 8
-        (for ws in workspaces (box :class (concat "ws " (if (= (get ws :active) true) "active" ""))
-          (label :text (get ws :name)))))
-    ))
-
-  (defwindow hint
-    :geometry (geometry :x "50%" :y "96%" :anchor "bottom center" :width 520)
-    :stacking "fg"
-    :focusable false
-    :exclusive false
-    (box :class "hint"
-      (label :text "PRESS META+SPACE to open OMNIBAR")))
-
-  (defpoll time :interval "1s" "date +%H:%M")
-  (defpoll date :interval "30s" "date +%a %d %b")
-  (defpoll workspaces :interval "2s" "/etc/eww/ws-preview.sh")
-  '';
-
-  environment.etc."eww/eww.scss".text = ''
-  .omnibar-overlay { background: rgba(0,0,0,0.6); padding: 10px 14px; border-radius: 8px; }
-  .clock { font-size: 28px; font-weight: 600; }
-  .date  { font-size: 14px; opacity: .9; }
-  .workspaces { margin-top: 6px; }
-  .ws { padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); }
-  .ws.active { background: rgba(255,255,255,0.2); }
-  .app { font-family: "${fontFamily}", monospace; font-size: 13px; }
-  .hint { background: rgba(0,0,0,0.55); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 14px; letter-spacing: 0.5px; }
-  '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''
@@ -257,8 +227,8 @@ in
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
-  # Ensure eww is running; show the hint briefly on login
-  exec-once = eww -c /etc/eww daemon && (eww -c /etc/eww open hint & sleep 8 && eww -c /etc/eww close hint) &
+  # Ensure eww is running
+  exec-once = eww -c /etc/eww daemon &
   input {
     kb_layout = us
   }

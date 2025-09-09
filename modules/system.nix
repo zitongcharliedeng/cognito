@@ -140,15 +140,18 @@ in
 
   environment.etc."eww/eww.yuck".text = ''
   (defwindow omnibar_overlay
-    :geometry (geometry :x "50%" :y "8%" :anchor "top center" :width 420)
+    :geometry (geometry :x "50%" :y "10%" :anchor "top center" :width 520)
     :stacking "fg"
     :exclusive false
-    (box :class "omnibar-overlay"
-      :orientation "v"
-      :spacing 6
+    (box :class "omnibar-overlay" :orientation "v" :spacing 6
       (box :halign "center" (label :class "clock" :text time))
       (box :halign "center" (label :class "date"  :text date))
-    ))
+      (box :class "workspaces" :orientation "h" :spacing 8
+        (for ws in workspaces (box :class (concat "ws " (if (= (get ws :active) true) "active" ""))
+          (label :text (get ws :name))
+          (box :orientation "h" :spacing 4
+            (for app in (get ws :apps) (label :class "app" :text (get app :icon))))))))
+  )
 
   (defwindow hint
     :geometry (geometry :x "50%" :y "96%" :anchor "bottom center" :width 520)
@@ -160,11 +163,28 @@ in
 
   (defpoll time :interval "1s" "date +%H:%M")
   (defpoll date :interval "30s" "date +%a %d %b")
+  (defpoll workspaces :interval "2s" "/etc/eww/ws-preview.sh")
   '';
+  environment.etc."eww/ws-preview.sh".text = ''
+  #!/usr/bin/env bash
+  # Output JSON of workspaces with app icons using hyprctl
+  hyprctl -j workspaces | jq '[.[] | {id:.id,name:(.name//(\"\"+(.id|tostring))),active:.id==(input|fromjson).active}]' --argjson active "$(hyprctl -j monitors | jq 'map(select(.focused==true))[0].activeWorkspace.id')" | \
+  jq 'map(. + {apps: []})' | \
+  jq --slurpfile clients <(hyprctl -j clients) '
+    map(. as $ws | $ws + {apps: ($clients[0]
+      | map(select(.workspace.id == $ws.id))
+      | map({class, title, icon:(.class|ascii_downcase)}))})
+  '
+  '';
+
   environment.etc."eww/eww.scss".text = ''
   .omnibar-overlay { background: rgba(0,0,0,0.6); padding: 10px 14px; border-radius: 8px; }
   .clock { font-size: 28px; font-weight: 600; }
   .date  { font-size: 14px; opacity: .9; }
+  .workspaces { margin-top: 6px; }
+  .ws { padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); }
+  .ws.active { background: rgba(255,255,255,0.2); }
+  .app { font-family: "${fontFamily}", monospace; font-size: 13px; }
   .hint { background: rgba(0,0,0,0.55); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 14px; letter-spacing: 0.5px; }
   '';
 
@@ -258,6 +278,6 @@ in
   '';
 
   environment.etc."xdg/rofi/config.rasi".text = ''
-  configuration { font: "${fontFamily} 12"; }
+  configuration { font: "${fontFamily} 12"; modi: "drun,run"; location: 1; yoffset: 200; }
   '';
 }

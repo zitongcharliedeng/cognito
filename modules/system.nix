@@ -101,7 +101,7 @@ in
     eww -c "$EWWCFG" daemon 2>/dev/null || true
     eww -c "$EWWCFG" open --toggle omnibar_overlay
 
-    menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\n"
+    menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar")
@@ -112,6 +112,17 @@ in
       "Close Active Window") hyprctl dispatch killactive ;;
       "Toggle Fullscreen on Active Window") hyprctl dispatch fullscreen 1 ;;
       "Exit Hyprland") hyprctl dispatch exit ;;
+      "Screenshot region (grim+slurp)")
+        # Screenshot toolchain: slurp selects region; grim saves PNG
+        dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
+        file="$dir/$(date +%F_%H-%M-%S)_region.png"
+        geom=$(slurp) || exit 0
+        grim -g "$geom" "$file" ;;
+      "Screenshot full screen (grim)")
+        # Screenshot tool: grim captures the whole output
+        dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
+        file="$dir/$(date +%F_%H-%M-%S)_full.png"
+        grim "$file" ;;
       *)
         if printf "%s" "$CHOICE" | grep -q "^Switch view to Workspace "; then
           NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')

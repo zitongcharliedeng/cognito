@@ -79,7 +79,7 @@ in
 
   # TODO add vm tools to develop NixOS in NixOS or figure out the dry-run NixOS changes with failsafe of rebooting without saving the changes to git. Dry running switch command i think it is called - add this action to the omnibar, with a NixOS icon. Same with the other common NixOS commands.
   environment.systemPackages = with pkgs; [
-    waybar hyprpaper rofi-wayland
+    ironbar hyprpaper rofi-wayland
     obs-studio mangohud protonup
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
@@ -111,46 +111,48 @@ in
     '')
   ];
 
-  environment.etc."xdg/waybar/config.jsonc".text = ''
-  {
-      "hyprland/workspaces": {
-      "all-outputs": true,
-      "disable-scroll": true,
-      "sort-by-number": true,
-      "on-click": "hyprctl dispatch workspace %d",
-      "persistent-workspaces": { "*": [1,2,3,4,5,6,7,8,9,10] }
-    },
-    "layer": "top",
-    "position": "top",
-    "modules-left": ["hyprland/workspaces"],
-    "modules-center": ["clock"],
-    "modules-right": ["custom/mode", "pulseaudio", "network", "battery", "custom/omnibar"],
-    "custom/mode": { "exec": "sh -c '[ \"$WLR_RENDERER\" = pixman ] && echo \"Pixman (VM)\" || echo \"Wayland GL\"'", "interval": 0, "tooltip": false },
-    "clock": { "format": "{:%H:%M}" },
-    "network": {
-      "format-wifi": "{signalStrength}%",
-      "format-ethernet": "ethrnt",
-      "format-disconnected": "offline",
-      "tooltip": false
-    },
-    "pulseaudio": {
-      "format": "{volume}%",
-      "format-muted": "muted"
-    },
-    "battery": { "format": "{capacity}%" },
-    "custom/omnibar": { "format": "[ META+SPACE → Omnibar ]", "tooltip": false }
-  }
-  '';
-  environment.etc."xdg/waybar/style.css".text = ''
-  * { font-family: "${fontFamily}", monospace; font-size: 12px; }
-  #workspaces button.active { color: #ffffff; background: #3a3a3a; }
-  #clock, #network, #pulseaudio, #battery, #custom-omnibar, #workspaces { padding: 0 8px; }
+  environment.etc."ironbar/config.toml".text = ''
+  [window]
+  anchor = "top"
+  layer = "top"
+  exclusive = true
+  hide_on_fullscreen = true
+
+  [[bar.modules.left]]
+  type = "hyprland/workspaces"
+  disable_scroll = true
+  sort_by_number = true
+  on_click = "hyprctl dispatch workspace %d"
+  show_icons = true
+
+  [[bar.modules.right]]
+  type = "custom/script"
+  command = "sh -lc '[ "$WLR_RENDERER" = pixman ] && echo Pixman || echo Wayland\ GL'"
+  interval = 0
+
+  [[bar.modules.right]]
+  type = "pulseaudio"
+
+  [[bar.modules.right]]
+  type = "network"
+
+  [[bar.modules.right]]
+  type = "battery"
+
+  [[bar.modules.center]]
+  type = "clock"
+  format = "%H:%M"
+
+  [[bar.modules.right]]
+  type = "custom/script"
+  command = "echo [ META+SPACE → Omnibar ]"
+  interval = 0
   '';
 
   environment.etc."hypr/hyprland.conf".text = ''
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
-  exec-once = waybar &
+  exec-once = ironbar &
   input {
     kb_layout = us
   }
@@ -162,6 +164,14 @@ in
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
+  decoration {
+    rounding = 0
+    blur = false
+    drop_shadow = false
+  }
+  # Hide borders and bar when a window is fullscreen
+  windowrulev2 = noborder,fullscreen:1
+  windowrulev2 = nofullscreenrequest,fullscreen:1
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
   bind = $mod,RETURN,exec,kitty

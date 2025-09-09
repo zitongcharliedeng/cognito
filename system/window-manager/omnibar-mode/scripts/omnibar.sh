@@ -1,0 +1,72 @@
+#!/bin/sh
+# Check if rofi is already running and close it
+if pgrep rofi >/dev/null; then
+  pkill rofi
+  exit 0
+fi
+
+# Minimal inline overlay via rofi message (keeps config tiny and robust)
+MESG="$(date '+%H:%M')  •  placeholder"
+
+menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
+for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
+for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
+# Ensure eww daemon is running and expand to brain-mode bar
+eww daemon >/dev/null 2>&1 || true
+sleep 0.5
+# Close normal bar and open brain bar
+eww close bar >/dev/null 2>&1 || true
+sleep 0.3
+eww open bar_brain >/dev/null 2>&1 || true
+
+cleanup() {
+  # Close brain bar and restore normal bar
+  eww close bar_brain >/dev/null 2>&1 || true
+  sleep 0.3
+  eww open bar >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG")
+
+case "$CHOICE" in
+  "Apps") rofi -show drun ;;
+  "Open Terminal") kitty ;;
+  "Close Active Window") hyprctl dispatch killactive ;;
+  "Toggle Fullscreen on Active Window") hyprctl dispatch fullscreen 1 ;;
+  "Exit Hyprland") hyprctl dispatch exit ;;
+  "Screenshot region (grim+slurp)")
+    # Screenshot toolchain: slurp selects region; grim saves PNG
+    dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
+    file="$dir/$(date +%F_%H-%M-%S)_region.png"
+    geom=$(slurp) || exit 0
+    grim -g "$geom" "$file" ;;
+  "Screenshot full screen (grim)")
+    # Screenshot tool: grim captures the whole output
+    dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
+    file="$dir/$(date +%F_%H-%M-%S)_full.png"
+    grim "$file" ;;
+  "[Box] A (Terminal)"|"[Box] B (Terminal)"|"[Box] C (Terminal)"|"[Box] D (Terminal)")
+    kitty ;;
+  "[Debug] Force renderer: pixman")
+    mkdir -p "$HOME/.config/cognito"; echo pixman > "$HOME/.config/cognito/renderer"; notify-send "Renderer" "Override set to pixman. Log out to apply." ;;
+  "[Debug] Force renderer: gl")
+    mkdir -p "$HOME/.config/cognito"; echo gl > "$HOME/.config/cognito/renderer"; notify-send "Renderer" "Override set to gl. Log out to apply." ;;
+  "[Debug] Remove renderer override")
+    rm -f "$HOME/.config/cognito/renderer" && notify-send "Renderer" "Override removed. Auto-detect will apply on next login." || notify-send "Renderer" "No override to remove." ;;
+  "[Debug] Show renderer status")
+    OV="$HOME/.config/cognito/renderer"; SRC="auto"; OVV="-"
+    if [ -f "$OV" ]; then SRC="override"; OVV=$(cat "$OV"); fi
+    CUR=''${WLR_RENDERER:-unset}
+    if systemd-detect-virt --quiet; then VM="yes"; else VM="no"; fi
+    notify-send "Renderer status" "Current: $CUR\nOverride: $SRC''${OVV:+ ($OVV)}\nVM detected: $VM" ;;
+  *)
+    if printf "%s" "$CHOICE" | grep -q "^Switch view to Workspace "; then
+      NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
+      hyprctl dispatch workspace "$NUM"
+    elif printf "%s" "$CHOICE" | grep -q "^Move focused window to Workspace "; then
+      NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
+      hyprctl dispatch movetoworkspace "$NUM"
+    fi
+    ;;
+esac

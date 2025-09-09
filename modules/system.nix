@@ -112,11 +112,13 @@ in
     # Ensure eww daemon is running and expand to brain-mode bar
     ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     sleep 0.5
+    # Close normal bar and open brain bar
     ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
     sleep 0.3
     ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
+      # Close brain bar and restore normal bar
       ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
       sleep 0.3
       ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
@@ -235,6 +237,10 @@ in
   # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1
   
+  # Ensure windows respect the bar's reserved space
+  windowrulev2 = workspace 1,class:^(eww)$
+  windowrulev2 = workspace 1,class:^(rofi)$
+  
   # Configure eww bar behavior
   windowrulev2 = float,class:^(eww)$
   windowrulev2 = move 0 0,class:^(eww)$
@@ -242,6 +248,8 @@ in
   windowrulev2 = noinitialfocus,class:^(eww)$
   windowrulev2 = pin,class:^(eww)$
   windowrulev2 = opacity 0,fullscreen:1,class:^(eww)$
+  windowrulev2 = stayfocused,class:^(rofi)$
+  windowrulev2 = nofocus,class:^(rofi)$
 
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -287,6 +295,7 @@ in
     :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
     :struts (struts :side "top" :distance 40)
+    :reserve (struts :side "top" :distance 40)
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
 
@@ -296,6 +305,7 @@ in
     :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
     :struts (struts :side "top" :distance 320)
+    :reserve (struts :side "top" :distance 320)
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)
       (status_row)))

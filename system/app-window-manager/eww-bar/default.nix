@@ -22,7 +22,7 @@ in
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww daemon";
+      ExecStart = "${pkgs.eww}/bin/eww daemon --config /etc/eww-bar";
       Restart = "on-failure";
       RestartSec = 3;
     };

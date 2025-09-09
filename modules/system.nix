@@ -6,6 +6,7 @@ let
   fontFamily = "Noto Sans Mono";
 in
 {
+  imports = [ ./hyprland/session.nix ];
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.
   nixpkgs.config.allowUnfree = true; # :( Apps like Steam use proprietary drivers, closed source software.

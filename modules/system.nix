@@ -104,13 +104,11 @@ in
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     # Ensure eww daemon is running and swap to brain-mode bar
-    export EWW_CONFIG_DIR=/etc/eww
     ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
     ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
-      export EWW_CONFIG_DIR=/etc/eww
       ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
       ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
@@ -164,7 +162,6 @@ in
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh
     # Manual eww startup for testing
-    export EWW_CONFIG_DIR=/etc/eww
     ${pkgs.eww}/bin/eww daemon &
     sleep 1
     ${pkgs.eww}/bin/eww open bar
@@ -297,19 +294,18 @@ in
   .brain:hover { background: $tile-hover; }
   '';
 
+  # Create symlink in user's home directory so eww finds config
+  systemd.user.tmpfiles.rules = [
+    "L+ /home/ulysses/.config/eww - - - - /etc/eww"
+  ];
+
   # Start eww at login and open the normal bar
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.writeShellScriptBin "eww-daemon" ''#!/bin/sh
-        export EWW_CONFIG_DIR=/etc/eww
-        exec ${pkgs.eww}/bin/eww daemon
-      ''}/bin/eww-daemon";
-      ExecStartPost = "${pkgs.writeShellScriptBin "eww-open" ''#!/bin/sh
-        export EWW_CONFIG_DIR=/etc/eww
-        exec ${pkgs.eww}/bin/eww "$@"
-      ''}/bin/eww-open open bar";
+      ExecStart = "${pkgs.eww}/bin/eww daemon";
+      ExecStartPost = "${pkgs.eww}/bin/eww open bar";
       Restart = "on-failure";
     };
   };

@@ -56,9 +56,9 @@
       "[Debug] Show renderer status")
         OV="$HOME/.config/cognito/renderer"; SRC="auto"; OVV="-"
         if [ -f "$OV" ]; then SRC="override"; OVV=$(cat "$OV"); fi
-        CUR="\${WLR_RENDERER:-unset}"
+        CUR="$${WLR_RENDERER:-unset}"
         if systemd-detect-virt --quiet; then VM="yes"; else VM="no"; fi
-        notify-send "Renderer status" "Current: $CUR\nOverride: $SRC\${OVV:+ (\$OVV)}\nVM detected: $VM" ;;
+        notify-send "Renderer status" "Current: $CUR\nOverride: $SRC$${OVV:+ ($OVV)}\nVM detected: $VM" ;;
       *)
         if printf "%s" "$CHOICE" | grep -q "^Switch view to Workspace "; then
           NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
@@ -88,7 +88,7 @@
     (pkgs.writeShellScriptBin "eww-open" ''
     #!/bin/sh
     export EWW_CONFIG_DIR=/etc/eww
-    exec ${pkgs.eww}/bin/eww "\$@"
+    exec ${pkgs.eww}/bin/eww "$@"
     '')
 
     (pkgs.writeShellScriptBin "start-hyprland-session" ''
@@ -97,7 +97,3 @@
     '')
   ];
 }
-
-
-
-

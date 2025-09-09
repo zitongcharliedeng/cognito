@@ -85,29 +85,26 @@ in
     git vim htop tmux
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
-    CHOICE=$(printf "%s\n" \
-      "Apps" \
-      "Open Terminal" \
-      "Close Active Window" \
-      "Toggle Fullscreen on Active Window" \
-      "Exit Hyprland" \
-      "Switch view to Workspace 1" "Switch view to Workspace 2" "Switch view to Workspace 3" "Switch view to Workspace 4" "Switch view to Workspace 5" \
-      "Switch view to Workspace 6" "Switch view to Workspace 7" "Switch view to Workspace 8" "Switch view to Workspace 9" "Switch view to Workspace 10" \
-      "Move focused window to Workspace 1" "Move focused window to Workspace 2" "Move focused window to Workspace 3" "Move focused window to Workspace 4" "Move focused window to Workspace 5" \
-      "Move focused window to Workspace 6" "Move focused window to Workspace 7" "Move focused window to Workspace 8" "Move focused window to Workspace 9" "Move focused window to Workspace 10" \
-    | rofi -dmenu -i -p "Omnibar")
+    menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\n"
+    for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
+    for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
+    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar")
+
     case "$CHOICE" in
       "Apps") rofi -show drun ;;
       "Open Terminal") kitty ;;
       "Close Active Window") hyprctl dispatch killactive ;;
       "Toggle Fullscreen on Active Window") hyprctl dispatch fullscreen 1 ;;
       "Exit Hyprland") hyprctl dispatch exit ;;
-      "Switch view to Workspace "*)
-        NUM=${CHOICE##* }
-        hyprctl dispatch workspace "$NUM" ;;
-      "Move focused window to Workspace "*)
-        NUM=${CHOICE##* }
-        hyprctl dispatch movetoworkspace "$NUM" ;;
+      *)
+        if printf "%s" "$CHOICE" | grep -q "^Switch view to Workspace "; then
+          NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
+          hyprctl dispatch workspace "$NUM"
+        elif printf "%s" "$CHOICE" | grep -q "^Move focused window to Workspace "; then
+          NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
+          hyprctl dispatch movetoworkspace "$NUM"
+        fi
+        ;;
     esac
     '')
   ];

@@ -15,7 +15,7 @@
       mkHost = name: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./modules/system.nix
+          ./system/default.nix
           ./hosts/${name}/configuration.nix
         ];
       };

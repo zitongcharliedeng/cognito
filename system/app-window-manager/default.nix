@@ -58,7 +58,7 @@
   }
   
   # When any app is fullscreen on a workspace, remove gaps and borders
-  workspace = f[1], gapsin:0, gapsout:0  # f[1] targets any workspace with exactly 1 fullscreen window
+  workspace = f[0], gapsin:0, gapsout:0  # f[0] targets workspaces with fullscreen active
   windowrulev2 = noborder,fullscreen:1
   
   # Eww bar rules

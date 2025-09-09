@@ -12,7 +12,9 @@
   environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
   };
+
   # Sign-in Screen.
+  environment.systemPackages = with pkgs; [ gtkgreet ];
   services.greetd.enable = true;
   services.greetd.settings = {
     default_session = {
@@ -20,8 +22,16 @@
       user = "ulysses";
     };
     greeter = {
-      command = "${pkgs.greetd.gtkgreet}/bin/gtkgreet";
+      command = "${pkgs.gtkgreet}/bin/gtkgreet -l";
       user = "greeter";
     };
   };
+  # Create greeter user for greetd
+  users.users.greeter = {
+    isSystemUser = true;
+    group = "greeter";
+    home = "/var/lib/greeter";
+    createHome = true;
+  };
+  users.groups.greeter = {};
 }

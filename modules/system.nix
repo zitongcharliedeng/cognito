@@ -99,7 +99,7 @@ in
     # Start eww overlay with clock/workspaces while omnibar is open
     EWWCFG=/etc/eww
     eww -c "$EWWCFG" daemon 2>/dev/null || true
-    eww -c "$EWWCFG" open --toggle omnibar_overlay
+    eww -c "$EWWCFG" open omnibar_overlay
 
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
@@ -155,7 +155,7 @@ in
   # For now, keep a minimal placeholder window that proves the plumbing works.
   environment.etc."eww/eww.yuck".text = ''
   (defwindow omnibar_overlay
-    :geometry (geometry :x "50%" :y "8%" :anchor "top center")
+    :geometry (geometry :x "50%" :y "8%" :anchor "top center" :monitor 0)
     :stacking "fg"
     :exclusive false
     (box :class "placeholder"

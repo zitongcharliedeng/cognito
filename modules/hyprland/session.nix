@@ -3,8 +3,17 @@ let
   hyprStart = pkgs.writeShellScriptBin "hyprland-start" ''
     #!/bin/sh
     CONFIG_PATH=/etc/hypr/hyprland.conf
-    if systemd-detect-virt --quiet; then
-      export WLR_RENDERER=pixman
+    # Optional per-user override: ~/.config/cognito/renderer (pixman|gl)
+    OVERRIDE="$HOME/.config/cognito/renderer"
+    if [ -f "$OVERRIDE" ]; then
+      R=$(cat "$OVERRIDE" | tr -d '\n' )
+      if [ "$R" = "pixman" ] || [ "$R" = "gl" ]; then
+        export WLR_RENDERER="$R"
+      fi
+    else
+      if systemd-detect-virt --quiet; then
+        export WLR_RENDERER=pixman
+      fi
     fi
     exec Hyprland -c "$CONFIG_PATH"
   '';

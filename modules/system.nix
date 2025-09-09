@@ -104,13 +104,15 @@ in
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     # Ensure eww daemon is running and swap to brain-mode bar
-    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
-    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
-    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
+    export EWW_CONFIG_DIR=/etc/eww
+    ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
-      EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
-      EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
+      export EWW_CONFIG_DIR=/etc/eww
+      ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
+      ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
     trap cleanup EXIT
 
@@ -162,10 +164,25 @@ in
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh
     # Manual eww startup for testing
-    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww daemon &
+    export EWW_CONFIG_DIR=/etc/eww
+    ${pkgs.eww}/bin/eww daemon &
     sleep 1
-    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar
+    ${pkgs.eww}/bin/eww open bar
     echo "Eww bar should now be visible at the top"
+    '')
+
+    (pkgs.writeShellScriptBin "eww-daemon" ''
+    #!/bin/sh
+    # Eww daemon wrapper with proper environment
+    export EWW_CONFIG_DIR=/etc/eww
+    exec ${pkgs.eww}/bin/eww daemon
+    '')
+
+    (pkgs.writeShellScriptBin "eww-open" ''
+    #!/bin/sh
+    # Eww open wrapper with proper environment
+    export EWW_CONFIG_DIR=/etc/eww
+    exec ${pkgs.eww}/bin/eww "$@"
     '')
   ];
 
@@ -285,9 +302,14 @@ in
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      Environment = "EWW_CONFIG_DIR=/etc/eww";
-      ExecStart = "${pkgs.eww}/bin/eww daemon";
-      ExecStartPost = "${pkgs.eww}/bin/eww open bar";
+      ExecStart = "${pkgs.writeShellScriptBin "eww-daemon" ''#!/bin/sh
+        export EWW_CONFIG_DIR=/etc/eww
+        exec ${pkgs.eww}/bin/eww daemon
+      ''}/bin/eww-daemon";
+      ExecStartPost = "${pkgs.writeShellScriptBin "eww-open" ''#!/bin/sh
+        export EWW_CONFIG_DIR=/etc/eww
+        exec ${pkgs.eww}/bin/eww "$@"
+      ''}/bin/eww-open open bar";
       Restart = "on-failure";
     };
   };

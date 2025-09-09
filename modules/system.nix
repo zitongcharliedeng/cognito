@@ -212,7 +212,7 @@ in
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = start-hyprland-session
-  exec-once = sleep 3 && eww open bar
+  exec-once = sleep 5 && eww open bar
   input {
     kb_layout = us
   }
@@ -354,7 +354,8 @@ in
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon";
       Restart = "on-failure";
-      RestartSec = 3;
+      RestartSec = 5;
+      Environment = "WAYLAND_DISPLAY=wayland-1";
     };
   };
 

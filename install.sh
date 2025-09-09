@@ -11,6 +11,21 @@ print_header() {
   echo
 }
 
+setup_sudo_once() {
+  # Read sudo password once and use askpass for non-interactive sudo later
+  echo -n "[sudo] password for $(whoami): "
+  stty -echo
+  read -r SUDO_PW
+  stty echo
+  echo
+  ASKPASS_SCRIPT=$(mktemp)
+  chmod 700 "$ASKPASS_SCRIPT"
+  printf '#!/usr/bin/env bash\necho "%s"\n' "$SUDO_PW" > "$ASKPASS_SCRIPT"
+  unset SUDO_PW
+  export SUDO_ASKPASS="$ASKPASS_SCRIPT"
+  trap 'shred -u "$ASKPASS_SCRIPT" 2>/dev/null || rm -f "$ASKPASS_SCRIPT"' EXIT
+}
+
 list_hosts() {
   echo "Existing hosts:"
   ls -1 "$REPO_PATH/hosts" || echo "(none yet)"
@@ -133,10 +148,7 @@ build_system() {
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
   # Prompt once right before the long build, then keep sudo alive
-  sudo -v
-  ( while true; do sleep 30; sudo -n -v 2>/dev/null || exit; done ) &
-  SUDO_KEEPALIVE_PID=$!
-  if sudo nixos-rebuild switch --flake .#${HOSTNAME}; then
+  if sudo -A nixos-rebuild switch --flake .#${HOSTNAME}; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
     echo -n "Reboot now? [Y/n] Auto-rebooting in 10s: "
@@ -144,14 +156,12 @@ build_system() {
     read -r -t 10 ans || true
     case "${ans:-Y}" in
       n|N) echo "Skipping reboot." ;;
-      *) echo "Rebooting..."; sudo -n -v 2>/dev/null || sudo -v; sudo reboot ;;
+      *) echo "Rebooting..."; sudo -A reboot ;;
     esac
   else
     echo "❌ nixos-rebuild failed. Not rebooting."
     exit 1
   fi
-  # stop keepalive
-  kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
 }
 
 main() {
@@ -159,6 +169,7 @@ main() {
   list_hosts
   get_host
   create_host_dir
+  setup_sudo_once
   build_system
 }
 

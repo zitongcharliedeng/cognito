@@ -152,8 +152,8 @@ in
 
   # Eww daemon as user service to ensure overlays show reliably at login
   systemd.user.services.eww = {
-    Unit = { Description = "Eww daemon"; };
-    Install = { WantedBy = [ "default.target" ]; };
+    description = "Eww daemon";
+    wantedBy = [ "default.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww -c /etc/eww daemon";
       Restart = "on-failure";

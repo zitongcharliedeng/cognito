@@ -57,9 +57,9 @@
     col.inactive_border = rgba(000000ff) # Black
   }
   # Fullscreen rules - zero gaps and borders
-  windowrulev2 = noborder,fullscreen:1
-  windowrulev2 = gapsout:0,fullscreen:1
-  windowrulev2 = gapsin:0,fullscreen:1
+  windowrulev2 = bordersize 0,fullscreen:1
+  windowrulev2 = gapsin 0,fullscreen:1
+  windowrulev2 = gapsout 0,fullscreen:1
   
   # Eww bar rules
   windowrulev2 = float, class:^(eww)$

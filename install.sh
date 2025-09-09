@@ -9,12 +9,6 @@ print_header() {
   echo "=== Cognito Installer ==="
   echo "This will set up a new host or reuse an existing one."
   echo
-  # Ask for sudo up-front to cache credentials
-  if sudo -v; then
-    # Keep sudo alive while the script runs (refresh timestamp without prompting)
-    ( while true; do sleep 10; sudo -n -v 2>/dev/null || exit; done ) &
-    SUDO_KEEPALIVE_PID=$!
-  fi
 }
 
 list_hosts() {
@@ -138,8 +132,10 @@ build_system() {
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
-  # Refresh sudo timestamp just-in-time (non-interactive if still valid)
-  sudo -n -v 2>/dev/null || sudo -v
+  # Prompt once right before the long build, then keep sudo alive
+  sudo -v
+  ( while true; do sleep 30; sudo -n -v 2>/dev/null || exit; done ) &
+  SUDO_KEEPALIVE_PID=$!
   if sudo nixos-rebuild switch --flake .#${HOSTNAME}; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
@@ -148,12 +144,14 @@ build_system() {
     read -r -t 10 ans || true
     case "${ans:-Y}" in
       n|N) echo "Skipping reboot." ;;
-      *) echo "Rebooting..."; sudo reboot ;;
+      *) echo "Rebooting..."; sudo -n -v 2>/dev/null || sudo -v; sudo reboot ;;
     esac
   else
     echo "❌ nixos-rebuild failed. Not rebooting."
     exit 1
   fi
+  # stop keepalive
+  kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
 }
 
 main() {
@@ -162,8 +160,6 @@ main() {
   get_host
   create_host_dir
   build_system
-  # Stop keepalive if running
-  if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true; fi
 }
 
 main

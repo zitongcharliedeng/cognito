@@ -88,7 +88,7 @@ in
 
   # TODO add vm tools to develop NixOS in NixOS or figure out the dry-run NixOS changes with failsafe of rebooting without saving the changes to git. Dry running switch command i think it is called - add this action to the omnibar, with a NixOS icon. Same with the other common NixOS commands.
   environment.systemPackages = with pkgs; [
-    hyprpaper rofi-wayland eww jq
+    hyprpaper rofi-wayland jq
     obs-studio mangohud protonup
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
@@ -96,15 +96,13 @@ in
 
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
-    # Start eww overlay with clock/workspaces while omnibar is open
-    EWWCFG=/etc/eww
-    eww -c "$EWWCFG" daemon 2>/dev/null || true
-    eww -c "$EWWCFG" open omnibar_overlay
+    # Minimal inline overlay via rofi message (keeps config tiny and robust)
+    MESG="$(date '+%H:%M')  •  placeholder"
 
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
-    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar")
+    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG")
 
     case "$CHOICE" in
       "Apps") rofi -show drun ;;
@@ -145,38 +143,8 @@ in
         fi
         ;;
     esac
-    # Close overlay
-    eww -c "$EWWCFG" close omnibar_overlay || true
     '')
   ];
-
-  # Eww daemon as user service to ensure overlays show reliably at login
-  # TODO: Reintroduce clock/hint/workspace previews in the eww overlay.
-  # For now, keep a minimal placeholder window that proves the plumbing works.
-  environment.etc."eww/eww.yuck".text = ''
-  (defwindow omnibar_overlay
-    :geometry (geometry :x "50%" :y "8%" :anchor "top center" :monitor 0)
-    :stacking "fg"
-    :exclusive false
-    (box :class "placeholder"
-      (label :text "placeholder")))
-  '';
-
-  environment.etc."eww/eww.scss".text = ''
-  .placeholder { background: rgba(0,0,0,0.6); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
-  '';
-
-  # Remove now-unneeded workspace preview helper
-  environment.etc."eww/ws-preview.sh".text = "";
-
-  systemd.user.services.eww = {
-    description = "Eww daemon";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww -c /etc/eww daemon";
-      Restart = "on-failure";
-    };
-  };
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''
@@ -184,51 +152,11 @@ in
   wallpaper = ,${wallpaperPath}
   ipc = off
   '';
-  
-  environment.etc."ironbar/config.toml".text = ''
-  [bar]
-  layer = "top"
-  anchor = "top"
-  exclusivity = "exclusive"
-  hide_on_fullscreen = true
-
-  [[bar.start]]
-  type = "workspaces"
-  disable_scroll = true
-  sort_by_number = true
-  on_click = "hyprctl dispatch workspace %d"
-  show_icons = true
-
-  [[bar.center]]
-  type = "clock"
-  format = "%H:%M"
-
-  [[bar.end]]
-  type = "script"
-  command = "sh -lc '[ \"$WLR_RENDERER\" = pixman ] && echo Pixman || echo Wayland\\ GL'"
-  interval = 0
-
-  [[bar.end]]
-  type = "pulseaudio"
-
-  [[bar.end]]
-  type = "network"
-
-  [[bar.end]]
-  type = "battery"
-
-  [[bar.end]]
-  type = "script"
-  command = "echo [ META+SPACE → Omnibar ]"
-  interval = 0
-  '';
 
   environment.etc."hypr/hyprland.conf".text = ''
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
-  # Ensure eww is running
-  exec-once = eww -c /etc/eww daemon &
   input {
     kb_layout = us
   }

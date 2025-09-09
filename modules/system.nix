@@ -104,13 +104,13 @@ in
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     # Ensure eww daemon is running and swap to brain-mode bar
-    ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
-    ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
-    ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
+    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
+    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
+    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
-      ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
-      ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
+      EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
+      EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
     trap cleanup EXIT
 
@@ -157,6 +157,15 @@ in
         fi
         ;;
     esac
+    '')
+
+    (pkgs.writeShellScriptBin "start-eww" ''
+    #!/bin/sh
+    # Manual eww startup for testing
+    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww daemon &
+    sleep 1
+    EWW_CONFIG_DIR=/etc/eww ${pkgs.eww}/bin/eww open bar
+    echo "Eww bar should now be visible at the top"
     '')
   ];
 
@@ -271,14 +280,12 @@ in
   .brain:hover { background: $tile-hover; }
   '';
 
-  # Create symlink so eww finds config in /etc/eww via default ~/.config/eww path
-  environment.etc."xdg/eww".source = "/etc/eww";
-  
   # Start eww at login and open the normal bar
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
+      Environment = "EWW_CONFIG_DIR=/etc/eww";
       ExecStart = "${pkgs.eww}/bin/eww daemon";
       ExecStartPost = "${pkgs.eww}/bin/eww open bar";
       Restart = "on-failure";

@@ -148,7 +148,7 @@ build_system() {
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
   # Prompt once right before the long build, then keep sudo alive
-  if sudo -A nixos-rebuild switch --flake .#${HOSTNAME} --reboot; then
+  if sudo -A sh -c "nixos-rebuild switch --flake .#${HOSTNAME} && systemctl reboot"; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "System is rebooting now..."
   else

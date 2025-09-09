@@ -85,13 +85,29 @@ in
     git vim htop tmux
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
-    CHOICE=$(printf "%s\n" "Apps" "Open Terminal" "Close Active Window" "Toggle Fullscreen" "Exit Hyprland" | rofi -dmenu -i -p "Omnibar")
+    CHOICE=$(printf "%s\n" \
+      "Apps" \
+      "Open Terminal" \
+      "Close Active Window" \
+      "Toggle Fullscreen on Active Window" \
+      "Exit Hyprland" \
+      "Switch view to Workspace 1" "Switch view to Workspace 2" "Switch view to Workspace 3" "Switch view to Workspace 4" "Switch view to Workspace 5" \
+      "Switch view to Workspace 6" "Switch view to Workspace 7" "Switch view to Workspace 8" "Switch view to Workspace 9" "Switch view to Workspace 10" \
+      "Move focused window to Workspace 1" "Move focused window to Workspace 2" "Move focused window to Workspace 3" "Move focused window to Workspace 4" "Move focused window to Workspace 5" \
+      "Move focused window to Workspace 6" "Move focused window to Workspace 7" "Move focused window to Workspace 8" "Move focused window to Workspace 9" "Move focused window to Workspace 10" \
+    | rofi -dmenu -i -p "Omnibar")
     case "$CHOICE" in
       "Apps") rofi -show drun ;;
       "Open Terminal") kitty ;;
       "Close Active Window") hyprctl dispatch killactive ;;
-      "Toggle Fullscreen") hyprctl dispatch fullscreen 1 ;;
+      "Toggle Fullscreen on Active Window") hyprctl dispatch fullscreen 1 ;;
       "Exit Hyprland") hyprctl dispatch exit ;;
+      "Switch view to Workspace "*)
+        NUM=${CHOICE##* }
+        hyprctl dispatch workspace "$NUM" ;;
+      "Move focused window to Workspace "*)
+        NUM=${CHOICE##* }
+        hyprctl dispatch movetoworkspace "$NUM" ;;
     esac
     '')
   ];
@@ -103,12 +119,38 @@ in
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
     "modules-right": ["pulseaudio", "network", "battery", "custom/omnibar"],
-    "custom/omnibar": { "format": "[ META+SPACE → Omnibar ]" }
+
+    "clock": { "format": "{:%H:%M}" },
+
+    "network": {
+      "format-wifi": "{signalStrength}%",
+      "format-ethernet": "eth",
+      "format-disconnected": "offline",
+      "tooltip": false
+    },
+
+    "pulseaudio": {
+      "format": "{volume}%",
+      "format-muted": "muted"
+    },
+
+    "battery": { "format": "{capacity}%" },
+
+    "hyprland/workspaces": {
+      "all-outputs": true,
+      "disable-scroll": true,
+      "sort-by-number": true,
+      "on-click": "hyprctl dispatch workspace %d",
+      "persistent-workspaces": { "*": [1,2,3,4,5,6,7,8,9,10] }
+    },
+
+    "custom/omnibar": { "format": "[ META+SPACE → Omnibar ]", "tooltip": false }
   }
   '';
   environment.etc."xdg/waybar/style.css".text = ''
   * { font-family: "${fontFamily}", monospace; font-size: 12px; }
   #workspaces button.active { color: #ffffff; background: #3a3a3a; }
+  #clock, #network, #pulseaudio, #battery, #custom-omnibar, #workspaces { padding: 0 8px; }
   '';
 
   environment.etc."hypr/hyprland.conf".text = ''
@@ -124,7 +166,7 @@ in
     border_size = 2 # Hyperland Default is 2 ಠ_ಠ
     # Hyperland does not guarantee the same default colors in new releases.
     col.active_border = rgba(ffffffff) # White
-    col.inactive_border = rgba(808080ff) # 50% Grey
+    col.inactive_border = rgba(000000ff) # Black
   }
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar

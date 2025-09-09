@@ -18,18 +18,18 @@
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
 
     # Ensure eww daemon is running and expand to brain-mode bar
-    ''${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     sleep 0.5
     # Close normal bar and open brain bar
-    ''${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
     sleep 0.3
-    ''${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
       # Close brain bar and restore normal bar
-      ''${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
+      ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
       sleep 0.3
-      ''${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
+      ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
     trap cleanup EXIT
 
@@ -63,9 +63,9 @@
       "[Debug] Show renderer status")
         OV="$HOME/.config/cognito/renderer"; SRC="auto"; OVV="-"
         if [ -f "$OV" ]; then SRC="override"; OVV=$(cat "$OV"); fi
-        CUR=''${WLR_RENDERER:-unset}
+        CUR="${WLR_RENDERER:-unset}"
         if systemd-detect-virt --quiet; then VM="yes"; else VM="no"; fi
-        notify-send "Renderer status" "Current: $CUR\nOverride: $SRC''${OVV:+ ($OVV)}\nVM detected: $VM" ;;
+        notify-send "Renderer status" "Current: $CUR\nOverride: $SRC${OVV:+ ($OVV)}\nVM detected: $VM" ;;
       *)
         if printf "%s" "$CHOICE" | grep -q "^Switch view to Workspace "; then
           NUM=$(printf "%s" "$CHOICE" | awk '{print $NF}')
@@ -81,9 +81,9 @@
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh
     # Manual eww startup for testing
-    ''${pkgs.eww}/bin/eww daemon &
+    ${pkgs.eww}/bin/eww daemon &
     sleep 1
-    ''${pkgs.eww}/bin/eww open bar
+    ${pkgs.eww}/bin/eww open bar
     echo "Eww bar should now be visible at the top"
     '')
 
@@ -91,15 +91,15 @@
     #!/bin/sh
     # Eww daemon wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
-    exec ''${pkgs.eww}/bin/eww daemon
+    exec ${pkgs.eww}/bin/eww daemon
     '')
 
     (pkgs.writeShellScriptBin "eww-open" ''
     #!/bin/sh
     # Eww open wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
-    exec ''${pkgs.eww}/bin/eww "$@"
-    ''')
+    exec ${pkgs.eww}/bin/eww "$@"
+    '')
 
     (pkgs.writeShellScriptBin "start-hyprland-session" ''
     #!/bin/sh
@@ -108,3 +108,4 @@
     '')
   ];
 }
+

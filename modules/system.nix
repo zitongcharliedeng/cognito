@@ -257,7 +257,7 @@ in
   (defwindow bar
     :monitor 0
     :exclusive true
-    :geometry "0 0 100% 40px"
+    :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
@@ -265,7 +265,7 @@ in
   (defwindow bar_brain
     :monitor 0
     :exclusive true
-    :geometry "0 0 100% 320px"
+    :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)

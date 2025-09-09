@@ -112,39 +112,39 @@ in
   ];
 
   environment.etc."ironbar/config.toml".text = ''
-  [window]
-  anchor = "top"
+  [bar]
   layer = "top"
-  exclusive = true
+  anchor = "top"
+  exclusivity = "exclusive"
   hide_on_fullscreen = true
 
-  [[bar.modules.left]]
-  type = "hyprland/workspaces"
+  [[bar.start]]
+  type = "workspaces"
   disable_scroll = true
   sort_by_number = true
   on_click = "hyprctl dispatch workspace %d"
   show_icons = true
 
-  [[bar.modules.right]]
-  type = "custom/script"
-  command = "sh -lc '[ "$WLR_RENDERER" = pixman ] && echo Pixman || echo Wayland\ GL'"
-  interval = 0
-
-  [[bar.modules.right]]
-  type = "pulseaudio"
-
-  [[bar.modules.right]]
-  type = "network"
-
-  [[bar.modules.right]]
-  type = "battery"
-
-  [[bar.modules.center]]
+  [[bar.center]]
   type = "clock"
   format = "%H:%M"
 
-  [[bar.modules.right]]
-  type = "custom/script"
+  [[bar.end]]
+  type = "script"
+  command = "sh -lc '[ \"$WLR_RENDERER\" = pixman ] && echo Pixman || echo Wayland\\ GL'"
+  interval = 0
+
+  [[bar.end]]
+  type = "pulseaudio"
+
+  [[bar.end]]
+  type = "network"
+
+  [[bar.end]]
+  type = "battery"
+
+  [[bar.end]]
+  type = "script"
   command = "echo [ META+SPACE → Omnibar ]"
   interval = 0
   '';
@@ -166,12 +166,15 @@ in
   }
   decoration {
     rounding = 0
-    blur = false
     drop_shadow = false
+    shadow_range = 0
+    shadow_render_power = 0
+    blur {
+      enabled = false
+    }
   }
-  # Hide borders and bar when a window is fullscreen
+  # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1
-  windowrulev2 = nofullscreenrequest,fullscreen:1
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
   bind = $mod,RETURN,exec,kitty

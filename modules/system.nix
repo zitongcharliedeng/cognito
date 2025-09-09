@@ -139,6 +139,14 @@ in
       (box :halign "center" (label :class "date"  :text date))
     ))
 
+  (defwindow hint
+    :geometry (geometry :x "50%" :y "96%" :anchor "bottom center" :width 520)
+    :stacking "fg"
+    :focusable false
+    :exclusive false
+    (box :class "hint"
+      (label :text "PRESS META+SPACE to open OMNIBAR")))
+
   (defpoll time :interval "1s" "date +%H:%M")
   (defpoll date :interval "30s" "date +%a %d %b")
   '';
@@ -146,6 +154,7 @@ in
   .omnibar-overlay { background: rgba(0,0,0,0.6); padding: 10px 14px; border-radius: 8px; }
   .clock { font-size: 28px; font-weight: 600; }
   .date  { font-size: 14px; opacity: .9; }
+  .hint { background: rgba(0,0,0,0.55); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 14px; letter-spacing: 0.5px; }
   '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
@@ -202,6 +211,7 @@ in
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
+  exec-once = eww -c /etc/eww daemon && (eww -c /etc/eww open hint & sleep 8 && eww -c /etc/eww close hint) &
   input {
     kb_layout = us
   }

@@ -12,7 +12,7 @@ print_header() {
   # Ask for sudo up-front to cache credentials
   if sudo -v; then
     # Keep sudo alive while the script runs (refresh timestamp without prompting)
-    ( while true; do sleep 30; sudo -n -v 2>/dev/null || exit; done ) &
+    ( while true; do sleep 10; sudo -n -v 2>/dev/null || exit; done ) &
     SUDO_KEEPALIVE_PID=$!
   fi
 }
@@ -138,7 +138,9 @@ build_system() {
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
-  if sudo -n nixos-rebuild switch --flake .#${HOSTNAME}; then
+  # Refresh sudo timestamp just-in-time (non-interactive if still valid)
+  sudo -n -v 2>/dev/null || sudo -v
+  if sudo nixos-rebuild switch --flake .#${HOSTNAME}; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
     echo -n "Reboot now? [Y/n] Auto-rebooting in 10s: "

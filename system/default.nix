@@ -58,12 +58,6 @@ in
     EWW_CONFIG_DIR = "/etc/eww";
   };
 
-
-
-
-
-
-
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''
   preload = ${wallpaperPath}

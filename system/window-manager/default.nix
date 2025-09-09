@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./session/default.nix ];
+  imports = [ ./session/default.nix ./omnibar-mode/default.nix ];
   services.xserver.enable = false;  # We are using Wayland, not X11.
   # 3D acceleration for Wayland. See README.md for more details.
   hardware.graphics = {

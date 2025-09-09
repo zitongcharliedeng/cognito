@@ -38,7 +38,7 @@ in
   services.greetd.enable = true;
   services.greetd.settings = {
     default_session = {
-      command = "Hyprland -c /etc/hypr/hyprland.conf";
+      command = config.cognito.hyprland.startCmd;  # VM-safe Hyprland session launcher
       user = "ulysses";
     };
   };
@@ -83,6 +83,7 @@ in
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
     git vim htop tmux
+
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\n"
@@ -115,7 +116,9 @@ in
     "position": "top",
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "network", "battery", "custom/omnibar"],
+    "modules-right": ["custom/mode", "pulseaudio", "network", "battery", "custom/omnibar"],
+    # Read once from env exported by hyprland-start (set in hyprland/session.nix)
+    "custom/mode": { "exec": "sh -c '[ -n \"$HYPR_VM_PIXMAN\" ] && echo \"This device is a VM - using pixman renderer\" || echo \"This device is a Non-VM\"'", "interval": 0, "tooltip": false },
 
     "clock": { "format": "{:%H:%M}" },
 

@@ -138,8 +138,7 @@ build_system() {
   git add hosts/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} host configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
-  echo "Note: You'll be prompted for your sudo password (same as your NixOS installer password)"
-  if sudo nixos-rebuild switch --flake .#${HOSTNAME}; then
+  if sudo -n nixos-rebuild switch --flake .#${HOSTNAME}; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "Note: Your flake configuration is now active. Future changes should be made in this repository."
     echo -n "Reboot now? [Y/n] Auto-rebooting in 10s: "

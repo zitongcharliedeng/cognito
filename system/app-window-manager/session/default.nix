@@ -18,12 +18,12 @@ let
     exec Hyprland -c "$CONFIG_PATH"
   '';
   wallpaperCandidates = [
-    ../assets/wallpapers/wallpaper.png
-    ../assets/wallpapers/wallpaper.jpg
-    ../assets/wallpapers/wallpaper.jpeg
+    ../wallpapers/wallpaper.png
+    ../wallpapers/wallpaper.jpg
+    ../wallpapers/wallpaper.jpeg
   ];
   chosenWallpapers = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
-  wallpaperPath = if chosenWallpapers == [] then ./assets/wallpapers/wallpaper.png else builtins.head chosenWallpapers;
+  wallpaperPath = if chosenWallpapers == [] then ./wallpapers/wallpaper.png else builtins.head chosenWallpapers;
 in
 {
   options = {

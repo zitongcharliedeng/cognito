@@ -43,7 +43,7 @@
   monitor=,1920x1080@60,auto,1  # TODO make this auto-detect
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
-  exec-once = start-hyprland-session
+  exec-once = systemctl --user start hyprland-session.target
   input {
     kb_layout = us
   }

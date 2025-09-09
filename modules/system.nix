@@ -97,9 +97,9 @@ in
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
     # Minimal inline overlay via rofi message (keeps config tiny and robust)
-    MESG="$(date '+%H:%M')  •  placeholder"
+    MESG=$(printf '<span font_desc="%s 12">[ 1 ]  Box A    [ 2 ]  Box B    [ 3 ]  Box C    [ 4 ]  Box D</span>\n<span>%s  •  placeholder</span>' "${fontFamily}" "$(date '+%H:%M')")
 
-    menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
+    menu="[Box] A (Terminal)\n[Box] B (Terminal)\n[Box] C (Terminal)\n[Box] D (Terminal)\n""Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
     CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG" -markup -theme /etc/xdg/rofi/cognito.rasi)
@@ -121,6 +121,8 @@ in
         dir="$HOME/Pictures/Screenshots"; mkdir -p "$dir"
         file="$dir/$(date +%F_%H-%M-%S)_full.png"
         grim "$file" ;;
+      "[Box] A (Terminal)"|"[Box] B (Terminal)"|"[Box] C (Terminal)"|"[Box] D (Terminal)")
+        kitty ;;
       "[Debug] Force renderer: pixman")
         mkdir -p "$HOME/.config/cognito"; echo pixman > "$HOME/.config/cognito/renderer"; notify-send "Renderer" "Override set to pixman. Log out to apply." ;;
       "[Debug] Force renderer: gl")
@@ -146,26 +148,29 @@ in
     '')
   ];
 
-  # Rofi theme: larger window, 2-column grid, semi-transparent background
+  # Rofi theme: larger window, semi-transparent background, message ABOVE input,
+  # 4-column-like header achieved with monospaced markup in the message.
   environment.etc."xdg/rofi/cognito.rasi".text = ''
   configuration { show-icons: false; }
   * { font: "${fontFamily} 12"; }
   window {
     width: 900px;
     height: 520px;
-    transparency: "real";
-    background-color: rgba(0,0,0,60%);
+    background-color: rgba(0,0,0,0.55);
     border-radius: 8px;
   }
+  mainbox { children: [ message, inputbar, listview ]; background-color: transparent; }
   listview {
-    columns: 2;
+    columns: 4;
     spacing: 8px;
     cycle: true;
+    background-color: transparent;
   }
-  element { padding: 12px 16px; border-radius: 6px; }
+  element { padding: 12px 16px; border-radius: 6px; background-color: transparent; }
   element selected { background-color: rgba(255,255,255,10%); }
-  message { padding: 8px 12px; }
-  inputbar { padding: 8px 12px; }
+  message { padding: 10px 12px; background-color: transparent; }
+  textbox { background-color: transparent; }
+  inputbar { padding: 8px 12px; background-color: transparent; }
   '';
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired

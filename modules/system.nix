@@ -99,10 +99,13 @@ in
     # Minimal inline overlay via rofi message (keeps config tiny and robust)
     MESG=$(printf '<span font_desc="%s 12">status row (WIP)</span>' "${fontFamily}")
 
+    # Common rofi options: ignore user configs and avoid grabs
+    ROFI_OPTS="-no-config -no-lazy-grab"
+
     # Start a persistent header loop; kill it after main rofi exits
     header_loop() {
       while :; do
-        SEL=$(printf "Box A\nBox B\nBox C\nBox D\n" | rofi -dmenu -theme /etc/xdg/rofi/cognito-header.rasi -p "")
+        SEL=$(printf "Box A\nBox B\nBox C\nBox D\n" | rofi $ROFI_OPTS -dmenu -theme /etc/xdg/rofi/cognito-header.rasi -p "")
         [ -n "$SEL" ] && kitty &
       done
     }
@@ -112,7 +115,7 @@ in
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
-    CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG" -markup -theme /etc/xdg/rofi/cognito.rasi)
+    CHOICE=$(printf "%b" "$menu" | rofi $ROFI_OPTS -dmenu -i -p "Omnibar" -mesg "$MESG" -markup -theme /etc/xdg/rofi/cognito.rasi)
 
     # Stop header regardless of selection
     kill "$HDR_PID" 2>/dev/null || true
@@ -179,13 +182,13 @@ in
     background-color: transparent;
     scrollbar: false;
   }
-  element { padding: 10px 12px; border-radius: 6px; background-color: transparent; }
-  element normal { background-color: transparent; }
-  element selected { background-color: rgba(255,255,255,0.15); }
+  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.04); }
+  element normal { background-color: rgba(255,255,255,0.04); }
+  element selected { background-color: rgba(255,255,255,0.18); }
   element-text { color: #f2f2f2; }
   element selected element-text { color: #ffffff; }
   message { padding: 8px 12px; background-color: transparent; }
-  inputbar { padding: 8px 12px; background-color: rgba(0,0,0,0.35); border-radius: 6px; }
+  inputbar { padding: 8px 12px; background-color: rgba(0,0,0,0.40); border-radius: 6px; }
   prompt, textbox, element-icon { color: #f2f2f2; }
   '';
 
@@ -193,11 +196,11 @@ in
   environment.etc."xdg/rofi/cognito-header.rasi".text = ''
   configuration { show-icons: false; }
   * { font: "${fontFamily} 12"; }
-  window { width: 900px; height: 90px; background-color: rgba(20,20,20,0.5); border-radius: 8px; location: north; }
+  window { width: 900px; height: 90px; background-color: rgba(20,20,20,0.6); border-radius: 8px; location: north; }
   mainbox { children: [ listview ]; }
-  listview { columns: 4; lines: 1; spacing: 10px; background-color: transparent; scrollbar: false; }
-  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.08); }
-  element selected { background-color: rgba(255,255,255,0.18); }
+  listview { columns: 4; lines: 1; spacing: 10px; background-color: transparent; scrollbar: false; fixed-height: true; }
+  element { padding: 10px 12px; border-radius: 6px; background-color: rgba(48,48,48,0.8); }
+  element selected { background-color: rgba(80,80,80,0.9); }
   element-text { color: #ffffff; }
   '';
 

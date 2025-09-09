@@ -56,9 +56,9 @@
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
-  # Fullscreen rules - zero borders only
-  # Note: Hyprland doesn't support gap rules in windowrulev2
-  # Gaps are controlled by general settings and workspace rules
+  
+  # When any app is fullscreen on a workspace, remove gaps and borders
+  workspace = f[1], gapsin:0, gapsout:0  # f[1] targets any workspace with exactly 1 fullscreen window
   windowrulev2 = noborder,fullscreen:1
   
   # Eww bar rules

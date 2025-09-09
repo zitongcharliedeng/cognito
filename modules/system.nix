@@ -84,11 +84,12 @@ in
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
     NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
+    EWW_CONFIG_DIR = "/etc/eww";
   };
 
   # TODO add vm tools to develop NixOS in NixOS or figure out the dry-run NixOS changes with failsafe of rebooting without saving the changes to git. Dry running switch command i think it is called - add this action to the omnibar, with a NixOS icon. Same with the other common NixOS commands.
   environment.systemPackages = with pkgs; [
-    hyprpaper rofi-wayland jq
+    hyprpaper rofi-wayland jq eww
     obs-studio mangohud protonup
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils brightnessctl papirus-icon-theme
@@ -102,6 +103,17 @@ in
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
+    # Ensure eww daemon is running and swap to brain-mode bar
+    ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
+    ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
+
+    cleanup() {
+      ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
+      ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
+    }
+    trap cleanup EXIT
+
     CHOICE=$(printf "%b" "$menu" | rofi -dmenu -i -p "Omnibar" -mesg "$MESG")
 
     case "$CHOICE" in
@@ -148,10 +160,6 @@ in
     '')
   ];
 
-  # No custom rofi themes for now (use defaults to stabilize feature work)
-  environment.etc."xdg/rofi/cognito.rasi".text = "";
-  environment.etc."xdg/rofi/cognito-header.rasi".text = "";
-
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
   environment.etc."hypr/hyprpaper.conf".text = ''
   preload = ${wallpaperPath}
@@ -174,6 +182,7 @@ in
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
+
   decoration {
     rounding = 0
     blur {
@@ -185,6 +194,7 @@ in
   }
   # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1
+
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
   bind = $mod,RETURN,exec,kitty
@@ -192,6 +202,86 @@ in
   bind = $mod,M,exit
   bind = $mod,F,fullscreen,1
   '';
+
+  # eww configuration (modular): variables, widgets, windows
+  environment.etc."eww/eww.yuck".text = ''
+  (include "variables.yuck")
+  (include "widgets.yuck")
+  (include "windows.yuck")
+  '';
+
+  environment.etc."eww/variables.yuck".text = ''
+  (defpoll time :interval "1s" "date '+%H:%M'")
+  '';
+
+  environment.etc."eww/widgets.yuck".text = ''
+  (defwidget status_row []
+    (box :class "status-row" :space-evenly false :halign "fill" :valign "center"
+      (box :class "left" :halign "start" :valign "center"
+        (label :class "hint" :text "PRESS META+SPACE to open OMNIBAR"))
+      (box :class "right" :halign "end" :valign "center"
+        (label :class "clock" :text "{time}"))))
+
+  (defwidget brain_grid []
+    (grid :class "brain-grid" :halign "fill" :valign "fill" :row-spacing 6 :column-spacing 6 :rows 2 :columns 2
+      (button :class "brain" :onclick "kitty" "A")
+      (button :class "brain" :onclick "kitty" "B")
+      (button :class "brain" :onclick "kitty" "C")
+      (button :class "brain" :onclick "kitty" "D")))
+  '';
+
+  environment.etc."eww/windows.yuck".text = ''
+  (defwindow bar
+    :monitor 0
+    :exclusive true
+    :geometry "0 0 100% 40px"
+    :stacking "fg"
+    (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
+      (status_row)))
+
+  (defwindow bar_brain
+    :monitor 0
+    :exclusive true
+    :geometry "0 0 100% 320px"
+    :stacking "fg"
+    (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
+      (brain_grid)
+      (status_row)))
+  '';
+
+  environment.etc."eww/vars.scss".text = ''
+  $bg: rgba(20,20,20,0.7);
+  $bg_brain: rgba(20,20,20,0.8);
+  $fg: #ffffff;
+  $fg-muted: #cccccc;
+  $tile: rgba(255,255,255,0.08);
+  $tile-hover: rgba(255,255,255,0.18);
+  '';
+
+  environment.etc."eww/eww.scss".text = ''
+  @import "vars";
+  * { font-family: "${fontFamily}", monospace; }
+  .bar { background: $bg; padding: 8px; }
+  .brain-mode { background: $bg_brain; }
+  .status-row { padding: 4px 8px; }
+  .hint { color: $fg-muted; }
+  .clock { color: $fg; }
+  .brain-grid { padding: 8px; }
+  .brain { background: $tile; color: $fg; border-radius: 8px; font-size: 20px; padding: 24px; }
+  .brain:hover { background: $tile-hover; }
+  '';
+
+  # Start eww at login and open the normal bar
+  systemd.user.services.eww = {
+    description = "Eww daemon";
+    wantedBy = [ "graphical-session.target" ];
+    serviceConfig = {
+      Environment = "EWW_CONFIG_DIR=/etc/eww";
+      ExecStart = "${pkgs.eww}/bin/eww daemon";
+      ExecStartPost = "${pkgs.eww}/bin/eww open bar";
+      Restart = "on-failure";
+    };
+  };
 
   environment.etc."xdg/kitty/kitty.conf".text = ''
   font_family ${fontFamily}

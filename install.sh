@@ -11,8 +11,8 @@ print_header() {
   echo
   # Ask for sudo up-front to cache credentials
   if sudo -v; then
-    # Keep sudo alive while the script runs
-    ( while true; do sleep 60; sudo -n true 2>/dev/null || exit; done ) &
+    # Keep sudo alive while the script runs (refresh timestamp without prompting)
+    ( while true; do sleep 30; sudo -n -v 2>/dev/null || exit; done ) &
     SUDO_KEEPALIVE_PID=$!
   fi
 }

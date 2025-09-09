@@ -75,7 +75,7 @@
         fi
         ;;
     esac
-    ''')
+    '''))
 
     (pkgs.writeShellScriptBin "start-eww" ''
     #!/bin/sh
@@ -84,26 +84,26 @@
     sleep 1
     ''${pkgs.eww}/bin/eww open bar
     echo "Eww bar should now be visible at the top"
-    ''')
+    '''))
 
     (pkgs.writeShellScriptBin "eww-daemon" ''
     #!/bin/sh
     # Eww daemon wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
     exec ''${pkgs.eww}/bin/eww daemon
-    ''')
+    '''))
 
     (pkgs.writeShellScriptBin "eww-open" ''
     #!/bin/sh
     # Eww open wrapper with proper environment
     export EWW_CONFIG_DIR=/etc/eww
     exec ''${pkgs.eww}/bin/eww "$@"
-    ''')
+    '''))
 
     (pkgs.writeShellScriptBin "start-hyprland-session" ''
     #!/bin/sh
     # Start Hyprland session target for systemd services
     systemctl --user start hyprland-session.target
-    ''')
+    '''))
   ];
 }

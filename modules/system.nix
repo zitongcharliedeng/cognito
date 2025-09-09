@@ -1,4 +1,10 @@
 { config, pkgs, ... }:
+let
+  # Noto is the best practical base with broad symbol coverage ("no more tofu").
+  # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
+  # Fallback will use non-mono Noto families when a glyph is missing.
+  fontFamily = "Noto Sans Mono";
+in
 {
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.
@@ -36,13 +42,6 @@
       user = "ulysses";
     };
   };
-
-
-  # TODO: refactor the fontFamily to be a variable passed between files.
-  # Noto is the best practical base with broad symbol coverage ("no more tofu").
-  # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
-  # Fallback will use non-mono Noto families when a glyph is missing.
-  let fontFamily = "Noto Sans Mono"; in
   fonts = {
     fontconfig.enable = true;
     packages = with pkgs; [

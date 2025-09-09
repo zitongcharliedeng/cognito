@@ -19,7 +19,7 @@ list_hosts() {
 
 get_host() {
   while true; do
-    echo -n "Enter hostname for hardware-shim (existing or create new): "
+    echo -n "Enter hostname for this device to "use existing or create new" hardware-shim so Cognito is compatible with it i.e. my-dying-thinkpad-laptop. Note that the device must support 3D hardware acceleration, since Cognito is a Wayland-first OS. Most devices in the last decade - phone, laptop, desktop - should support this. "
     read -r HOSTNAME
     
     # Validate hostname is not empty

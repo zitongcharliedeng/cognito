@@ -16,12 +16,11 @@ let
 in
 {
   imports = [ 
-    ./hyprland/session.nix
-    ./steam/default.nix
+    ./hyprland/default.nix
+    ./apps/steam/default.nix
   ];
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.
-  nixpkgs.config.allowUnfree = true; # :( Apps like Steam use proprietary drivers, closed source software.
 
   i18n.defaultLocale = "en_GB.UTF-8";
   i18n.supportedLocales = [ "en_GB.UTF-8/UTF-8" ];
@@ -38,23 +37,7 @@ in
   };
   security.sudo.enable = true; # Enable sudo for members of "wheel" when needed.
 
-  services.xserver.enable = false;  # We are using Wayland, not X11.
-  # 3D acceleration for Wayland. See README.md for more details.
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-  programs.hyprland.enable = true;  # Wayland isn’t a global toggle...
-  # ... It is implicitly enabled by using i.e. Hyprland as my window manager.
 
-  # Sign-in Screen.
-  services.greetd.enable = true;
-  services.greetd.settings = {
-    default_session = {
-      command = config.cognito.hyprland.startCmd;  # VM-safe Hyprland session launcher
-      user = "ulysses";
-    };
-  };
   fonts = {
     packages = with pkgs; [
       noto-fonts
@@ -70,10 +53,8 @@ in
     };
   };
 
-
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
-    NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
     EWW_CONFIG_DIR = "/etc/eww";
   };
 

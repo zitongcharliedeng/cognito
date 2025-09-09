@@ -35,5 +35,3 @@ in
     cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
   };
 }
-
-

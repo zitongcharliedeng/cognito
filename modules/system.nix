@@ -241,15 +241,14 @@ in
   windowrulev2 = workspace 1,class:^(eww)$
   windowrulev2 = workspace 1,class:^(rofi)$
   
-  # Configure eww bar behavior
-  windowrulev2 = float,class:^(eww)$
-  windowrulev2 = move 0 0,class:^(eww)$
-  windowrulev2 = nofocus,class:^(eww)$
-  windowrulev2 = noinitialfocus,class:^(eww)$
-  windowrulev2 = pin,class:^(eww)$
-  windowrulev2 = opacity 0,fullscreen:1,class:^(eww)$
-  windowrulev2 = stayfocused,class:^(rofi)$
-  windowrulev2 = nofocus,class:^(rofi)$
+  # Eww bar rules - proper patterns
+  windowrulev2 = float, class:^(eww)$
+  windowrulev2 = nofocus, class:^(eww)$
+  windowrulev2 = opacity 0, fullscreen:1, class:^(eww)$
+  
+  # Rofi rules
+  windowrulev2 = float, class:^(rofi)$
+  windowrulev2 = nofocus, class:^(rofi)$
 
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -291,19 +290,19 @@ in
   environment.etc."eww/windows.yuck".text = ''
   (defwindow bar
     :monitor 0
+    :geometry (geometry :x "0px" :y "0px" :width "100%" :height "40px")
     :exclusive true
-    :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
-    :struts (struts :side "top" :distance 40)
+    :struts (struts :top 40)
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
 
   (defwindow bar_brain
     :monitor 0
+    :geometry (geometry :x "0px" :y "0px" :width "100%" :height "320px")
     :exclusive true
-    :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
-    :struts (struts :side "top" :distance 320)
+    :struts (struts :top 320)
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)
       (status_row)))
@@ -344,14 +343,14 @@ in
     };
   };
 
-  # Start eww daemon only - simplified approach
+  # Start eww daemon - simple and reliable
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon";
-      Restart = "always";
-      RestartSec = 2;
+      Restart = "on-failure";
+      RestartSec = 3;
     };
   };
 

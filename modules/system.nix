@@ -118,7 +118,7 @@ in
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
     "modules-right": ["custom/mode", "pulseaudio", "network", "battery", "custom/omnibar"],
-    "custom/mode": { "exec": "sh -c '[ -n \"$HYPR_VM_PIXMAN\" ] && echo \"This device is a VM - using pixman renderer\" || echo \"This device is a Non-VM\"'", "interval": 0, "tooltip": false },
+    "custom/mode": { "exec": "sh -c '[ \"$WLR_RENDERER\" = pixman ] && echo \"Pixman (VM)\" || echo \"Wayland GL\"'", "interval": 0, "tooltip": false },
     "clock": { "format": "{:%H:%M}" },
 
     "network": {

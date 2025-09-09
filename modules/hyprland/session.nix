@@ -5,7 +5,6 @@ let
     CONFIG_PATH=/etc/hypr/hyprland.conf
     if systemd-detect-virt --quiet; then
       export WLR_RENDERER=pixman
-      export HYPR_VM_PIXMAN=1
     fi
     exec Hyprland -c "$CONFIG_PATH"
   '';

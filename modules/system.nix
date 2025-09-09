@@ -15,7 +15,10 @@ let
   wallpaperExt = "." + (lib.last (lib.splitString "." (builtins.baseNameOf wallpaperPath)));
 in
 {
-  imports = [ ./hyprland/session.nix ];
+  imports = [ 
+    ./hyprland/session.nix
+    ./steam/default.nix
+  ];
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.
   nixpkgs.config.allowUnfree = true; # :( Apps like Steam use proprietary drivers, closed source software.
@@ -67,19 +70,6 @@ in
     };
   };
 
-  # ********************** START OF STEAM CONFIGURATION **********************
-  programs.steam = {
-    enable = true;
-    gamescopeSession.enable = true;
-  };
-  programs.gamemode.enable = true;
-  # This is needed for some (i.e. Steam) app dialogs popups to work.
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
-  environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/ulysses/.steam/root/compatibilitytools.d";
-  };
-  # ********************** END OF STEAM CONFIGURATION **********************
 
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.

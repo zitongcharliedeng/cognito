@@ -113,12 +113,12 @@ in
     ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     sleep 0.5
     ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
-    sleep 0.2
+    sleep 0.3
     ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
 
     cleanup() {
       ${pkgs.eww}/bin/eww close bar_brain >/dev/null 2>&1 || true
-      sleep 0.2
+      sleep 0.3
       ${pkgs.eww}/bin/eww open bar >/dev/null 2>&1 || true
     }
     trap cleanup EXIT
@@ -210,6 +210,7 @@ in
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = start-hyprland-session
+  exec-once = sleep 3 && eww open bar
   input {
     kb_layout = us
   }
@@ -240,7 +241,7 @@ in
   windowrulev2 = nofocus,class:^(eww)$
   windowrulev2 = noinitialfocus,class:^(eww)$
   windowrulev2 = pin,class:^(eww)$
-  windowrulev2 = nofullscreenrequest,class:^(eww)$
+  windowrulev2 = opacity 0,fullscreen:1,class:^(eww)$
 
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -335,14 +336,13 @@ in
     };
   };
 
-  # Start eww at login and open the normal bar
+  # Start eww daemon only
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "hyprland-session.target" ];
     partOf = [ "hyprland-session.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon";
-      ExecStartPost = "sleep 2 && ${pkgs.eww}/bin/eww open bar";
       Restart = "on-failure";
       RestartSec = 3;
     };

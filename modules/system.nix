@@ -1,29 +1,34 @@
 { config, pkgs, ... }:
-# Regression: autologin removed; XMonad/xmobar and custom rofi modes removed; X11 tools replaced by Wayland equivalents (wl-clipboard, grim, slurp); VMs often require 3D acceleration for Hyprland; hyprlock omitted on nixpkgs 23.11.
 {
-  services.openssh.enable = true;
-  systemd.oomd.enable = false;
-
-  nixpkgs.config.allowUnfree = true;
+  services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
+  systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.
+  nixpkgs.config.allowUnfree = true; # :( Apps like Steam use proprietary drivers, closed source software.
 
   i18n.defaultLocale = "en_GB.UTF-8";
   i18n.supportedLocales = [ "en_GB.UTF-8/UTF-8" ];
   time.timeZone = "UTC";
 
-  users.users.root.isNormalUser = false;
-
+  # Standard pattern: keep daily user as a normal account in the historical
+  # "wheel" group (name comes from early Unix privileged users). This grants
+  # sudo-based elevation for admin tasks while preserving a regular login/home
+  # experience a typical non-root "customer" user would have.
   users.users.ulysses = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
     initialPassword = "password";
   };
+  security.sudo.enable = true; # Enable sudo for members of "wheel" when needed.
 
-  security.sudo.enable = true;
+  services.xserver.enable = false;  # We are using Wayland, not X11.
+  # 3D acceleration for Wayland. See README.md for more details.
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+  programs.hyprland.enable = true;  # Wayland isn’t a global toggle...
+  # ... It is implicitly enabled by using i.e. Hyprland as my window manager.
 
-  services.xserver.enable = false;
-
-  programs.hyprland.enable = true;
-
+  # Sign-in Screen.
   services.greetd.enable = true;
   services.greetd.settings = {
     default_session = {
@@ -32,14 +37,8 @@
     };
   };
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
-
+  # TODO: refactor the fontFamily to be a variable passed between files.
   # Noto is the best practical base with broad symbol coverage ("no more tofu").
   # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
   # Fallback will use non-mono Noto families when a glyph is missing.
@@ -55,16 +54,23 @@
     defaultFonts.emoji = [ "Noto Color Emoji" ];
   };
 
+  # ********************** START OF STEAM CONFIGURATION **********************
   programs.steam = {
     enable = true;
     gamescopeSession.enable = true;
   };
   programs.gamemode.enable = true;
-
+  # This is needed for some (i.e. Steam) app dialogs popups to work.
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland ];
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/ulysses/.steam/root/compatibilitytools.d";
-    WLR_NO_HARDWARE_CURSORS = "1";
-    NIXOS_OZONE_WL = "1";
+  };
+  # ********************** END OF STEAM CONFIGURATION **********************
+
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
+    NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
   };
 
   # TODO add vm tools to develop NixOS in NixOS or figure out the dry-run NixOS changes with failsafe of rebooting without saving the changes to git. Dry running switch command i think it is called - add this action to the omnibar, with a NixOS icon. Same with the other common NixOS commands.

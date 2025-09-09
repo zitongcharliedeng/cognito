@@ -17,7 +17,7 @@ in
 {
   imports = [ 
     ./hyprland/default.nix
-    ./apps/steam/default.nix
+    ./apps/default.nix
   ];
   services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
   systemd.oomd.enable = false;  # Don't auto kill big processes. Cognito is a free land.

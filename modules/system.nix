@@ -97,13 +97,19 @@ in
 
     (pkgs.writeShellScriptBin "cognito-omnibar" ''
     #!/bin/sh
+    # Check if rofi is already running and close it
+    if pgrep rofi >/dev/null; then
+      pkill rofi
+      exit 0
+    fi
+
     # Minimal inline overlay via rofi message (keeps config tiny and robust)
     MESG="$(date '+%H:%M')  •  placeholder"
 
     menu="Apps\nOpen Terminal\nClose Active Window\nToggle Fullscreen on Active Window\nExit Hyprland\nScreenshot region (grim+slurp)\nScreenshot full screen (grim)\n[Debug] Force renderer: pixman\n[Debug] Force renderer: gl\n[Debug] Remove renderer override\n[Debug] Show renderer status\n"
     for i in $(seq 1 10); do menu="$menu""Switch view to Workspace $i\n"; done
     for i in $(seq 1 10); do menu="$menu""Move focused window to Workspace $i\n"; done
-    # Ensure eww daemon is running and swap to brain-mode bar
+    # Ensure eww daemon is running and expand to brain-mode bar
     ${pkgs.eww}/bin/eww daemon >/dev/null 2>&1 || true
     ${pkgs.eww}/bin/eww close bar >/dev/null 2>&1 || true
     ${pkgs.eww}/bin/eww open bar_brain >/dev/null 2>&1 || true
@@ -181,6 +187,12 @@ in
     export EWW_CONFIG_DIR=/etc/eww
     exec ${pkgs.eww}/bin/eww "$@"
     '')
+
+    (pkgs.writeShellScriptBin "start-hyprland-session" ''
+    #!/bin/sh
+    # Start Hyprland session target for systemd services
+    systemctl --user start hyprland-session.target
+    '')
   ];
 
   # Hyprpaper wallpaper config; replace the path with your PNG if desired
@@ -194,6 +206,7 @@ in
   monitor=,1920x1080@60,auto,1
   env = XCURSOR_SIZE,24
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
+  exec-once = start-hyprland-session
   input {
     kb_layout = us
   }
@@ -217,6 +230,14 @@ in
   }
   # Hide borders when a window is fullscreen
   windowrulev2 = noborder,fullscreen:1
+  
+  # Hide eww bar when window is fullscreen
+  windowrulev2 = float,class:^(eww)$
+  windowrulev2 = move 0 0,class:^(eww)$
+  windowrulev2 = nofocus,class:^(eww)$
+  windowrulev2 = noinitialfocus,class:^(eww)$
+  windowrulev2 = pin,class:^(eww)$
+  windowrulev2 = fakefullscreen,class:^(eww)$
 
   $mod = SUPER
   bind = $mod,SPACE,exec,cognito-omnibar
@@ -224,6 +245,8 @@ in
   bind = $mod,Q,killactive
   bind = $mod,M,exit
   bind = $mod,F,fullscreen,1
+  bind = $mod,ESCAPE,exec,pkill rofi
+  bind = $mod SHIFT,SPACE,exec,pkill rofi
   '';
 
   # eww configuration (modular): variables, widgets, windows
@@ -259,6 +282,7 @@ in
     :exclusive true
     :geometry (geometry :x 0 :y 0 :width "100%" :height 40)
     :stacking "fg"
+    :reserve (struts :side "top" :distance 40)
     (box :class "bar" :orientation "v" :halign "fill" :valign "fill"
       (status_row)))
 
@@ -267,6 +291,7 @@ in
     :exclusive true
     :geometry (geometry :x 0 :y 0 :width "100%" :height 320)
     :stacking "fg"
+    :reserve (struts :side "top" :distance 320)
     (box :class "bar brain-mode" :orientation "v" :halign "fill" :valign "fill"
       (brain_grid)
       (status_row)))
@@ -299,14 +324,24 @@ in
     "L+ /home/ulysses/.config/eww - - - - /etc/eww"
   ];
 
+  # Create Hyprland session target for systemd user services
+  systemd.user.targets.hyprland-session = {
+    description = "Hyprland session";
+    unitConfig = {
+      StopWhenUnneeded = false;
+    };
+  };
+
   # Start eww at login and open the normal bar
   systemd.user.services.eww = {
     description = "Eww daemon";
-    wantedBy = [ "graphical-session.target" ];
+    wantedBy = [ "hyprland-session.target" ];
+    partOf = [ "hyprland-session.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon";
-      ExecStartPost = "${pkgs.eww}/bin/eww open bar";
+      ExecStartPost = "sleep 2 && ${pkgs.eww}/bin/eww open bar";
       Restart = "on-failure";
+      RestartSec = 3;
     };
   };
 

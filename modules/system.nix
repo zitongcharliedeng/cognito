@@ -43,14 +43,18 @@ in
     };
   };
   fonts = {
-    fontconfig.enable = true;
     packages = with pkgs; [
       noto-fonts
       noto-fonts-cjk
       noto-fonts-emoji
     ];
-    defaultFonts.monospace = [ fontFamily ];
-    defaultFonts.emoji = [ "Noto Color Emoji" ];
+    fontconfig = {
+      enable = true;
+      defaultFonts = {
+        monospace = [ fontFamily ];
+        emoji = [ "Noto Color Emoji" ];
+      };
+    };
   };
 
   # ********************** START OF STEAM CONFIGURATION **********************

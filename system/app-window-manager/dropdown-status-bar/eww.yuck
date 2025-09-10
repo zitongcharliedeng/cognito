@@ -25,16 +25,21 @@
 
 ;;   Thus, widget state tend to use defvars (update live), 
 ;;   while window state only uses "function" arguments 
-;;   (the square brackets []) and only at its creation.
+;;   (the square brackets []) and only at its creation...
+;;   Is what I would say, but the latter part in eww v0.6
+;;   isn't possible BECAUSE WINDOWS CAN'T USE ARGUMENTS.
 ;;
-;; For dynamic hitbox-sizing behaviour... 
+;; So for dynamic hitbox-sizing behaviour... 
 
 ;; 👉 I came up with the idea of two windows per entity:
 ;;      1. "its appearance, zero-hitbox window"
 ;;         (renders its appearance (+widgets), no hitbox space).
-;;      2. "its hitbox, zero-appearance window"
-;;         (no appearance, defines its hitbox space).
-
+;;      2. "its hitbox, zero-appearance windows*"
+;;         (no appearance, defines its hitbox space). *Not a typo,
+;;         windows don't accept arguments, so we need to hardcode
+;;         a new window for each hitbox size we ever want to switch
+;;         to. Which I guess is like fighting games, but is a PAIN!
+;;
 ;; e.g. making a status bar switch from taking up space to 
 ;;   taking up less/none(floating), without rerendering the 
 ;;   appearance by just destroying and recreating the hitbox 
@@ -46,7 +51,7 @@
 ; Variable to control whether the status bar reserves physical space and is visible
 (defvar collapse_status_bar true)
 
-(defwindow dropdown_status_bar_appearance []
+(defwindow dropdown_status_bar_appearance
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
@@ -61,13 +66,13 @@
   (topbar :screen 0)
 )
 
-(defwindow dropdown_status_bar_hitbox [hitbox_height]
+(defwindow dropdown_status_bar_hitbox_normal
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
-                      :height hitbox_height)
+                      :height "2.8%")
   :stacking  "fg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   :opacity "0"  ; INVISIBLE HITBOX WINDOW

@@ -8,11 +8,7 @@ let
   
 in
 {
-  imports = [ 
-    ./session/default.nix 
-    ./omnibar-mode/default.nix 
-    (./dropdown-status-bar/default.nix { StatusBar_BuiltOSPath = StatusBar_BuiltOSPath; })
-  ];
+  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
   
   config = {
     services.xserver.enable = false;  # We are using Wayland, not X11.

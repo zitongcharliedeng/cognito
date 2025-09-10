@@ -1,5 +1,11 @@
-{ config, pkgs, StatusBar_BuiltOSPath, ... }:
+{ config, pkgs, ... }:
 
+let
+  StatusBar_BuiltOSPath = builtins.path {
+    path = ./.;
+    name = "status-bar";
+  };
+in
 {
   environment.systemPackages = with pkgs; [ 
     eww 

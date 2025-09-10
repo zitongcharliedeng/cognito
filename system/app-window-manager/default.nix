@@ -7,9 +7,11 @@ let
   };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''
+    # Start daemon in background
+    eww daemon -c ${StatusBar_BuiltOSPath} &
     # Wait for daemon to be ready, then open window
     sleep 3
-    eww open window -c ${StatusBar_BuiltOSPath} &
+    eww open window -c ${StatusBar_BuiltOSPath}
   '';
   
 in

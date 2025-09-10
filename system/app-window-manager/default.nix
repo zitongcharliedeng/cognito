@@ -17,8 +17,7 @@ in
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
   
   config = {
-    # Add startEww script to system packages
-    environment.systemPackages = with pkgs; [ startEww ];
+    environment.systemPackages = with pkgs; [ gtkgreet startEww ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.
     # 3D acceleration for Wayland. See README.md for more details.
@@ -33,7 +32,6 @@ in
     };
 
     # Sign-in Screen.
-    environment.systemPackages = with pkgs; [ gtkgreet ];
     services.greetd.enable = true;
     services.greetd.settings = {
       default_session = {

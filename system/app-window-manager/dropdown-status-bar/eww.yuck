@@ -76,9 +76,6 @@
 (defvar baseBarMode "normal")
 (defvar isBarForcedExpanded false)
 
-(defvar status_bar_collapsed "(box)")
-(defvar status_bar_normal "(box :class \"normal_bar\" :valign \"center\" :halign \"center\" :width \"100%\" :height \"2.8%\" (clock))")
-(defvar status_bar_expanded "(box :class \"normal_bar\" :valign \"center\" :halign \"center\" :width \"100%\" :height \"25%\" (clock))")
 (defvar variable_containing_yuck
   "(box (button 'baseBarMode'))")
 
@@ -119,7 +116,7 @@
        :valign "center"
        :halign "center"
        :width  "100%"
-       :height (baseBarMode)
+       :height "2.8%"
     ; (_buttons :shutdown "poweroff" :reboot "reboot"
     ;           :logout "loginctl kill-session self"
     ;           :shutdown_icon "󰐦" :reboot_icon "󰜉" :logout_icon "󰍂") ; TODO: 

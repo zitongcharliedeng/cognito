@@ -22,9 +22,9 @@ update_status_bar_once() {
   fi
 
   if check_omnibar; then
-    eww update forcifully_reveal_and_extend_status_bar=true 2>/dev/null || true
+    eww update forcibly_reveal_and_extend_status_bar=true 2>/dev/null || true
   else
-    eww update forcifully_reveal_and_extend_status_bar=false 2>/dev/null || true
+    eww update forcibly_reveal_and_extend_status_bar=false 2>/dev/null || true
   fi
 }
 

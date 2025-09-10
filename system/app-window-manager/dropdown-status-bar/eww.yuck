@@ -1,8 +1,52 @@
 
+;; ──────────────────────────────────────────────
+;; NOTES I LEARNED THE HARD WAY (PLEASE READ): 
+;;   eww is a dynamic *widget* tool, but a 
+;;   static *window* tool.
+;;
+;; - `defvar` variables are reactive: `eww update` 
+;;   changes their value, and any `defwidget` that 
+;;   references them will re-render automatically.
+;;
+;; - Variables cannot be used inside `defwindow` 
+;;   (don’t waste time trying like I did).
+;;
+;; - Windows (`defwindow`) are static: geometry, 
+;;   stacking, and `:exclusive` are fixed at parse-time.
+;;
+;; - We can only define "hitboxes" (the physical area it 
+;;   takes up in e.g. Hyprland and displaces other windows) 
+;;   at a per-window level — not in widgets themselves. 
+
+;;   The hitbox always matches the size of its `defwindow` 
+;;   size, never the widgets within the defwindow. Enabling 
+;;   the hitbox of a window is done with `:exclusive true` 
+;;   in the `defwindow`.
+
+;;   Thus, widget state tend to use defvars (update live), 
+;;   while window state only uses "function" arguments 
+;;   (the square brackets []) and only at its creation.
+;;
+;; For dynamic hitbox-sizing behaviour... 
+
+;; 👉 I came up with the idea of two windows per entity:
+;;      1. "its appearance, zero-hitbox window"
+;;         (renders its appearance (+widgets), no hitbox space).
+;;      2. "its hitbox, zero-appearance window"
+;;         (no appearance, defines its hitbox space).
+
+;; e.g. making a status bar switch from taking up space to 
+;;   taking up less/none(floating), without rerendering the 
+;;   appearance by just destroying and recreating the hitbox 
+;;   with a new hitbox size. This also means we can use defvars
+;;   to change the appearance i.e. height of our entity without 
+;;   destroying the appearance window entirely and rebuilding it.
+;; ──────────────────────────────────────────────
+
 ; Variable to control whether the status bar reserves physical space and is visible
 (defvar collapse_status_bar true)
 
-(defwindow window
+(defwindow dropdown_status_bar_appearance []
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
@@ -10,10 +54,23 @@
                       :width  "101%"
                       :height {false ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive true
+  :exclusive false  ; NO HITBOX FOR MY APPEARANCE WINDOW
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :opacity "1"
+  :opacity "1"  ; VISIBLE APPEARANCE WINDOW
+  ; The widgets it contains listed below:
   (topbar :screen 0)
+)
+
+(defwindow dropdown_status_bar_hitbox [hitbox_height]
+  :monitor 0
+  :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
+                      :x      "0"          ; Position of the window. Values may be provided in px or %.
+                      :y      "0"          ; Will be relative to anchor.
+                      :width  "101%"
+                      :height hitbox_height)
+  :stacking  "fg"
+  :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
+  :opacity "0"  ; INVISIBLE HITBOX WINDOW
 )
 
 (defwidget topbar [screen]

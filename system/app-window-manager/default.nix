@@ -16,7 +16,7 @@ let
     # Wait for daemon to be ready, then open both windows
     sleep 3
     eww open dropdown_status_bar_appearance
-    eww open dropdown_status_bar_hitbox --arg hitbox_height_as_percentage="28%"
+    eww open dropdown_status_bar_hitbox_normal
   '';
   
 in
@@ -24,7 +24,15 @@ in
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
   
   config = {
-    environment.systemPackages = with pkgs; [ gtkgreet startEww ];
+    environment.systemPackages = with pkgs; [ 
+      gtkgreet 
+      startEww 
+      (pkgs.writeShellScriptBin "toggle-current-window-fullscreen" (builtins.readFile ./toggle-current-window-fullscreen.sh))
+      (pkgs.writeShellScriptBin "switch-to-workspace" (builtins.readFile ./switch-to-workspace.sh))
+      (pkgs.writeShellScriptBin "close-current-window" (builtins.readFile ./close-current-window.sh))
+      (pkgs.writeShellScriptBin "move-current-window-to-workspace" (builtins.readFile ./move-current-window-to-workspace.sh))
+      (pkgs.writeShellScriptBin "_sync-current-workspace-fullscreen-state" (builtins.readFile ./_sync-current-workspace-fullscreen-state.sh))
+    ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.
     # 3D acceleration for Wayland. See README.md for more details.
@@ -100,17 +108,15 @@ in
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
     bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi
     bind = $mod,RETURN,exec,kitty
-    # META+F: Toggle fullscreen and update status bar
-    bind = $mod,F,exec,hyprctl dispatch fullscreen && status-bar-state-refresher --update-once
-    # META+E: Update status bar state (for debugging)
-    bind = $mod,E,exec,status-bar-state-refresher
+    # META+F: Toggle current window fullscreen (atomic operation with status bar update)
+    bind = $mod,F,exec,toggle-current-window-fullscreen
     
-    # Workspace switching with status bar updates
-    bind = $mod,1,exec,hyprctl dispatch workspace 1 && status-bar-state-refresher --update-once
-    bind = $mod,2,exec,hyprctl dispatch workspace 2 && status-bar-state-refresher --update-once
-    bind = $mod,3,exec,hyprctl dispatch workspace 3 && status-bar-state-refresher --update-once
-    bind = $mod,4,exec,hyprctl dispatch workspace 4 && status-bar-state-refresher --update-once
-    bind = $mod,5,exec,hyprctl dispatch workspace 5 && status-bar-state-refresher --update-once
+    # Workspace switching with status bar sync
+    bind = $mod,1,exec,switch-to-workspace 1
+    bind = $mod,2,exec,switch-to-workspace 2
+    bind = $mod,3,exec,switch-to-workspace 3
+    bind = $mod,4,exec,switch-to-workspace 4
+    bind = $mod,5,exec,switch-to-workspace 5
     '';
   };
 }

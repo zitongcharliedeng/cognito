@@ -45,14 +45,10 @@ in
           kitty &
           ;;
         "Close Active Window")
-          hyprctl dispatch closewindow
-          # Update status bar since this may close a fullscreen window
-          /etc/profiles/per-user/${config.systemUsername}/bin/status-bar-state-refresher --update-once 2>/dev/null || true
+          close-current-window
           ;;
         "Toggle Fullscreen on Active Window")
-          hyprctl dispatch fullscreen
-          # Update status bar after fullscreen toggle
-          /etc/profiles/per-user/${config.systemUsername}/bin/status-bar-state-refresher --update-once 2>/dev/null || true
+          toggle-current-window-fullscreen
           ;;
         "Exit Hyprland")
           hyprctl dispatch exit
@@ -78,13 +74,10 @@ in
         *[0-9]*)
           NUM=$(echo "$choice" | grep -o '[0-9]\+')
           if [ -n "$NUM" ]; then
-            hyprctl dispatch movetoworkspace "$NUM"
+            move-current-window-to-workspace "$NUM"
           fi
           ;;
       esac
-
-      # Update status bar state when rofi closes (fallback cleanup)
-      /etc/profiles/per-user/${config.systemUsername}/bin/status-bar-state-refresher 2>/dev/null || true
     '')
   ];
 }

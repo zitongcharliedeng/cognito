@@ -1,11 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  StatusBar_BuiltOSPath = builtins.path {
-    path = ./.;
-    name = "status-bar";
-  };
-in
 {
   environment.systemPackages = with pkgs; [ 
     eww 
@@ -16,7 +10,7 @@ in
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
+      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${config.cognito.hyprland.StatusBar_BuiltOSPath}";
       Restart = "on-failure";
       RestartSec = 3;
     };

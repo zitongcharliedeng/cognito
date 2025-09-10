@@ -1,6 +1,10 @@
-{ config, pkgs, mynixui, ... }:
+{ config, pkgs, ... }:
 
 let
+  mynixui = pkgs.runCommand "mynixui" {} ''
+    cp -r ${./mynixui} $out
+  '';
+  
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window
     sleep 3

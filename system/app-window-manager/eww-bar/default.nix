@@ -1,5 +1,10 @@
-{ config, pkgs, mynixui, ... }:
+{ config, pkgs, ... }:
 
+let
+  mynixui = pkgs.runCommand "mynixui" {} ''
+    cp -r ${./mynixui} $out
+  '';
+in
 {
   # Add eww to system packages
   environment.systemPackages = with pkgs; [ eww ];

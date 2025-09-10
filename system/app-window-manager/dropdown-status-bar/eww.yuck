@@ -53,8 +53,8 @@
 ;; TODO: Contribute my suffering to the bare EWW docs.
 ;; ──────────────────────────────────────────────
 
-; Variable to control whether the status bar reserves physical space and is visible
-(defvar collapse_status_bar true)
+; Variable to control appearance 
+(defvar status_bar_appears_collapsed true)
 
 (defwindow dropdown_status_bar_appearance []
   :monitor 0

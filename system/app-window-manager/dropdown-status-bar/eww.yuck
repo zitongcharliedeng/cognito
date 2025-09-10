@@ -10,9 +10,9 @@
                       :width  "101%"
                       :height {false ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive true
+  :exclusive {(collapse_status_bar || false) ? "false" : "true"}
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :opacity 1  ; Hide if fullscreen, otherwise show
+  :opacity {false ? "1" : (collapse_status_bar ? "0" : "1")}  ; Always show when omnibar is open, otherwise hide if fullscreen
   (topbar :screen 0)
 )
 

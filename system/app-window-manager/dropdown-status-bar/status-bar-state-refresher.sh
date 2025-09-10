@@ -25,17 +25,17 @@ update_status_bar_once() {
     return 0  # No windows open, variables don't exist yet
   fi
 
-  if check_fullscreen; then
-    eww update collapse_status_bar=true 2>/dev/null || true
-  else
-    eww update collapse_status_bar=false 2>/dev/null || true
-  fi
+  # if check_fullscreen; then
+  #   eww update collapse_status_bar=true 2>/dev/null || true
+  # else
+  #   eww update collapse_status_bar=false 2>/dev/null || true
+  # fi
 
-  if check_omnibar; then
-    eww update force_extend_status_bar=true 2>/dev/null || true
-  else
-    eww update force_extend_status_bar=false 2>/dev/null || true
-  fi
+  # if check_omnibar; then
+  #   eww update force_extend_status_bar=true 2>/dev/null || true
+  # else
+  #   eww update force_extend_status_bar=false 2>/dev/null || true
+  # fi
 }
 
 # Check if we should run in monitor mode (continuous monitoring)

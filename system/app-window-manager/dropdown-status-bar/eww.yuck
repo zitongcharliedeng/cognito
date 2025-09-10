@@ -69,8 +69,8 @@
 (defwindow dropdown_status_bar_hitbox_normal
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
-                      :x      "1"          ; Position of the window. Values may be provided in px or %.
-                      :y      "1"          ; Will be relative to anchor.
+                      :x      "1px"          ; Position of the window. Values may be provided in px or %.
+                      :y      "1px"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "2.8%")
   :stacking  "bg"     ; background

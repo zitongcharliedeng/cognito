@@ -22,9 +22,6 @@
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
         ];
-        specialArgs = {
-          inherit mynixui;
-        };
       };
     in {
       nixosConfigurations =

@@ -1,10 +1,10 @@
-{ config, pkgs, mynixui, ... }:
+{ config, pkgs, ... }:
 
 let
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window
     sleep 3
-    eww open window -c ${mynixui}/eww &
+    eww open window -c ${../../mynixui}/eww &
   '';
 in
 {

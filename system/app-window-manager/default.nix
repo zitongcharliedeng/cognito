@@ -17,6 +17,9 @@ in
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
   
   config = {
+    # Add startEww script to system packages
+    environment.systemPackages = with pkgs; [ startEww ];
+    
     services.xserver.enable = false;  # We are using Wayland, not X11.
     # 3D acceleration for Wayland. See README.md for more details.
     hardware.graphics = {

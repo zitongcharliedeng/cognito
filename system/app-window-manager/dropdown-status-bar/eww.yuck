@@ -62,11 +62,12 @@
                       :x      "0"
                       :y      "0"
                       :width  "101%"
-                      :height "2.8%"
+                      ; :height "2.8%" auto fit to bar-widget height
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "fg"
   :exclusive false
+  :opacity "0.75"
   ; The widgets it contains listed below:
   (topbar :screen 0)
 )
@@ -79,6 +80,7 @@
                       :width  "101%"
                       :height hitbox_height_as_percentage)
   :stacking  "bg"
+  :opacity "0"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   (box)  ; Minimal required empty content for a window in a config to compile
 )

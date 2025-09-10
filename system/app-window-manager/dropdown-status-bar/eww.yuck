@@ -23,7 +23,7 @@
 ;;   the hitbox of a window is done with `:exclusive true` 
 ;;   in the `defwindow`.
 
-;;   Thus, widget state tend to use defvars (update live), 
+;;   Thus, widget state tend to use variables (update live), 
 ;;   while window state only uses static "function" arguments.
 ;;
 ;; So for dynamic hitbox-sizing behaviour... 
@@ -49,6 +49,10 @@
 ;;   - ALL WINDOWS MUST HAVE AT LEAST ONE (widget) INSIDE OR THE
 ;;     ENTIRE CONFIG WILL NOT COMPILE, EVEN IF YOU AREN"T LAUNCHING
 ;;     THAT WINDOW EVER! SO STUPID AND IS WHY I HAVE (box) WIDGETS.
+;;   - To use variables to update more inherent widget properties
+;;     like height, we need to use the `literal` defvar instead.
+;;     For other stuff like switcing text in boxes, regular defvars.
+;;     For periodic updates we'd use defpolls.
 ;; 
 ;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
 ;; 
@@ -72,6 +76,11 @@
 (defvar baseBarMode "normal")
 (defvar isBarForcedExpanded false)
 
+(defvar status_bar_collapsed "(box)")
+(defvar status_bar_normal "(box :class \"normal_bar\" :valign \"center\" :halign \"center\" :width \"100%\" :height \"2.8%\" (clock))")
+(defvar status_bar_expanded "(box :class \"normal_bar\" :valign \"center\" :halign \"center\" :width \"100%\" :height \"25%\" (clock))")
+(defvar variable_containing_yuck
+  "(box (button 'baseBarMode'))")
 
 ;; ──────────────────────────────────────────────
 ;; APPEARANCE WINDOW (always lives, exclusive=false)
@@ -89,8 +98,7 @@
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   :exclusive false
-  ; The widgets it contains listed below:
-  (normal_bar :screen 0)
+  (literal :content variable_containing_yuck)
 )
 
 (defwindow dropdown_status_bar_hitbox_normal []
@@ -106,13 +114,12 @@
   (box)  ; Minimal required empty content for a window in a config to compile
 )
 
-(defwidget normal_bar [screen]
+(defwidget normal_bar
   (box :class "normal_bar"
        :valign "center"
        :halign "center"
        :width  "100%"
-       :height { isBarForcedExpanded ? "25%" : 
-                 baseBarMode == "normal" ? "2.8%" : "0%" }
+       :height (baseBarMode)
     ; (_buttons :shutdown "poweroff" :reboot "reboot"
     ;           :logout "loginctl kill-session self"
     ;           :shutdown_icon "󰐦" :reboot_icon "󰜉" :logout_icon "󰍂") ; TODO: 

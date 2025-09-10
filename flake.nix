@@ -3,7 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    mynixui.url = "path:./mynixui";
+    mynixui = {
+      url = "path:./mynixui";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, mynixui, ... }:

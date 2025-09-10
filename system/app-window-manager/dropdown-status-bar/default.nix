@@ -3,7 +3,7 @@
 let
   StatusBar_BuiltOSPath = builtins.path {
     path = ./.;
-    name = "status-bar";
+    name = "dropdown-status-bar";
   };
 in
 {

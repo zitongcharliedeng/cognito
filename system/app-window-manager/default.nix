@@ -3,7 +3,7 @@
 let
   StatusBar_BuiltOSPath = builtins.path {
     path = ./dropdown-status-bar;
-    name = "status-bar";
+    name = "dropdown-status-bar";
   };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''

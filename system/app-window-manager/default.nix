@@ -2,7 +2,7 @@
 
 let
   mynixui = pkgs.runCommand "mynixui" {} ''
-    cp -r ${./mynixui} $out
+    cp -r ${../../mynixui} $out
   '';
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''

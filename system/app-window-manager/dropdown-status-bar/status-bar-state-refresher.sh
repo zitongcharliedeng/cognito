@@ -15,6 +15,16 @@ check_omnibar() {
 # We only need to check workspace fullscreen state and rofi process status
 
 update_status_bar_once() {
+  # Only try to update variables if eww daemon is running and has windows open
+  if ! pgrep eww >/dev/null 2>&1; then
+    return 0  # Eww daemon not running, nothing to update
+  fi
+  
+  # Check if eww has any windows open (variables only exist when windows are open)
+  if ! eww list-windows | grep -q "window" 2>/dev/null; then
+    return 0  # No windows open, variables don't exist yet
+  fi
+
   if check_fullscreen; then
     eww update hide_status_bar=true 2>/dev/null || true
   else

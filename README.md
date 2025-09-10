@@ -1,3 +1,6 @@
+# WARNING THE CURRENT README IS A JARBLE OF AI SLOP AND RANDOM IDEAS I HAVE... STAY TUNED ONCE I GET PAST THE EXPERIMENTATION PERIOD FOR NIXOS
+
+HOW THE FUCK DO I ORGANISE NIX PROJECTS FUCK IT WE INVENT IS AS WE GO. HOME MANAGER? NAH. I'D HASKELL!
 Say Hi to Cognito, my PROJECT:u17553z OS.
 sudo nixos-generate-config
 to create the hardware config in case the nixos didnt auto gen it for your machine in /etc/nixos
@@ -208,3 +211,10 @@ Cognito OS is designed to be as hardware agnostic as practical. Core stack is Wa
 - X11 apps run under Xwayland.
 - If the VM lacks 3D, Hyprland may not start or will be slow; prefer KVM/QEMU or bare metal.
 - Note: virt-manager defaults often have 3D acceleration off; explicitly enable the settings above or Hyprland will not start.
+
+**IDEA: status bar expands downwards in the omnibar mode, exposing a diagram with a brain which is interactable and leads to my most important tools and tells me reminders. Reminders in full screen mode can be bubbles flying across the screen or colored borders accompanied with sounds.**
+
+
+THANks to:
+vimjoyer for exposing me to nixos
+/eureka-cpu/mynixui for cool dotfiles that helped me get eww widgets working the first time

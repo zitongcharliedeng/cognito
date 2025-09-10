@@ -10,7 +10,7 @@
                       :width  "101%"
                       :height {false ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive {collapse_status_bar}
+  :exclusive true
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :opacity "1"
   (topbar :screen 0)

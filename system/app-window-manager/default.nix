@@ -17,6 +17,8 @@ let
     sleep 3
     eww open dropdown_status_bar_appearance
     eww open dropdown_status_bar_hitbox_normal
+    sleep 1
+    _sync-current-workspace-fullscreen-state
   '';
   
 in

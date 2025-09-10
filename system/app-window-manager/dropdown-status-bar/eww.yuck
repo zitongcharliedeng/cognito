@@ -46,6 +46,11 @@
 ;;   with a new hitbox size. This also means we can use defvars
 ;;   to change the appearance i.e. height of our entity without 
 ;;   destroying the appearance window entirely and rebuilding it.
+;;
+;; Other rules that aren't apparent:
+;;   - If defining (not even launching) multiple windows in a file,
+;;     to be a valid config,  TODO
+
 ;; ──────────────────────────────────────────────
 
 ; Variable to control whether the status bar reserves physical space and is visible
@@ -58,7 +63,9 @@
                       :x      "0"
                       :y      "0"
                       :width  "101%"
+                      :height "2.8%"
                       )
+  :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   ; The widgets it contains listed below:
   (topbar :screen 0)
@@ -68,8 +75,8 @@
   :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
-                      :x      "1px"          ; Position of the window. Values may be provided in px or %.
-                      :y      "1px"          ; Will be relative to anchor.
+                      :x      "0"          ; Position of the window. Values may be provided in px or %.
+                      :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "2.8%")
   :stacking  "fg"

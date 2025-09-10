@@ -1,4 +1,7 @@
 
+; Variable to control whether the status bar reserves physical space and is visible
+(defvar collapse_status_bar false)
+
 (defwindow window
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.

@@ -53,7 +53,7 @@ in
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
   # Eww daemon is started by systemd service, just open the window
-  exec-once = sleep 3 && eww open window -c ${StatusBar_BuiltOSPath}
+  exec-once = sleep 3 && eww open window
   input {
     kb_layout = us
   }

@@ -16,7 +16,6 @@ let
     # Wait for daemon to be ready, then open both windows
     sleep 3
     eww open dropdown_status_bar_appearance
-    eww open dropdown_status_bar_hitbox_normal
   '';
   
 in

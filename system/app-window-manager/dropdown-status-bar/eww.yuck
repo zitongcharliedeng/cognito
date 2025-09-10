@@ -49,8 +49,9 @@
 ;;
 ;; Other rules that aren't apparent:
 ;;   - If defining (not even launching) multiple windows in a file,
-;;     to be a valid config,  TODO
-
+;;     to be a valid config, if the window areas overlap and one is
+;;     :exclusive true, and the other is :exclusive false, then the
+;;     the overlapping area will be exclusive (additive).
 ;; ──────────────────────────────────────────────
 
 ; Variable to control whether the status bar reserves physical space and is visible
@@ -80,7 +81,6 @@
                       :height "2.8%")
   :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
-  (topbar :screen 0)
 )
 
 (defwidget topbar [screen]

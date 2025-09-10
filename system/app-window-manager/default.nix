@@ -7,11 +7,15 @@ let
   };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''
+    # Create eww config directory and copy files
+    mkdir -p ~/.config/eww
+    cp -r ${StatusBar_BuiltOSPath}/* ~/.config/eww/
+    
     # Start daemon in background
-    eww daemon -c ${StatusBar_BuiltOSPath} &
+    eww daemon &
     # Wait for daemon to be ready, then open window
     sleep 3
-    eww open window -c ${StatusBar_BuiltOSPath}
+    eww open window
   '';
   
 in

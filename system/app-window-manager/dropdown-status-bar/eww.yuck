@@ -1,8 +1,6 @@
 ; Variable to control whether the status bar reserves physical space and is visible
 (defvar collapse_status_bar false)
 ; Variable to control whether the status bar extends to 25% height (for dropdown/expanded view)
-(defvar force_extend_status_bar false)
-; We can control variables externally with: i.e. eww update collapse_status_bar=true
 
 (defwindow window
   :monitor 0
@@ -10,11 +8,11 @@
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
-                      :height {force_extend_status_bar ? "25%" : "2.8%"})
+                      :height {false ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive {(collapse_status_bar || force_extend_status_bar) ? "false" : "true"}
+  :exclusive {(collapse_status_bar || false) ? "false" : "true"}
   :focusable "false"  ; This is necessary for any widgets that use the keyboard to work.
-  :opacity {force_extend_status_bar ? "1" : (collapse_status_bar ? "0" : "1")}  ; Always show when omnibar is open, otherwise hide if fullscreen
+  :opacity {false ? "1" : (collapse_status_bar ? "0" : "1")}  ; Always show when omnibar is open, otherwise hide if fullscreen
   (topbar :screen 0)
 )
 

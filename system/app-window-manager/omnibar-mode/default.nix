@@ -29,6 +29,11 @@ in
         "Open Terminal" \
         "Close Active Window" \
         "Toggle Fullscreen on Active Window" \
+        "Switch to Workspace 1" \
+        "Switch to Workspace 2" \
+        "Switch to Workspace 3" \
+        "Switch to Workspace 4" \
+        "Switch to Workspace 5" \
         "Exit Hyprland" \
         "Screenshot region (grim+slurp)" \
         "Screenshot full screen (grim)" \
@@ -49,6 +54,21 @@ in
           ;;
         "Toggle Fullscreen on Active Window")
           toggle-current-window-fullscreen
+          ;;
+        "Switch to Workspace 1")
+          switch-to-workspace 1
+          ;;
+        "Switch to Workspace 2")
+          switch-to-workspace 2
+          ;;
+        "Switch to Workspace 3")
+          switch-to-workspace 3
+          ;;
+        "Switch to Workspace 4")
+          switch-to-workspace 4
+          ;;
+        "Switch to Workspace 5")
+          switch-to-workspace 5
           ;;
         "Exit Hyprland")
           hyprctl dispatch exit

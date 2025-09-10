@@ -100,7 +100,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "bg"     ; background - invisible spacer behind appearance window
+  :stacking  "fg"     ; foreground - needs to be in front to displace other windows
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile

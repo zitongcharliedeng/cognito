@@ -58,7 +58,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height {false ? "25%" : "2.8%"})
-  :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
+  :stacking  "fg"     ; foreground - Possible values: fg, bg, overlay, bottom.
   :exclusive false  ; NO HITBOX FOR MY APPEARANCE WINDOW
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :opacity "1"  ; VISIBLE APPEARANCE WINDOW
@@ -73,7 +73,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "2.8%")
-  :stacking  "fg"
+  :stacking  "bg"     ; background
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   :opacity "0"  ; INVISIBLE HITBOX WINDOW
 )

@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, StatusBar_BuiltOSPath, ... }:
 
 {
   environment.systemPackages = with pkgs; [ 
@@ -10,7 +10,7 @@
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${config.cognito.hyprland.StatusBar_BuiltOSPath}";
+      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
       Restart = "on-failure";
       RestartSec = 3;
     };

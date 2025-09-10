@@ -8,12 +8,13 @@ let
   
 in
 {
-  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
+  imports = [ 
+    ./session/default.nix 
+    ./omnibar-mode/default.nix 
+    (./dropdown-status-bar/default.nix { StatusBar_BuiltOSPath = StatusBar_BuiltOSPath; })
+  ];
   
   config = {
-    # Export status bar path for other modules
-    cognito.hyprland.StatusBar_BuiltOSPath = StatusBar_BuiltOSPath;
-    
     services.xserver.enable = false;  # We are using Wayland, not X11.
     # 3D acceleration for Wayland. See README.md for more details.
     hardware.graphics = {

@@ -55,8 +55,9 @@
   :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
-                      :x      "0"          ; Position of the window. Values may be provided in px or %.
-                      :y      "0"          ; Will be relative to anchor.
+                      :x      "0"
+                      :y      "0"
+                      :width  "101%"
                       )
   :stacking "overlay"
   ; The widgets it contains listed below:
@@ -72,6 +73,7 @@
                       :width  "101%"
                       :height "2.8%")
   :stacking  "fg"
+  :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   (topbar :screen 0)
 )
 

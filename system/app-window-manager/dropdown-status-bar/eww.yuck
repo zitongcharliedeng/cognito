@@ -52,30 +52,27 @@
 (defvar collapse_status_bar true)
 
 (defwindow dropdown_status_bar_appearance
+  :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
-                      :width  "101%"
-                      :height {false ? "25%" : "2.8%"})
-  :stacking  "fg"     ; foreground - Possible values: fg, bg, overlay, bottom.
-  :exclusive false  ; NO HITBOX FOR MY APPEARANCE WINDOW
-  :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :opacity "1"  ; VISIBLE APPEARANCE WINDOW
+                      )
+  :stacking "overlay"
   ; The widgets it contains listed below:
   (topbar :screen 0)
 )
 
 (defwindow dropdown_status_bar_hitbox_normal
+  :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "1px"          ; Position of the window. Values may be provided in px or %.
                       :y      "1px"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "2.8%")
-  :stacking  "bg"     ; background
-  :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
-  :opacity "0"  ; INVISIBLE HITBOX WINDOW
+  :stacking  "fg"
+  (topbar :screen 0)
 )
 
 (defwidget topbar [screen]

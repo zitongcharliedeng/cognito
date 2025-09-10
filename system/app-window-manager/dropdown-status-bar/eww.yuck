@@ -1,12 +1,18 @@
+; Variable to control whether the bar reserves physical space
+(defvar hide_status_bar false)
+; Variable to control whether the bar extends to 25% height (for dropdown/expanded view)
+(defvar extend_status_bar false)
+; We can control variables externally with: i.e. eww update hide_status_bar=true
+
 (defwindow window
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
-                      :height "2.8%")
+                      :height {extend_status_bar ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive "true"   ; Whether the compositor should reserve space for the window.
+  :exclusive {(hide_status_bar || extend_status_bar) ? "false" : "true"}
   :focusable "false"  ; This is necessary for any widgets that use the keyboard to work.
   (topbar :screen 0)
 )

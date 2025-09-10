@@ -2,8 +2,13 @@
 # Check if rofi is already running and close it
 if pgrep rofi >/dev/null; then
   pkill rofi
+  # Reset status bar to normal when closing rofi
+  eww update extend_status_bar=false 2>/dev/null || true
   exit 0
 fi
+
+# Extend status bar when opening rofi
+eww update extend_status_bar=true 2>/dev/null || true
 
 # Minimal inline overlay via rofi message (keeps config tiny and robust)
 MESG="$(date '+%H:%M')  •  placeholder"
@@ -55,3 +60,6 @@ case "$CHOICE" in
     fi
     ;;
 esac
+
+# Reset status bar to normal when rofi closes (fallback cleanup)
+eww update extend_status_bar=false 2>/dev/null || true

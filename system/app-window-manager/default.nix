@@ -62,10 +62,10 @@ in
     kb_layout = us
   }
   general {
-    gaps_in = 2 # Hyperland Default is 5 ಠ_ಠ
-    gaps_out = 2 # Hyperland Default is 20 ಠ_ಠ
-    border_size = 2 # Hyperland Default is 2 ಠ_ಠ
-    # Hyperland does not guarantee the same default colors in new releases.
+    gaps_in = 2 # Hyprland Default is 5 ಠ_ಠ
+    gaps_out = 2 # Hyprland Default is 20 ಠ_ಠ
+    border_size = 2 # Hyprland Default is 2 ಠ_ಠ
+    # Hyprland does not guarantee the same default colors in new releases.
     col.active_border = rgba(ffffffff) # White
     col.inactive_border = rgba(000000ff) # Black
   }
@@ -79,13 +79,37 @@ in
   # detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
   windowrulev2 = noborder,fullscreen:1
   
-  # Eww bar rules
+  # Eww bar rules - eww windows typically have class "eww" by default
   windowrulev2 = float, class:^(eww)$
   windowrulev2 = nofocus, class:^(eww)$
   windowrulev2 = workspace 1, class:^(eww)$
   
+  # Control eww bar based on fullscreen state
+  # When fullscreen: hide status bar (no physical space reservation)
+  # When not fullscreen: show status bar (reserve physical space)
+  windowrulev2 = exec, eww update hide_status_bar=true, class:^(eww)$, workspace:f[1]
+  windowrulev2 = exec, eww update hide_status_bar=false, class:^(eww)$, workspace:f[-1]
+  
+  # Control eww bar based on rofi/cognito-omnibar state
+  # When rofi is open: extend status bar to 25% height (dropdown mode)
+  # When rofi is closed: normal status bar height
+  # Note: rofi might not have class "rofi", so we use a more generic approach
+  windowrulev2 = exec, eww update extend_status_bar=true, class:^(rofi)$
+  windowrulev2 = exec, eww update extend_status_bar=false, class:^(rofi)$, focus:0
+  
+  # Alternative: Monitor rofi process lifecycle
+  # This will be handled by the omnibar script itself
+  
+  # Alternative: if eww doesn't use class "eww", try these fallbacks:
+  # windowrulev2 = float, title:^(eww)$
+  # windowrulev2 = nofocus, title:^(eww)$
+  # windowrulev2 = workspace 1, title:^(eww)$
+  # windowrulev2 = opacity 0, title:^(eww)$, workspace:f[1]
+  # windowrulev2 = opacity 1, title:^(eww)$, workspace:f[-1]
+  
   $mod = SUPER
-  bind = $mod,SPACE,exec,cognito-omnibar
+  # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
+  bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi
   bind = $mod,RETURN,exec,kitty
   '';
 }

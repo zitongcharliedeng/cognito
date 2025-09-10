@@ -1,6 +1,6 @@
 
 ; Variable to control whether the status bar reserves physical space and is visible
-(defvar collapse_status_bar false)
+(defvar collapse_status_bar true)
 
 (defwindow window
   :monitor 0
@@ -10,9 +10,9 @@
                       :width  "101%"
                       :height {false ? "25%" : "2.8%"})
   :stacking  "fg"     ; Possible values: fg, bg, overlay, bottom.
-  :exclusive {(collapse_status_bar || false) ? "false" : "true"}
+  :exclusive collapse_status_bar
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :opacity {false ? "1" : (collapse_status_bar ? "0" : "1")}  ; Always show when omnibar is open, otherwise hide if fullscreen
+  :opacity "1"
   (topbar :screen 0)
 )
 

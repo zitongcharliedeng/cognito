@@ -19,6 +19,8 @@ in
       ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
       Restart = "on-failure";
       RestartSec = 3;
+      Environment = "WAYLAND_DISPLAY=wayland-1";
+      Environment = "XDG_RUNTIME_DIR=/run/user/%i";
     };
   };
 }

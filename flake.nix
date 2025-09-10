@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     mynixui = {
-      url = "git+file:./mynixui";
+      url = "path:./mynixui";
       flake = false;
     };
   };

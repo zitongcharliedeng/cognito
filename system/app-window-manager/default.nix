@@ -16,6 +16,7 @@ let
     # Wait for daemon to be ready, then open both windows
     sleep 3
     eww open dropdown_status_bar_appearance
+    eww open dropdown_status_bar_hitbox --arg hitbox_height_as_percentage="2.8%"
   '';
   
 in

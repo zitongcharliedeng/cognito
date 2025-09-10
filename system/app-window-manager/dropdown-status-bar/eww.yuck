@@ -31,11 +31,8 @@
 ;; 👉 I came up with the idea of two windows per entity:
 ;;      1. "its appearance, zero-hitbox window"
 ;;         (renders its appearance (+widgets), no hitbox space).
-;;      2. "its hitbox, zero-appearance windows*"
-;;         (no appearance, defines its hitbox space). *Not a typo,
-;;         windows don't accept arguments, so we need to hardcode
-;;         a new window for each hitbox size we ever want to switch
-;;         to. Which I guess is like fighting games, but is a PAIN!
+;;      2. "its hitbox, zero-appearance window*"
+;;         (no appearance, defines its hitbox space).
 ;;
 ;; e.g. making a status bar switch from taking up space to 
 ;;   taking up less/none(floating), without rerendering the 
@@ -59,7 +56,7 @@
 ; Variable to control whether the status bar reserves physical space and is visible
 (defvar collapse_status_bar true)
 
-(defwindow dropdown_status_bar_appearance
+(defwindow dropdown_status_bar_appearance []
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"
@@ -74,13 +71,13 @@
   (topbar :screen 0)
 )
 
-(defwindow dropdown_status_bar_hitbox_normal
+(defwindow dropdown_status_bar_hitbox [hitbox_height_as_percentage]
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
-                      :height "2.8%")
+                      :height hitbox_height_as_percentage)
   :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   (box)  ; Minimal required empty content for a window in a config to compile

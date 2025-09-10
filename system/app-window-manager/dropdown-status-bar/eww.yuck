@@ -24,10 +24,7 @@
 ;;   in the `defwindow`.
 
 ;;   Thus, widget state tend to use defvars (update live), 
-;;   while window state only uses "function" arguments 
-;;   (the square brackets []) and only at its creation...
-;;   Is what I would say, but the latter part in eww v0.6
-;;   isn't possible BECAUSE WINDOWS CAN'T USE ARGUMENTS.
+;;   while window state only uses static "function" arguments.
 ;;
 ;; So for dynamic hitbox-sizing behaviour... 
 
@@ -52,6 +49,9 @@
 ;;     to be a valid config, if the window areas overlap and one is
 ;;     :exclusive true, and the other is :exclusive false, then the
 ;;     the overlapping area will be exclusive (additive).
+;;   - ALL WINDOWS MUST HAVE AT LEAST ONE (widget) INSIDE OR THE
+;;     ENTIRE CONFIG WILL NOT COMPILE, EVEN IF YOU AREN"T LAUNCHING
+;;     THAT WINDOW EVER! SO STUPID AND IS WHY I HAVE DUMMY WIDGETS.
 ;; ──────────────────────────────────────────────
 
 ; Variable to control whether the status bar reserves physical space and is visible
@@ -81,6 +81,7 @@
                       :height "2.8%")
   :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
+  (box)  ; Minimal required empty content for a window in a config to compile
 )
 
 (defwidget topbar [screen]

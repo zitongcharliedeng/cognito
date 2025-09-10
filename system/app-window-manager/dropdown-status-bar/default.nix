@@ -2,7 +2,7 @@
 
 let
   dropdownStatusBarStorePath = builtins.path {
-    path = ./;
+    path = ./.;
     name = "dropdown-status-bar";
   };
 in

@@ -23,22 +23,19 @@ in
       # Minimal inline overlay via rofi message (keeps config tiny and robust)
       MESG="$(date '+%H:%M')  •  placeholder"
 
-      # Create menu items as array for better handling
-      menu_items=(
-        "Apps"
-        "Open Terminal"
-        "Close Active Window"
-        "Toggle Fullscreen on Active Window"
-        "Exit Hyprland"
-        "Screenshot region (grim+slurp)"
-        "Screenshot full screen (grim)"
-        "[Debug] Force renderer: pixman"
-        "[Debug] Force renderer: gl"
-        "[Debug] Remove renderer override"
-        "[Debug] Show renderer status"
-      )
-
-      choice=$(printf '%s\n' "${menu_items[@]}" | rofi -dmenu -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 12; }')
+      # Create menu items using printf directly (avoids Nix escaping issues)
+      choice=$(printf '%s\n' \
+        "Apps" \
+        "Open Terminal" \
+        "Close Active Window" \
+        "Toggle Fullscreen on Active Window" \
+        "Exit Hyprland" \
+        "Screenshot region (grim+slurp)" \
+        "Screenshot full screen (grim)" \
+        "[Debug] Force renderer: pixman" \
+        "[Debug] Force renderer: gl" \
+        "[Debug] Remove renderer override" \
+        "[Debug] Show renderer status" | rofi -dmenu -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 12; }')
 
       case "$choice" in
         "Apps")

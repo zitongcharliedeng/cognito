@@ -112,7 +112,7 @@
        :halign "center"
        :width  "100%"
        :height { isBarForcedExpanded ? "25%" : 
-                 baseBarMode == "collapsed" ? "0%" : "2.8%" }
+                 baseBarMode == "normal" ? "2.8%" : "0%" }
     ; (_buttons :shutdown "poweroff" :reboot "reboot"
     ;           :logout "loginctl kill-session self"
     ;           :shutdown_icon "󰐦" :reboot_icon "󰜉" :logout_icon "󰍂") ; TODO: 

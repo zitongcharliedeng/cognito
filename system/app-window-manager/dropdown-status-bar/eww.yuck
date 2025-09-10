@@ -35,7 +35,7 @@
 ;;         (no appearance, defines its hitbox space).
 ;;
 ;; e.g. making a status bar switch from taking up space to 
-;;   taking up less/none(floating), without rerendering the 
+;;   taking up less/none(floating), without re-rendering the 
 ;;   appearance by just destroying and recreating the hitbox 
 ;;   with a new hitbox size. This also means we can use defvars
 ;;   to change the appearance i.e. height of our entity without 
@@ -48,9 +48,11 @@
 ;;     the overlapping area will be exclusive (additive).
 ;;   - ALL WINDOWS MUST HAVE AT LEAST ONE (widget) INSIDE OR THE
 ;;     ENTIRE CONFIG WILL NOT COMPILE, EVEN IF YOU AREN"T LAUNCHING
-;;     THAT WINDOW EVER! SO STUPID AND IS WHY I HAVE DUMMY WIDGETS.
+;;     THAT WINDOW EVER! SO STUPID AND IS WHY I HAVE (box) WIDGETS.
 ;; 
-;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS
+;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
+;; 
+;; Kind regards, Charlie the Chud.
 ;; ──────────────────────────────────────────────
 
 ;; ──────────────────────────────────────────────
@@ -73,7 +75,8 @@
 
 ;; ──────────────────────────────────────────────
 ;; APPEARANCE WINDOW (always lives, exclusive=false)
-;; Widgets inside react live to defvars
+;; Sole purpose is to host the widgets inside, which react live to `defvar` variable changes.
+;; (using `eww update myvar="10px"` to change the `defvar` variables)
 ;; ──────────────────────────────────────────────
 (defwindow dropdown_status_bar_appearance []
   :monitor 0
@@ -84,9 +87,8 @@
                       ; :height auto fit to live bar-widget height
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :stacking "fg"
+  :stacking "overlay"
   :exclusive false
-  :opacity "0.75"
   ; The widgets it contains listed below:
   (normal_bar :screen 0)
 )
@@ -97,10 +99,10 @@
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
-                      :height "10%")
-  :stacking  "bg"
-  :opacity "0"
+                      :height "50%")
+  :stacking  "bottom"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
+  ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile
 )
 

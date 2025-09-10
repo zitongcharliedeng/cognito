@@ -57,7 +57,6 @@
 (defvar collapse_status_bar true)
 
 (defwindow dropdown_status_bar_appearance
-  :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"
@@ -66,20 +65,19 @@
                       :height "2.8%"
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :stacking "overlay"
+  :stacking "fg"
   ; The widgets it contains listed below:
   (topbar :screen 0)
 )
 
 (defwindow dropdown_status_bar_hitbox_normal
-  :namespace "eww"
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "2.8%")
-  :stacking  "fg"
+  :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   (topbar :screen 0)
 )

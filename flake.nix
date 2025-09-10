@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    mynixui.url = "github:eureka-cpu/mynixui";
+    mynixui.url = "path:./mynixui";
   };
 
   outputs = { self, nixpkgs, mynixui, ... }:

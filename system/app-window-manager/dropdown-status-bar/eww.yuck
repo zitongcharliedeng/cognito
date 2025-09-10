@@ -80,12 +80,11 @@
 ;; ──────────────────────────────────────────────
 (defwindow dropdown_status_bar_appearance []
   :monitor 0
-  :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
+  :geometry (geometry :anchor "top center"
                       :x      "0"
                       :y      "0"
                       :width  "101%"
-                      ; :height auto fit to live bar-widget height
-                      )
+                      :height "50%")  ; Match hitbox height for proper overlay
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   :exclusive false
@@ -100,7 +99,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "bottom"
+  :stacking  "overlay"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile

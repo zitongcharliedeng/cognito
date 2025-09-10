@@ -52,6 +52,8 @@
 ;;   - ALL WINDOWS MUST HAVE AT LEAST ONE (widget) INSIDE OR THE
 ;;     ENTIRE CONFIG WILL NOT COMPILE, EVEN IF YOU AREN"T LAUNCHING
 ;;     THAT WINDOW EVER! SO STUPID AND IS WHY I HAVE DUMMY WIDGETS.
+;; 
+;; TODO: Contribute my suffering to the bare EWW docs.
 ;; ──────────────────────────────────────────────
 
 ; Variable to control whether the status bar reserves physical space and is visible

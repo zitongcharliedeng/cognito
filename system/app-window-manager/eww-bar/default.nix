@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 
 let
-  mynixuiStorePath = builtins.path {
-    path = ../../../mynixui;
-    name = "mynixui";
+  dropdownStatusBarStorePath = builtins.path {
+    path = ../dropdown-status-bar;
+    name = "dropdown-status-bar";
   };
 in
 {
@@ -15,7 +15,7 @@ in
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${mynixuiStorePath}/eww";
+      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${dropdownStatusBarStorePath}";
       Restart = "on-failure";
       RestartSec = 3;
     };

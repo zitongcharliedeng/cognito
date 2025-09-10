@@ -1,15 +1,15 @@
 { config, pkgs, ... }:
 
 let
-  mynixuiStorePath = builtins.path {
-    path = ../../mynixui;
-    name = "mynixui";
+  dropdownStatusBarStorePath = builtins.path {
+    path = ./dropdown-status-bar;
+    name = "dropdown-status-bar";
   };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window
     sleep 3
-    eww open window -c ${mynixuiStorePath}/eww &
+    eww open window -c ${dropdownStatusBarStorePath} &
   '';
 in
 {

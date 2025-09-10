@@ -15,14 +15,14 @@ in
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "hyprland-session.target" ];
+    environment = {
+      WAYLAND_DISPLAY = "wayland-1";
+      XDG_RUNTIME_DIR = "/run/user/%i";
+    };
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
       Restart = "on-failure";
       RestartSec = 3;
-      environment = {
-        WAYLAND_DISPLAY = "wayland-1";
-        XDG_RUNTIME_DIR = "/run/user/%i";
-      };
     };
   };
 }

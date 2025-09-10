@@ -19,6 +19,9 @@
       mkHost = name: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
+          {
+            networking.hostName = "cognito";
+          }
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
         ];

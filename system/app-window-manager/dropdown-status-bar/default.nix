@@ -14,7 +14,7 @@ in
 
   systemd.user.services.eww = {
     description = "Eww daemon";
-    wantedBy = [ "graphical-session.target" ];
+    wantedBy = [ "hyprland-session.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
       Restart = "on-failure";

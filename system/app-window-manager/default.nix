@@ -1,9 +1,10 @@
 { config, pkgs, ... }:
 
 let
-  mynixui = pkgs.runCommand "mynixui" {} ''
-    cp -r ${../../mynixui} $out
-  '';
+  mynixui = builtins.path {
+    path = ../../mynixui;
+    name = "mynixui";
+  };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window

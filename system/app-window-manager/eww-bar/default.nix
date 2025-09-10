@@ -1,11 +1,5 @@
-{ config, pkgs, ... }:
+{ config, pkgs, mynixui, ... }:
 
-let
-  mynixui = builtins.path {
-    path = ../../../mynixui;
-    name = "mynixui";
-  };
-in
 {
   # Add eww to system packages
   environment.systemPackages = with pkgs; [ eww ];

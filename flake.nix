@@ -3,9 +3,13 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    mynixui = {
+      url = "path:./mynixui";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs = { self, nixpkgs, mynixui, ... }:
     let
       system = "x86_64-linux";
 
@@ -18,6 +22,7 @@
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
         ];
+        specialArgs = { inherit mynixui; };
       };
     in {
       nixosConfigurations =

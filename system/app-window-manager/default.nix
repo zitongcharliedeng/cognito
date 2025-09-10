@@ -1,11 +1,6 @@
-{ config, pkgs, ... }:
+{ config, pkgs, mynixui, ... }:
 
 let
-  mynixui = builtins.path {
-    path = ../../mynixui;
-    name = "mynixui";
-  };
-  
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window
     sleep 3

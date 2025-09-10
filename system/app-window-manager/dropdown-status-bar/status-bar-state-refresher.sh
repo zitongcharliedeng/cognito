@@ -26,15 +26,15 @@ update_status_bar_once() {
   fi
 
   if check_fullscreen; then
-    eww update hide_status_bar=true 2>/dev/null || true
+    eww update collapse_status_bar=true 2>/dev/null || true
   else
-    eww update hide_status_bar=false 2>/dev/null || true
+    eww update collapse_status_bar=false 2>/dev/null || true
   fi
 
   if check_omnibar; then
-    eww update forcibly_reveal_and_extend_status_bar=true 2>/dev/null || true
+    eww update force_extend_status_bar=true 2>/dev/null || true
   else
-    eww update forcibly_reveal_and_extend_status_bar=false 2>/dev/null || true
+    eww update force_extend_status_bar=false 2>/dev/null || true
   fi
 }
 

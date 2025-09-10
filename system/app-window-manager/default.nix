@@ -6,11 +6,6 @@ let
     name = "status-bar";
   };
   
-  startEww = pkgs.writeShellScriptBin "start-eww" ''
-    # Wait for daemon to be ready, then open window
-    sleep 3
-    eww open window -c ${StatusBar_BuiltOSPath} &
-  '';
 in
 {
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
@@ -57,7 +52,8 @@ in
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
-  exec-once = sleep 2 && ${startEww}/bin/start-eww
+  # Eww daemon is started by systemd service, just open the window
+  exec-once = sleep 3 && eww open window
   input {
     kb_layout = us
   }

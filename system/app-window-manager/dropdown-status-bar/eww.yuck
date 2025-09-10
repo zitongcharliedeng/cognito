@@ -66,6 +66,7 @@
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "fg"
+  :exclusive false
   ; The widgets it contains listed below:
   (topbar :screen 0)
 )

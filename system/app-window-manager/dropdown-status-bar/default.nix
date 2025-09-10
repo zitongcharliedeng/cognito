@@ -1,21 +1,22 @@
 { config, pkgs, ... }:
 
 let
-  dropdownStatusBarStorePath = builtins.path {
+  StatusBar_BuiltOSPath = builtins.path {
     path = ./.;
-    name = "dropdown-status-bar";
+    name = "status-bar";
   };
 in
 {
-  # Add eww to system packages
-  environment.systemPackages = with pkgs; [ eww ];
+  environment.systemPackages = with pkgs; [ 
+    eww 
+    (pkgs.writeShellScriptBin "status-bar-state-refresher" (builtins.readFile ./status-bar-state-refresher.sh))
+  ];
 
-  # Use local mynixui directory
   systemd.user.services.eww = {
     description = "Eww daemon";
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${dropdownStatusBarStorePath}";
+      ExecStart = "${pkgs.eww}/bin/eww daemon -c ${StatusBar_BuiltOSPath}";
       Restart = "on-failure";
       RestartSec = 3;
     };

@@ -22,8 +22,8 @@ let
     ../wallpapers/wallpaper.jpg
     ../wallpapers/wallpaper.jpeg
   ];
-  chosenWallpapers = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
-  wallpaperPath = if chosenWallpapers == [] then ./wallpapers/wallpaper.png else builtins.head chosenWallpapers;
+  CustomWallpaper_BuiltOSPaths = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
+  Wallpaper_BuiltOSPath = if CustomWallpaper_BuiltOSPaths == [] then ./wallpapers/wallpaper.png else builtins.head CustomWallpaper_BuiltOSPaths;
 in
 {
   options = {
@@ -51,8 +51,8 @@ in
 
     # Hyprpaper wallpaper config; replace the path with your PNG if desired
     environment.etc."hypr/hyprpaper.conf".text = ''
-    preload = ${wallpaperPath}
-    wallpaper = ,${wallpaperPath}
+    preload = ${Wallpaper_BuiltOSPath}
+    wallpaper = ,${Wallpaper_BuiltOSPath}
     ipc = off
     '';
   };

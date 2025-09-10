@@ -5,6 +5,7 @@ let
   # Fallback will use non-mono Noto families when a glyph is missing.
   fontFamily = "Noto Sans Mono";
   lib = pkgs.lib;
+  systemUsername = "ulysses";
 in
 {
   imports = [ 
@@ -22,7 +23,7 @@ in
   # "wheel" group (name comes from early Unix privileged users). This grants
   # sudo-based elevation for admin tasks while preserving a regular login/home
   # experience a typical non-root "customer" user would have.
-  users.users.ulysses = {
+  users.users.${systemUsername} = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
     initialPassword = "password";
@@ -53,4 +54,11 @@ in
   environment.etc."xdg/rofi/config.rasi".text = ''
   configuration { font: "${fontFamily} 12"; }
   '';
+
+  # Export system username for other modules to use
+  options.systemUsername = lib.mkOption {
+    type = lib.types.str;
+    default = systemUsername;
+    description = "The primary system username";
+  };
 }

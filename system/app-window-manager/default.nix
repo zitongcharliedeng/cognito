@@ -1,15 +1,15 @@
 { config, pkgs, ... }:
 
 let
-  dropdownStatusBarStorePath = builtins.path {
+  StatusBar_BuiltOSPath = builtins.path {
     path = ./dropdown-status-bar;
-    name = "dropdown-status-bar";
+    name = "status-bar";
   };
   
   startEww = pkgs.writeShellScriptBin "start-eww" ''
     # Wait for daemon to be ready, then open window
     sleep 3
-    eww open window -c ${dropdownStatusBarStorePath} &
+    eww open window -c ${StatusBar_BuiltOSPath} &
   '';
 in
 {
@@ -53,7 +53,7 @@ in
   };
 
   environment.etc."hypr/hyprland.conf".text = ''
-  monitor=,1920x1080@60,auto,1  # TODO make this auto-detect
+  monitor=,preferred,auto,1  # Auto-detect primary monitor resolution
   env = XCURSOR_SIZE,24  # TODO make this custom
   exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
   exec-once = systemctl --user start hyprland-session.target
@@ -79,37 +79,25 @@ in
   # detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
   windowrulev2 = noborder,fullscreen:1
   
-  # Eww bar rules - eww windows typically have class "eww" by default
+  # Status bar rules - eww windows typically have class "eww" by default, TODO CHECK IF THESE ARE NEEDED
   windowrulev2 = float, class:^(eww)$
   windowrulev2 = nofocus, class:^(eww)$
   windowrulev2 = workspace 1, class:^(eww)$
-  
-  # Control eww bar based on fullscreen state
-  # When fullscreen: hide status bar (no physical space reservation)
-  # When not fullscreen: show status bar (reserve physical space)
-  windowrulev2 = exec, eww update hide_status_bar=true, class:^(eww)$, workspace:f[1]
-  windowrulev2 = exec, eww update hide_status_bar=false, class:^(eww)$, workspace:f[-1]
-  
-  # Control eww bar based on rofi/cognito-omnibar state
-  # When rofi is open: extend status bar to 25% height (dropdown mode)
-  # When rofi is closed: normal status bar height
-  # Note: rofi might not have class "rofi", so we use a more generic approach
-  windowrulev2 = exec, eww update extend_status_bar=true, class:^(rofi)$
-  windowrulev2 = exec, eww update extend_status_bar=false, class:^(rofi)$, focus:0
-  
-  # Alternative: Monitor rofi process lifecycle
-  # This will be handled by the omnibar script itself
-  
-  # Alternative: if eww doesn't use class "eww", try these fallbacks:
-  # windowrulev2 = float, title:^(eww)$
-  # windowrulev2 = nofocus, title:^(eww)$
-  # windowrulev2 = workspace 1, title:^(eww)$
-  # windowrulev2 = opacity 0, title:^(eww)$, workspace:f[1]
-  # windowrulev2 = opacity 1, title:^(eww)$, workspace:f[-1]
   
   $mod = SUPER
   # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
   bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi
   bind = $mod,RETURN,exec,kitty
+  # META+F: Toggle fullscreen and update status bar
+  bind = $mod,F,exec,hyprctl dispatch fullscreen && status-bar-state-refresher --update-once
+  # META+E: Update status bar state (for debugging)
+  bind = $mod,E,exec,status-bar-state-refresher
+  
+  # Workspace switching with status bar updates
+  bind = $mod,1,exec,hyprctl dispatch workspace 1 && status-bar-state-refresher --update-once
+  bind = $mod,2,exec,hyprctl dispatch workspace 2 && status-bar-state-refresher --update-once
+  bind = $mod,3,exec,hyprctl dispatch workspace 3 && status-bar-state-refresher --update-once
+  bind = $mod,4,exec,hyprctl dispatch workspace 4 && status-bar-state-refresher --update-once
+  bind = $mod,5,exec,hyprctl dispatch workspace 5 && status-bar-state-refresher --update-once
   '';
 }

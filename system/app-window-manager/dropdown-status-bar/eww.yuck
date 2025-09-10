@@ -84,7 +84,8 @@
                       :x      "0"
                       :y      "0"
                       :width  "101%"
-                      :height "50%")  ; Match hitbox height for proper overlay
+                      ; :height auto fit to live bar-widget height
+                      )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   :exclusive false
@@ -99,7 +100,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "overlay"
+  :stacking  "bg"     ; background - invisible spacer behind appearance window
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile

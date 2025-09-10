@@ -10,7 +10,7 @@
 # This is the single source of truth for status bar state detection
 
 # Check if the current workspace has fullscreen/maximized windows and update status bar accordingly
-if hyprctl activeworkspace | grep -q "f\[1\]" 2>/dev/null; then
+if hyprctl activeworkspace | grep -q "hasfullscreen: 1" 2>/dev/null; then
     echo "Current workspace has fullscreen - collapsing status bar"
     eww update baseBarMode=collapsed
     eww close dropdown_status_bar_hitbox_normal 2>/dev/null || true

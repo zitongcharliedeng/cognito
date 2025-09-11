@@ -18,9 +18,6 @@
           ./system-hardware-shims/${name}/configuration.nix
           # Pass flake inputs down so any descendant modules can use them
           {
-            _module.args.hyprland = hyprland;
-            _module.args.xdph = xdph;
-
             # For faster downloads
             nix.settings = {
               substituters = [

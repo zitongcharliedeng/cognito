@@ -53,6 +53,8 @@
 ;;     like height, we need to use the `literal` defvar instead.
 ;;     For other stuff like switcing text in boxes, regular defvars.
 ;;     For periodic updates we'd use defpolls.
+;;   - Widgets (and windows?) need the empty [] arg syntax and
+;;     it sometimes doesn't say that in the error logs.
 ;; 
 ;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
 ;; 
@@ -116,11 +118,11 @@
   (box)  ; Minimal required empty content for a window in a config to compile
 )
 
-(defwidget barContainerCollapsed
+(defwidget barContainerCollapsed []
   (box)
 )
 
-(defwidget barContainerNormal
+(defwidget barContainerNormal []
   (box :valign "center"
        :halign "center"
        :width  "100%"
@@ -129,7 +131,7 @@
   )
 )
 
-(defwidget barContainerExpanded
+(defwidget barContainerExpanded []
   (box :valign "center"
        :halign "center"
        :width  "100%"
@@ -139,7 +141,7 @@
 )
 
 ; The core bar icons and stuff displayed when in normal or expanded, not in collapsed.
-(defwidget coreBarContent
+(defwidget coreBarContent []
   (box :valign "center"
        :halign "center"
        :width  "100%"

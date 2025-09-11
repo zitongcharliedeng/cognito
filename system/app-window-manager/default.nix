@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, hyprland, ... }:
 
 let
   StatusBar_BuiltOSPath = builtins.path {

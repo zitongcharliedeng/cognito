@@ -91,7 +91,7 @@
                       ; :height auto fit to live bar-widget height
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :stacking "overlay"
+  :stacking "fg"
   :exclusive false
   (literal :content {isBarForcedExpanded ? "(barContainerExpanded)" : baseBarMode == "normal" ? "(barContainerNormal)" : "(barContainerCollapsed)"})
 )
@@ -112,7 +112,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "fg"     ; foreground - needs to be in front to displace other windows
+  :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile

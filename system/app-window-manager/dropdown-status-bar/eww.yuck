@@ -112,7 +112,7 @@
 (defwindow dropdown_status_bar_hitbox_normal []
   :monitor 0
   :namespace "statusbar-hitbox"
-  :geometry (geometry :anchor "top left"   ; Different anchor from appearance window
+  :geometry (geometry :anchor "top center"   ; Different anchor from appearance window
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"

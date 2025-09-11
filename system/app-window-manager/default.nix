@@ -101,6 +101,12 @@ in
     windowrulev2 = nofocus, class:^(eww)$
     windowrulev2 = workspace 1, class:^(eww)$
     
+    # Layer rules for status bar namespaces - critical for proper layering
+    layerrule = noanim, ^(statusbar-appearance)$
+    layerrule = noanim, ^(statusbar-hitbox)$
+    # Try to force appearance layer to ignore exclusive zones
+    layerrule = ignorezero, ^(statusbar-appearance)$
+    
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
     bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi

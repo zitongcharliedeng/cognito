@@ -1,25 +1,13 @@
 {
   description = "Cognito OS";
 
-  nixConfig = {
-    # Pulling packages raw from i.e. github Hyperland will take a long time to pull dependencies,
-    # so we use a cached version kindly made by cachix to speed up the process.
-    extra-substituters = [
-      "https://hyprland.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "hyprland.cachix.org-1:a7pgxzMz7+cdLXytWZyaUoVJgkPV+XYNXYK17xMLWfE="
-    ];
-  };
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Track Hyprland master (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)
+    # Packages I want latest versions of (not yet in nixos-unstable pkgs):
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
 
-    # xdg-desktop-portal-hyprland (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)
     xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland";
     xdph.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -35,9 +23,23 @@
         modules = [
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
-
           # Pass flake inputs down so any descendant modules can use them
-          { _module.args.hyprland = hyprland; _module.args.xdph = xdph; }
+          {
+            _module.args.hyprland = hyprland;
+            _module.args.xdph = xdph;
+
+            # For faster downloads
+            nix.settings = {
+              substituters = [
+                "https://cache.nixos.org"
+                "https://hyprland.cachix.org"
+              ];
+              trusted-public-keys = [
+                "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+                "hyprland.cachix.org-1:a7pgxzkh7+cdlXytW2JqwT/2WyiZ/3U4q8D8y1V9x6o="
+              ];
+            };
+          }
         ];
       };
     in {

@@ -118,6 +118,7 @@ in
     # Appearance - floats above, no exclusivity
     layerrule = overlay, ^(statusbar-appearance)$
     layerrule = nointeract, ^(statusbar-appearance)$
+    layerrule = top, eww
 
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)

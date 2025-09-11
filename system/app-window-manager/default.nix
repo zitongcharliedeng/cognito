@@ -111,12 +111,12 @@ in
     # My namespace with the :exclusive true is called "statusbar-hitbox" and the pure independent appearance 
     # is called "statusbar-appearance"
     
-    # Hitbox - reserves space
+    # Hitbox - controls reserved space
     layerrule = top, ^(statusbar-hitbox)$
+    layerrule = ignorezero, ^(statusbar-hitbox)$
 
-    # Appearance - overlays and ignores exclusives
+    # Appearance - floats above, no exclusivity
     layerrule = overlay, ^(statusbar-appearance)$
-    layerrule = ignorezero, ^(statusbar-appearance)$
     layerrule = nointeract, ^(statusbar-appearance)$
 
     $mod = SUPER

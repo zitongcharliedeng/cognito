@@ -106,16 +106,14 @@ in
     # My namespace with the :exclusive true is called "statusbar-hitbox" and the pure independent appearance 
     # is called "statusbar-appearance"
     
-    # Hitbox layer - no animations, standard behavior for space reservation  
-    # Hitbox (exclusive)
-    layerrule = namespace:^(statusbar-hitbox)$, top
+    # Hitbox - reserves space
+    layerrule = top, ^(statusbar-hitbox)$
 
-    # Appearance (independent overlay)
-    layerrule = namespace:^(statusbar-appearance)$, overlay
-    layerrule = namespace:^(statusbar-appearance)$, ignorezero
-    layerrule = namespace:^(statusbar-appearance)$, nointeract
+    # Appearance - overlays and ignores exclusives
+    layerrule = overlay, ^(statusbar-appearance)$
+    layerrule = ignorezero, ^(statusbar-appearance)$
+    layerrule = nointeract, ^(statusbar-appearance)$
 
-    
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
     bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi

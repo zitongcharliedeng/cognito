@@ -6,7 +6,7 @@
     hyprland.url = "github:hyprwm/Hyprland"; # pull directly from upstream since unstable doesn't have layerrule rn
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs = { self, nixpkgs, hyprland, ... }:
     let
       system = "x86_64-linux";
 

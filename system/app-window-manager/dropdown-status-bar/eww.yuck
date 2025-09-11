@@ -121,7 +121,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "top"
+  :stacking  "overlay"  ;; placeholder, we turn it into top in hyprland.conf, for some reason the YUCK creation API doesnt have all the wayland stacking, despite having bottom it don't have top :crying:
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box :style "background-color: red; opacity: 0.5;")  ; Red debug hitbox to visualize area

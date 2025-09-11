@@ -1,6 +1,17 @@
 {
   description = "Cognito OS";
 
+  nixConfig = {
+    # Pulling packages raw from i.e. github Hyperland will take a long time to pull dependencies,
+    # so we use a cached version kindly made by cachix to speed up the process.
+    extra-substituters = [
+      "https://hyprland.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+cdLXytWZyaUoVJgkPV+XYNXYK17xMLWfE="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -12,7 +23,6 @@
     xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland";
     xdph.inputs.nixpkgs.follows = "nixpkgs";
   };
-
 
   outputs = { self, nixpkgs, hyprland, xdph, ... }:
     let

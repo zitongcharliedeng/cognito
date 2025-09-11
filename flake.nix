@@ -3,16 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-    # Packages I want latest versions of (not yet in nixos-unstable pkgs):
-    hyprland.url = "github:hyprwm/Hyprland";
-    hyprland.inputs.nixpkgs.follows = "nixpkgs";
-
-    xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland";
-    xdph.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, hyprland, xdph, ... }:
+  outputs = { self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
       # Discover all host configs programmatically inside ./system-hardware-shims/
@@ -32,11 +25,9 @@
             nix.settings = {
               substituters = [
                 "https://cache.nixos.org"
-                "https://hyprland.cachix.org"
               ];
               trusted-public-keys = [
                 "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-                "hyprland.cachix.org-1:a7pgxzkh7+cdlXytW2JqwT/2WyiZ/3U4q8D8y1V9x6o="
               ];
             };
           }

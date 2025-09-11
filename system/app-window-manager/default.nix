@@ -1,4 +1,4 @@
-{ config, pkgs, hyprland, xdph, ... }:
+{ config, pkgs, ... }:
 
 let
   StatusBar_BuiltOSPath = builtins.path {
@@ -37,12 +37,7 @@ in
       enable = true;
       enable32Bit = true;
     };
-    programs.hyprland = {
-      enable = true;
-      # Override default packages to newer versions. (why is nixos-unstable still using old hyprland?)
-      package = hyprland.packages.x86_64-linux.hyprland;
-      portalPackage = xdph.packages.x86_64-linux.xdg-desktop-portal-hyprland;
-    };
+    programs.hyprland.enable = true;  # Wayland isn't a global toggle...
     # ... Wayland implicitly enabled by setting i.e. Hyprland as my window manager after signing in.
     environment.sessionVariables = {
         NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
@@ -118,7 +113,6 @@ in
     # Appearance - floats above, no exclusivity
     layerrule = overlay, ^(statusbar-appearance)$
     layerrule = nointeract, ^(statusbar-appearance)$
-    layerrule = top, eww
 
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)

@@ -55,7 +55,10 @@
 ;;     For periodic updates we'd use defpolls.
 ;;   - Widgets (and windows?) need the empty [] arg syntax and
 ;;     it sometimes doesn't say that in the error logs.
-;; 
+;;   - Wayland by default shares namespaces with all windows, so even
+;;     if one window is :exclusive and the other isn't, the exclusive
+;;     window will still "push" the non-exclusive window. To make 
+;;     windows independent, we need assign different :namespace values.
 ;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
 ;; 
 ;; Kind regards, Charlie the Chud.
@@ -84,6 +87,7 @@
 ;; ──────────────────────────────────────────────
 (defwindow dropdown_status_bar_appearance []
   :monitor 0
+  :namespace "statusbar-appearance-hitbox"
   :geometry (geometry :anchor "top center"
                       :x      "0"
                       :y      "0"
@@ -91,7 +95,7 @@
                       ; :height auto fit to live bar-widget height
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :stacking "fg"
+  :stacking "overlay"
   :exclusive false
   (literal :content {isBarForcedExpanded ? "(barContainerExpanded)" : baseBarMode == "normal" ? "(barContainerNormal)" : "(barContainerCollapsed)"})
 )
@@ -107,12 +111,13 @@
 ;; ──────────────────────────────────────────────
 (defwindow dropdown_status_bar_hitbox_normal []
   :monitor 0
+  :namespace "statusbar-hitbox"
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.
                       :x      "0"          ; Position of the window. Values may be provided in px or %.
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "bottom"
+  :stacking  "overlay"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box)  ; Minimal required empty content for a window in a config to compile

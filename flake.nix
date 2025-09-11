@@ -18,6 +18,7 @@
         modules = [
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
+          { _module.args.hyprland = hyprland; }
         ];
       };
     in {

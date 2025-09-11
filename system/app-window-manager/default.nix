@@ -107,13 +107,13 @@ in
     # is called "statusbar-appearance"
     
     # Hitbox layer - no animations, standard behavior for space reservation  
-    # Reserve space for hitbox (exclusive bar)
-    layerrule = ^(statusbar-hitbox)$, top
-    layerrule = ^(statusbar-hitbox)$, ignorezero
-    # Independent overlay appearance
-    layerrule = ^(statusbar-appearance)$, overlay
-    layerrule = ^(statusbar-appearance)$, ignorezero
-    layerrule = ^(statusbar-appearance)$, nointeract   # optional: clicks pass through
+    # Hitbox (exclusive)
+    layerrule = namespace:^(statusbar-hitbox)$, top
+
+    # Appearance (independent overlay)
+    layerrule = namespace:^(statusbar-appearance)$, overlay
+    layerrule = namespace:^(statusbar-appearance)$, ignorezero
+    layerrule = namespace:^(statusbar-appearance)$, nointeract
 
     
     $mod = SUPER

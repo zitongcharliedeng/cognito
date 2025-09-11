@@ -39,7 +39,9 @@ in
     };
     programs.hyprland = {
       enable = true;
+      # Override default packages to newer versions. (why is nixos-unstable still using old hyprland?)
       package = hyprland.packages.x86_64-linux.hyprland;
+      portalPackage = hyprland.packages.x86_64-linux.xdg-desktop-portal-hyprland;
     };
     # ... Wayland implicitly enabled by setting i.e. Hyprland as my window manager after signing in.
     environment.sessionVariables = {

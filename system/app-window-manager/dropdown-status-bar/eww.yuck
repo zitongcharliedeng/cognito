@@ -58,7 +58,8 @@
 ;;   - Wayland by default shares namespaces with all windows, so even
 ;;     if one window is :exclusive and the other isn't, the exclusive
 ;;     window will still "push" the non-exclusive window. To make 
-;;     windows independent, we need assign different :namespace values.
+;;     windows independent, we need assign different :namespace values
+;;     AND THEN IN HYPRLAND.CONF - DECLARE THOSE NAMESPACES INDEPENDENT.
 ;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
 ;; 
 ;; Kind regards, Charlie the Chud.
@@ -120,7 +121,7 @@
   :stacking  "bg"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
-  (box)  ; Minimal required empty content for a window in a config to compile
+  (box :style "background-color: red; opacity: 0.5;")  ; Red debug hitbox to visualize area
 )
 
 (defwidget barContainerCollapsed []

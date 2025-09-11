@@ -102,10 +102,17 @@ in
     windowrulev2 = workspace 1, class:^(eww)$
     
     # Layer rules for status bar namespaces - critical for proper layering
-    layerrule = noanim, ^(statusbar-appearance)$
-    layerrule = noanim, ^(statusbar-hitbox)$
-    # Try to force appearance layer to ignore exclusive zones
+    # Appearance layer - enable animations, ignore exclusive zones from other layers
     layerrule = ignorezero, ^(statusbar-appearance)$
+    layerrule = ignorealpha 0.1, ^(statusbar-appearance)$
+    # Experimental: try to make appearance completely independent of exclusive zones
+    layerrule = blur, ^(statusbar-appearance)$
+    
+    # Hitbox layer - no animations, standard behavior for space reservation  
+    layerrule = noanim, ^(statusbar-hitbox)$
+    layerrule = ignorezero, ^(statusbar-hitbox)$
+    # Experimental: different blur treatment for hitbox
+    layerrule = blur, ^(statusbar-hitbox)$
     
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)

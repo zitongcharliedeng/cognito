@@ -60,6 +60,9 @@
 ;;     window will still "push" the non-exclusive window. To make 
 ;;     windows independent, we need assign different :namespace values
 ;;     AND THEN IN HYPRLAND.CONF - DECLARE THOSE NAMESPACES INDEPENDENT.
+;;   - Wayland stupidly only have 4 layers of z indexes ?!?!? 
+;;     background < bottom < application windows < top < overlay
+;;
 ;; TODO: Contribute my suffering to the bare EWW docs. Also SCSS for opacity.
 ;; 
 ;; Kind regards, Charlie the Chud.
@@ -118,7 +121,7 @@
                       :y      "0"          ; Will be relative to anchor.
                       :width  "101%"
                       :height "50%")
-  :stacking  "bg"
+  :stacking  "top"
   :exclusive true  ; HITBOXES ON FOR MY HITBOX WINDOW
   ; The widgets it contains listed below:
   (box :style "background-color: red; opacity: 0.5;")  ; Red debug hitbox to visualize area

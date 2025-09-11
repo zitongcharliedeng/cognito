@@ -94,6 +94,15 @@
   (literal :content {isBarForcedExpanded ? barContainerExpanded : baseBarMode == "normal" ? barContainerNormal : barContainerCollapsed})
 )
 
+;; ──────────────────────────────────────────────
+;; HITBOX WINDOW (sometimes lives, exclusive=true)
+;; For changing the apparent hitbox of the status bar without
+;; destroying and reconstructing the visual components.
+;; 
+;; Could use arguments or multiple hitbox windows if I want
+;; multiple hitbox sizes in the future, but for now I just need
+;; this, since I want expanded mode to float.
+;; ──────────────────────────────────────────────
 (defwindow dropdown_status_bar_hitbox_normal []
   :monitor 0
   :geometry (geometry :anchor "top center" ; Values include top, center, bottom and left, center, right.

@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    hyprland.url = "github:hyprwm/Hyprland"; # pull directly from upstream since unstable doesn't have layerrule rn
   };
 
   outputs = { self, nixpkgs, ... }:

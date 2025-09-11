@@ -37,8 +37,11 @@ in
       enable = true;
       enable32Bit = true;
     };
-    programs.hyprland.enable = true;  # Wayland isn't a global toggle...
-    # ... It is implicitly enabled by setting i.e. Hyprland as my window manager after signing in.
+    programs.hyprland = {
+      enable = true;
+      package = hyprland.packages.x86_64-linux.hyprland;
+    };
+    # ... Wayland implicitly enabled by setting i.e. Hyprland as my window manager after signing in.
     environment.sessionVariables = {
         NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
     };

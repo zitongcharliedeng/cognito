@@ -107,7 +107,7 @@ create_host_dir() {
   # Note: System-agnostic features (SSH, X server, basic packages, users)
   # are automatically included via the flake.nix configuration.
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "$(nix eval --raw nixpkgs.lib.trivial.release)";
 }
 EOF
     echo "✔ Created minimal configuration.nix for $HOSTNAME"

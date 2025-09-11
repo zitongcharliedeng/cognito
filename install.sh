@@ -33,7 +33,7 @@ list_hosts() {
 
 get_host() {
   while true; do
-    echo -n "Enter hostname for this device to "use existing or create new" hardware-shim so Cognito is compatible with it i.e. my-dying-thinkpad-laptop. Note that the device must support 3D hardware acceleration, since Cognito is a Wayland-first OS. Most devices in the last decade - phone, laptop, desktop - should support this. "
+    echo -n "Enter hostname for this device to \"use existing or create new\" hardware-shim so Cognito is compatible with it i.e. my-dying-thinkpad-laptop. Note that the device must support 3D hardware acceleration, since Cognito is a Wayland-first OS. Most devices in the last decade - phone, laptop, desktop - should support this. "
     read -r HOSTNAME
     
     # Validate hostname is not empty
@@ -86,6 +86,12 @@ create_host_dir() {
 
   # Create or update configuration.nix
   if [[ ! -f "$HOST_DIR/configuration.nix" ]]; then
+    # Get current release; fall back to known stable if nixpkgs reports "unstable"
+    STATE_VERSION=$(nix eval --raw nixpkgs.lib.trivial.release 2>/dev/null || echo "")
+    if [[ "$STATE_VERSION" == "unstable" || -z "$STATE_VERSION" ]]; then
+      STATE_VERSION="25.05"  # TODO: bump this occasionally when nixpkgs updates its stable branch.
+    fi
+
     cat > "$HOST_DIR/configuration.nix" <<EOF
 { config, pkgs, ... }:
 
@@ -107,10 +113,10 @@ create_host_dir() {
   # Note: System-agnostic features (SSH, X server, basic packages, users)
   # are automatically included via the flake.nix configuration.
 
-  system.stateVersion = "$(nix eval --raw nixpkgs.lib.trivial.release)";
+  system.stateVersion = "${STATE_VERSION}";
 }
 EOF
-    echo "✔ Created minimal configuration.nix for $HOSTNAME"
+    echo "✔ Created minimal configuration.nix for $HOSTNAME (stateVersion=${STATE_VERSION})"
   else
     echo "✔ Configuration.nix already exists"
   fi
@@ -120,14 +126,12 @@ build_system() {
   echo "Building system for host $HOSTNAME..."
   echo "Running from directory: $(pwd)"
   
-  # Check if flake.nix exists in current directory otherwise nixos-rebuild will not use this repo's configs
   if [[ ! -f "flake.nix" ]]; then
     echo "❌ flake.nix not found in current directory"
     echo "Please run this script from the root of your cognito repository"
     exit 1
   fi
   
-  # Test that this NixOS version can use flake evaluation first
   echo "Testing flake configuration..."
   nix flake show --extra-experimental-features "nix-command flakes" 2>/dev/null || {
     echo "❌ Flake evaluation failed."
@@ -140,13 +144,11 @@ build_system() {
   
   echo "Building system..."
   echo "Committing new hardware shim configuration to Git (required for flake builds)..."
-  # Set temporary Git identity to avoid annoying prompts
   git config user.email "nixos@cognito.local" 2>/dev/null || true
   git config user.name "Cognito NixOS" 2>/dev/null || true
   git add system-hardware-shims/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} hardware shim configuration" || echo "No changes to commit or already committed"
   echo "Building system configuration..."
-  # Prompt once right before the long build, then keep sudo alive
   if sudo -A sh -c "nixos-rebuild switch --flake .#${HOSTNAME} && systemctl reboot"; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."
     echo "System is rebooting now..."

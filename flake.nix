@@ -3,13 +3,20 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    hyprland.url = "github:hyprwm/Hyprland/master"; # pull directly from most upstream since unstable doesn't have layerrule rn
+
+    # Track Hyprland master (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)
+    hyprland.url = "github:hyprwm/Hyprland/master";
+    hyprland.inputs.nixpkgs.follows = "nixpkgs";
+
+    # xdg-desktop-portal-hyprland (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)
+    xdph.url = "github:hyprwm/xdg-desktop-portal-hyprland";
+    xdph.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, hyprland, ... }:
+
+  outputs = { self, nixpkgs, hyprland, xdph, ... }:
     let
       system = "x86_64-linux";
-
       # Discover all host configs programmatically inside ./system-hardware-shims/
       hosts = builtins.attrNames (builtins.readDir ./system-hardware-shims);
 
@@ -18,7 +25,9 @@
         modules = [
           ./system/default.nix
           ./system-hardware-shims/${name}/configuration.nix
-          { _module.args.hyprland = hyprland; }
+
+          # Pass flake inputs down so any descendant modules can use them
+          { _module.args.hyprland = hyprland; _module.args.xdph = xdph; }
         ];
       };
     in {

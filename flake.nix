@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # Track Hyprland master (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)
-    hyprland.url = "github:hyprwm/Hyprland/master";
+    hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
 
     # xdg-desktop-portal-hyprland (I NEED THE LATEST FEATURES NOT ON NIXOS-UNSTABLE YET)

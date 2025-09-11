@@ -11,14 +11,8 @@ let
     mkdir -p ~/.config/eww
     cp -r ${StatusBar_BuiltOSPath}/* ~/.config/eww/
     
-    # Start daemon in background
-    eww daemon &
-    # Wait for daemon to be ready, then open both windows
-    sleep 3
-    eww open dropdown_status_bar_appearance
-    eww open dropdown_status_bar_hitbox_normal
-    sleep 1
-    _sync-current-workspace-fullscreen-state
+    # Launch the dropdown status bar using our dedicated script
+    _launch-dropdown-status-bar
   '';
   
 in
@@ -34,6 +28,7 @@ in
       (pkgs.writeShellScriptBin "close-current-window" (builtins.readFile ./close-current-window.sh))
       (pkgs.writeShellScriptBin "move-current-window-to-workspace" (builtins.readFile ./move-current-window-to-workspace.sh))
       (pkgs.writeShellScriptBin "_sync-current-workspace-fullscreen-state" (builtins.readFile ./_sync-current-workspace-fullscreen-state.sh))
+      (pkgs.writeShellScriptBin "_launch-dropdown-status-bar" (builtins.readFile ./_launch-dropdown-status-bar.sh))
     ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.
@@ -78,8 +73,8 @@ in
     env = XCURSOR_SIZE,24  # TODO make this custom
     exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
     exec-once = systemctl --user start hyprland-session.target
-  # Start eww daemon and open window
-  exec-once = sleep 2 && ${startEww}/bin/start-eww
+  # Start eww daemon and open window - increased delay for VM stability
+  exec-once = sleep 5 && ${startEww}/bin/start-eww
     input {
       kb_layout = us
     }

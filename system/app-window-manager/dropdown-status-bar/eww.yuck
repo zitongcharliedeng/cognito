@@ -75,10 +75,6 @@
 
 (defvar baseBarMode "normal")
 (defvar isBarForcedExpanded false)
-
-(defvar variable_containing_yuck
-  "(box (button 'baseBarMode'))")
-
 ;; ──────────────────────────────────────────────
 ;; APPEARANCE WINDOW (always lives, exclusive=false)
 ;; Sole purpose is to host the widgets inside, which react live to `defvar` variable changes.
@@ -95,7 +91,7 @@
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   :exclusive false
-  (literal :content variable_containing_yuck)
+  (literal :content {isBarForcedExpanded ? barContainerExpanded : baseBarMode == "normal" ? barContainerNormal : barContainerCollapsed})
 )
 
 (defwindow dropdown_status_bar_hitbox_normal []
@@ -111,9 +107,31 @@
   (box)  ; Minimal required empty content for a window in a config to compile
 )
 
-(defwidget normal_bar
-  (box :class "normal_bar"
-       :valign "center"
+(defwidget barContainerCollapsed
+  (box)
+)
+
+(defwidget barContainerNormal
+  (box :valign "center"
+       :halign "center"
+       :width  "100%"
+       :height "2.8%"
+    (coreBarContent)
+  )
+)
+
+(defwidget barContainerExpanded
+  (box :valign "center"
+       :halign "center"
+       :width  "100%"
+       :height "25%"
+    (coreBarContent)
+  )
+)
+
+; The core bar icons and stuff displayed when in normal or expanded, not in collapsed.
+(defwidget coreBarContent
+  (box :valign "center"
        :halign "center"
        :width  "100%"
        :height "2.8%"

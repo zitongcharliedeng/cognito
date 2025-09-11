@@ -93,7 +93,7 @@
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
   :stacking "overlay"
   :exclusive false
-  (literal :content {isBarForcedExpanded ? barContainerExpanded : baseBarMode == "normal" ? barContainerNormal : barContainerCollapsed})
+  (literal :content {isBarForcedExpanded ? "(barContainerExpanded)" : baseBarMode == "normal" ? "(barContainerNormal)" : "(barContainerCollapsed)"})
 )
 
 ;; ──────────────────────────────────────────────

@@ -91,7 +91,7 @@
                       ; :height auto fit to live bar-widget height
                       )
   :focusable false  ; This is necessary for any widgets that use the keyboard to work.
-  :stacking "fg"
+  :stacking "bg"
   :exclusive false
   (literal :content {isBarForcedExpanded ? "(barContainerExpanded)" : baseBarMode == "normal" ? "(barContainerNormal)" : "(barContainerCollapsed)"})
 )

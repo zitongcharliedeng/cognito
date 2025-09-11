@@ -144,10 +144,13 @@ build_system() {
   
   echo "Building system..."
   echo "Committing new hardware shim configuration to Git (required for flake builds)..."
+
+  # Set temporary Git identity to avoid annoying prompts
   git config user.email "nixos@cognito.local" 2>/dev/null || true
   git config user.name "Cognito NixOS" 2>/dev/null || true
   git add system-hardware-shims/${HOSTNAME}/
   git commit -m "Add ${HOSTNAME} hardware shim configuration" || echo "No changes to commit or already committed"
+  
   echo "Building system configuration..."
   if sudo -A sh -c "nixos-rebuild switch --flake .#${HOSTNAME} && systemctl reboot"; then
     echo "✔ Done. Reboot recommended to apply kernel/bootloader changes."

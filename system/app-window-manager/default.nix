@@ -58,7 +58,7 @@
     # Start window-manager environment programs
     exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
     exec-once = systemctl --user start hyprland-session.target
-    exec-once = sleep 5 && _launch-omniwidgets-overlay
+    exec-once = _launch-ags-omniwidget-overlay
 
     input {
       kb_layout = us
@@ -82,11 +82,16 @@
     windowrulev2 = noborder,fullscreen:1
 
     $mod = SUPER
-    # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)
-    bind = $mod,SPACE,exec,if pgrep rofi >/dev/null; then pkill rofi; else cognito-omnibar; fi
+    # META+SPACE: Toggle omnibar overlay (closes if open, opens if closed)
+    bind = $mod,SPACE,exec,toggle-omnibar-overlay
     bind = $mod,RETURN,exec,kitty
     # META+F: Toggle current window fullscreen (atomic operation with status bar update)
     bind = $mod,F,exec,toggle-current-window-fullscreen
+    
+    # Hyprshot screenshot commands
+    bind = $mod,PRINT,exec,hyprshot -m output
+    bind = $mod SHIFT,PRINT,exec,hyprshot -m window
+    bind = $mod CTRL,PRINT,exec,hyprshot -m region
     
     # Workspace switching with status bar sync
     bind = $mod,1,exec,switch-to-workspace 1

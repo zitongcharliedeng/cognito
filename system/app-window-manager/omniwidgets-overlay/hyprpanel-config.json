@@ -1,0 +1,60 @@
+{
+  "bar": {
+    "height": 52,
+    "width": "100%",
+    "position": "top",
+    "margin": {
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0
+    },
+    "border": {
+      "width": 0,
+      "radius": 0
+    },
+    "background": {
+      "color": "rgba(0, 0, 0, 0.8)"
+    }
+  },
+  "modules": {
+    "left": [
+      {
+        "name": "dashboard",
+        "settings": {}
+      },
+      {
+        "name": "workspaces",
+        "settings": {}
+      },
+      {
+        "name": "media",
+        "settings": {}
+      }
+    ],
+    "middle": [
+      {
+        "name": "windowtitle",
+        "settings": {}
+      }
+    ],
+    "right": [
+      {
+        "name": "volume",
+        "settings": {}
+      },
+      {
+        "name": "network",
+        "settings": {}
+      },
+      {
+        "name": "bluetooth",
+        "settings": {}
+      },
+      {
+        "name": "notifications",
+        "settings": {}
+      }
+    ]
+  }
+}

@@ -1,22 +1,5 @@
 { config, pkgs, lib, ... }:
 let
-  hyprStart = pkgs.writeShellScriptBin "hyprland-start" ''
-    #!/bin/sh
-    CONFIG_PATH=/etc/hypr/hyprland.conf
-    # Optional per-user override: ~/.config/cognito/renderer (pixman|gl)
-    OVERRIDE="$HOME/.config/cognito/renderer"
-    if [ -f "$OVERRIDE" ]; then
-      R=$(cat "$OVERRIDE" | tr -d '\n' )
-      if [ "$R" = "pixman" ] || [ "$R" = "gl" ]; then
-        export WLR_RENDERER="$R"
-      fi
-    else
-      if systemd-detect-virt --quiet; then
-        export WLR_RENDERER=pixman
-      fi
-    fi
-    exec Hyprland -c "$CONFIG_PATH"
-  '';
   wallpaperCandidates = [
     ../wallpapers/wallpaper.png
     ../wallpapers/wallpaper.jpg
@@ -35,11 +18,10 @@ in
   };
 
   config = {
-    # Hyprland session launcher with VM-safe renderer selection.
-    # In VMs, virgl/virtio 3D can stall wlroots compositors (random freezes).
-    # Use pixman only when virtualized; keep GPU acceleration on bare metal.
-    environment.systemPackages = [ hyprStart ];
-    cognito.hyprland.startCmd = "${hyprStart}/bin/hyprland-start";
+    environment.systemPackages = with pkgs; [
+      (pkgs.writeShellScriptBin "_launch-hyprland-session" (builtins.readFile ./_launch-hyprland-session.sh))
+    ];
+    cognito.hyprland.startCmd = "_launch-hyprland-session";
 
     # Create Hyprland session target for systemd user services
     systemd.user.targets.hyprland-session = {

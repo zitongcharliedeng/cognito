@@ -29,6 +29,8 @@ in
       (pkgs.writeShellScriptBin "move-current-window-to-workspace" (builtins.readFile ./move-current-window-to-workspace.sh))
       (pkgs.writeShellScriptBin "_sync-current-workspace-fullscreen-state" (builtins.readFile ./_sync-current-workspace-fullscreen-state.sh))
       (pkgs.writeShellScriptBin "_launch-dropdown-status-bar" (builtins.readFile ./_launch-dropdown-status-bar.sh))
+      (pkgs.writeShellScriptBin "set-base-bar-mode" (builtins.readFile ./set-base-bar-mode.sh))
+      (pkgs.writeShellScriptBin "set-bar-forced-expansion" (builtins.readFile ./set-bar-forced-expansion.sh))
     ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.

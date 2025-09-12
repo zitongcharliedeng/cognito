@@ -1,34 +1,18 @@
 { config, pkgs, ... }:
 
-let
-  StatusBar_BuiltOSPath = builtins.path {
-    path = ./dropdown-status-bar;
-    name = "dropdown-status-bar";
-  };
-  
-  startEww = pkgs.writeShellScriptBin "start-eww" ''
-    # Create eww config directory and copy files
-    mkdir -p ~/.config/eww
-    cp -r ${StatusBar_BuiltOSPath}/* ~/.config/eww/
-    
-    # Launch the dropdown status bar using our dedicated script
-    _launch-dropdown-status-bar
-  '';
-  
 in
 {
-  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./dropdown-status-bar/default.nix ];
+  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./omniwidgets-overlay/default.nix ];
   
   config = {
     environment.systemPackages = with pkgs; [ 
       gtkgreet 
-      startEww 
+      # Atomic action scripts (preserved architecture)
       (pkgs.writeShellScriptBin "toggle-current-window-fullscreen" (builtins.readFile ./toggle-current-window-fullscreen.sh))
       (pkgs.writeShellScriptBin "switch-to-workspace" (builtins.readFile ./switch-to-workspace.sh))
       (pkgs.writeShellScriptBin "close-current-window" (builtins.readFile ./close-current-window.sh))
       (pkgs.writeShellScriptBin "move-current-window-to-workspace" (builtins.readFile ./move-current-window-to-workspace.sh))
       (pkgs.writeShellScriptBin "_sync-current-workspace-fullscreen-state" (builtins.readFile ./_sync-current-workspace-fullscreen-state.sh))
-      (pkgs.writeShellScriptBin "_launch-dropdown-status-bar" (builtins.readFile ./_launch-dropdown-status-bar.sh))
     ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.
@@ -71,10 +55,12 @@ in
     environment.etc."hypr/hyprland.conf".text = ''
     monitor=,preferred,auto,1  # Auto-detect primary monitor resolution
     env = XCURSOR_SIZE,24  # TODO make this custom
+
+    # Start window-manager environment programs
     exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
     exec-once = systemctl --user start hyprland-session.target
-  # Start eww daemon and open window - increased delay for VM stability
-  exec-once = sleep 5 && ${startEww}/bin/start-eww
+    exec-once = sleep 5 && _launch-omniwidgets-overlay
+
     input {
       kb_layout = us
     }
@@ -89,30 +75,12 @@ in
     
     # When any app is fullscreen on a workspace, remove gaps and borders
     workspace = f[1], gapsin:0, gapsout:0  # f[1] targets workspaces with maximized windows
-    # NOTE: f[0] (fullscreen) doesn't work, but f[1] (maximized) does work
-    # HYPOTHESIS: Some apps or Hyprland versions may interpret fullscreen states as maximized
-    # instead of true fullscreen, or there may be Wayland protocol differences in how
-    # fullscreen state is detected. f[1] works because maximized windows are more reliably
-    # detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
+    ## NOTE: f[0] (fullscreen) doesn't work, but f[1] (maximized) does work
+    ## HYPOTHESIS: Some apps or Hyprland versions may interpret fullscreen states as maximized
+    ## instead of true fullscreen, or there may be Wayland protocol differences in how
+    ## fullscreen state is detected. f[1] works because maximized windows are more reliably
+    ## detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
     windowrulev2 = noborder,fullscreen:1
-    
-    # Status bar rules - eww windows typically have class "eww" by default, TODO CHECK IF THESE ARE NEEDED
-    windowrulev2 = float, class:^(eww)$
-    windowrulev2 = nofocus, class:^(eww)$
-    windowrulev2 = workspace 1, class:^(eww)$
-    
-    # Layer rules for status bar namespaces - critical for proper layering
-    # Experimental: try to make appearance completely independent of exclusive zones
-    # My namespace with the :exclusive true is called "statusbar-hitbox" and the pure independent appearance 
-    # is called "statusbar-appearance"
-    
-    # Hitbox - controls reserved space
-    layerrule = top, ^(statusbar-hitbox)$
-    layerrule = ignorezero, ^(statusbar-hitbox)$
-
-    # Appearance - floats above, no exclusivity
-    layerrule = overlay, ^(statusbar-appearance)$
-    layerrule = nointeract, ^(statusbar-appearance)$
 
     $mod = SUPER
     # META+SPACE: Toggle cognito-omnibar (closes if open, opens if closed)

@@ -11,13 +11,9 @@
 
 # Check if the current workspace has fullscreen/maximized windows and update status bar accordingly
 if hyprctl activeworkspace | grep -q "hasfullscreen: 1" 2>/dev/null; then
-    echo "Current workspace has fullscreen - collapsing status bar"
-    eww update baseBarMode=collapsed
-    eww close dropdown_status_bar_hitbox_normal 2>/dev/null || true
+    echo "Current workspace has fullscreen - retracting status bar space"
+    _retract-status-bar-space
 else
-    echo "Current workspace is normal - showing status bar"
-    eww update baseBarMode=normal
-    # Simply try to open - eww handles duplicates of the same window id (i.e. id=dropdown_status_bar_hitbox_normal) gracefully (only keeps one open)
-    # If it fails, it means there's already one open (which is what we want)
-    eww open dropdown_status_bar_hitbox_normal 2>/dev/null || true
+    echo "Current workspace is normal - reserving status bar space"
+    _reserve-status-bar-space
 fi

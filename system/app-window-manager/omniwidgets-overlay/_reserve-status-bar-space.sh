@@ -11,4 +11,5 @@
 
 # Reserve 52px at top for status bar (adjust as needed for your panel height)
 # Use gapsout to create space at screen edges, not gapsin which affects window spacing
-hyprctl keyword workspace "1,gapsout:52"
+# DEBUG: Disabled gap manipulation - HyprPanel should handle space reservation
+# hyprctl keyword workspace "1,gapsout:52"

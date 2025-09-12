@@ -31,6 +31,7 @@ _sync-current-workspace-fullscreen-state 2>/dev/null || true
 MESG="$(date '+%H:%M')  •  placeholder"
 
 # Create menu items using printf directly (avoids Nix escaping issues)
+# -i flag enables case-insensitive matching
 choice=$(printf '%s\n' \
   "Apps" \
   "Open Terminal" \
@@ -50,11 +51,11 @@ choice=$(printf '%s\n' \
   "[Debug] Force renderer: pixman" \
   "[Debug] Force renderer: gl" \
   "[Debug] Remove renderer override" \
-  "[Debug] Show renderer status" | rofi -dmenu -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 12; }')
+  "[Debug] Show renderer status" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 12; }')
 
 case "$choice" in
   "Apps")
-    rofi -show drun -theme-str 'window { width: 20%; } listview { lines: 8; }'
+    rofi -show drun -i -theme-str 'window { width: 20%; } listview { lines: 8; }'
     ;;
   "Open Terminal")
     kitty &

@@ -10,4 +10,6 @@
 
 # Remove status bar top gap, restore to normal gaps from hyprland.conf
 # Use gapsout to remove space at screen edges, not gapsin which affects window spacing
-hyprctl keyword workspace "1,gapsout:2"
+# Apply to all workspaces (remove workspace number to affect all)
+# DEBUG: Disabled gap manipulation - HyprPanel should handle space reservation
+# hyprctl keyword workspace "gapsout:2"

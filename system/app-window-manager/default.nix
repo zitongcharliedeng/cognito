@@ -1,6 +1,5 @@
 { config, pkgs, ... }:
 
-in
 {
   imports = [ ./session/default.nix ./omnibar-mode/default.nix ./omniwidgets-overlay/default.nix ];
   

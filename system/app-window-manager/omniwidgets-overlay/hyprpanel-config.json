@@ -15,46 +15,24 @@
     },
     "background": {
       "color": "rgba(0, 0, 0, 0.8)"
+    },
+    "layouts": {
+      "*": {
+        "left": [
+          "dashboard",
+          "workspaces", 
+          "media"
+        ],
+        "middle": [
+          "windowtitle"
+        ],
+        "right": [
+          "volume",
+          "network",
+          "bluetooth",
+          "notifications"
+        ]
+      }
     }
-  },
-  "modules": {
-    "left": [
-      {
-        "name": "dashboard",
-        "settings": {}
-      },
-      {
-        "name": "workspaces",
-        "settings": {}
-      },
-      {
-        "name": "media",
-        "settings": {}
-      }
-    ],
-    "middle": [
-      {
-        "name": "windowtitle",
-        "settings": {}
-      }
-    ],
-    "right": [
-      {
-        "name": "volume",
-        "settings": {}
-      },
-      {
-        "name": "network",
-        "settings": {}
-      },
-      {
-        "name": "bluetooth",
-        "settings": {}
-      },
-      {
-        "name": "notifications",
-        "settings": {}
-      }
-    ]
   }
 }

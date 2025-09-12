@@ -40,7 +40,7 @@ Final State = isBarForcedExpanded ? "expanded" : baseBarMode
 - **No side effects**: Override never modifies base state
 
 ### Atomic State Management
-- Single source of truth: `_sync-current-workspace-fullscreen-state`
+- Single source of truth: `_sync-current-workspace-fullscreen-state` for **baseBarMode** = "collapsed" | "normal"
 - All state changes flow through atomic action scripts
 - State detection is environment-aware (workspace fullscreen detection)
 - State application is implementation-agnostic

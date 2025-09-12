@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./session/default.nix ./omnibar-mode/default.nix ./omniwidgets-overlay/default.nix ];
+  imports = [ ./session/default.nix ./omniwidgets-overlay/default.nix ];
   
   config = {
     environment.systemPackages = with pkgs; [ 

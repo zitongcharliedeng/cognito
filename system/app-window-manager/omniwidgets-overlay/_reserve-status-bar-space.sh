@@ -10,4 +10,5 @@
 # so we use Hyprland workspace rules to create artificial top gaps for the status bar
 
 # Reserve 52px at top for status bar (adjust as needed for your panel height)
-hyprctl keyword workspace "1,gapsin:2,gapsout:2 2 52 2"
+# Only add top gap, preserve existing gap settings from hyprland.conf
+hyprctl keyword workspace "1,gapsin:52"

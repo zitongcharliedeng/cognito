@@ -1,11 +1,14 @@
 # Widget Overlay State Machine Documentation
 
+
+OMNIWIDGETS = TOGGLE OMNIBAR + STATUS BAR WHICH DROPS DOWN TO REVEAL MORE INTERACTABLES WHEN THE OMNIBAR IS VISIBLE. PRIMARY ACTION INTERFACE FOR A USER, LANGAUGE BASED AND REQUIRES ONLY ONE MEMORISATION -> THE BUTTON TO OPEN THE OMNI-VIEW (WHICH OPENS THE OMNIBAR AND EXPANDS STATUS BAR)
+
 TODO clarify omnibar design.
 
 ## Overview
 Pure state machine with memory + override for managing widget overlay states without side effects.
 
-## State Machine Design
+## State Machine Design for this...
 
 ### Core States
 - **baseBarMode** = "collapsed" | "normal"

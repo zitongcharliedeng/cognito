@@ -18,7 +18,7 @@
     # Fonts required by HyprPanel for icons
     fonts.packages = with pkgs; [
       jetbrains-mono  # NerdFont used by HyprPanel for icons
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+      nerd-fonts.jetbrains-mono  # JetBrainsMono NerdFont with icons
     ];
   };
 }

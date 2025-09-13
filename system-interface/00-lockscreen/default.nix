@@ -15,7 +15,8 @@ in
       settings = {
         default_session = {
           # Tuigreet with Wayland compatibility, remember username, show time
-          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri";
+          # Launch niri via its session wrapper to ensure proper env/dbus setup
+          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri-session";
           user = "greeter"; # greetd should always run as a system greeter user
         };
       };

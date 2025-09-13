@@ -39,15 +39,23 @@ choice=$(printf '%s\n' \
   "Switch to Workspace 4" \
   "Switch to Workspace 5" \
   "Exit Hyprland" \
+  "--- System Controls ---" \
+  "XFCE Settings" \
+  "Audio Control (Pavucontrol)" \
+  "Brightness Control" \
+  "Display Manager (wlr-randr)" \
+  "Display Profiles (Kanshi)" \
+  "--- Screenshots ---" \
   "Screenshot region (grim+slurp)" \
   "Screenshot full screen (grim)" \
   "Screenshot region (hyprshot)" \
   "Screenshot window (hyprshot)" \
   "Screenshot output (hyprshot)" \
+  "--- Debug ---" \
   "[Debug] Force renderer: pixman" \
   "[Debug] Force renderer: gl" \
   "[Debug] Remove renderer override" \
-  "[Debug] Show renderer status" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 12; }')
+  "[Debug] Show renderer status" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 18; }')
 
 case "$choice" in
   "Apps")
@@ -94,6 +102,21 @@ case "$choice" in
     ;;
   "Screenshot output (hyprshot)")
     hyprshot -m output
+    ;;
+  "XFCE Settings")
+    xfce4-settings &
+    ;;
+  "Audio Control (Pavucontrol)")
+    pavucontrol &
+    ;;
+  "Brightness Control")
+    kitty -e brightnessctl --help &
+    ;;
+  "Display Manager (wlr-randr)")
+    kitty -e wlr-randr --help &
+    ;;
+  "Display Profiles (Kanshi)")
+    kitty -e kanshi --help &
     ;;
   "[Debug] Force renderer: pixman")
     hyprctl keyword renderer:pixman

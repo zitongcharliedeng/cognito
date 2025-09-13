@@ -23,7 +23,7 @@
     # By default, Mod is equal to Super when running niri on a TTY, and to Alt when running niri as a nested winit window.
     input {
         mod-key "Super"
-        mod-key-nested "Super"
+        mod-key-nested "Alt" # For use in a VM/ nested window manager.
         keyboard {
             xkb {
                 layout "us"

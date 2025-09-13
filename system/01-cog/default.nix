@@ -19,7 +19,11 @@
     };
 
     environment.etc."niri/config.kdl".text = ''
+    
+    # By default, Mod is equal to Super when running niri on a TTY, and to Alt when running niri as a nested winit window.
     input {
+        mod-key "Super"
+        mod-key-nested "Super"
         keyboard {
             xkb {
                 layout "us"
@@ -28,7 +32,7 @@
     }
 
     binds {
-        Mod { spawn "toggle-omnibar-overlay"; }
+        Mod+Space { spawn "toggle-omnibar-overlay"; }
     }
     '';
   };

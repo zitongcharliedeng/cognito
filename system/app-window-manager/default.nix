@@ -77,12 +77,9 @@
     // (No startup programs configured)
     
     // Window rules
-    window-rules {
-        // Remove borders for fullscreen windows
-        {
-            condition { app_id = ".*" }
-            fullscreen { borders = false }
-        }
+    window-rule {
+        match app-id = ".*"
+        fullscreen { borders = false }
     }
     
     // Key bindings

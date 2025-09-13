@@ -76,11 +76,11 @@
     // Start window-manager environment programs
     // (No startup programs configured)
     
-    // Window rules
-    window-rule {
-        match app-id = ".*"
-        fullscreen { borders = false }
-    }
+    // Window rules (commented out due to KDL syntax issues)
+    // window-rule {
+    //     match app-id ".*"
+    //     fullscreen { borders = false }
+    // }
     
     // Key bindings
     key-bindings {

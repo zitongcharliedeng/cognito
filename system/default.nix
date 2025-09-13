@@ -54,14 +54,5 @@ in
         };
       };
     };
-    environment.etc."xdg/kitty/kitty.conf".text = ''
-    font_family ${fontFamily}
-    bold_font ${fontFamily} Bold
-    italic_font ${fontFamily} Italic
-    bold_italic_font ${fontFamily} Bold Italic
-    '';
-    environment.etc."xdg/rofi/config.rasi".text = ''
-    configuration { font: "${fontFamily} 12"; }
-    '';
   };
 }

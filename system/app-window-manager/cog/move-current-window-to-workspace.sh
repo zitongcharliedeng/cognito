@@ -1,7 +1,6 @@
 #!/bin/sh
-# Atomic move current window to workspace with status bar update
+# Atomic move current window to workspace
 # Any action in this OS, which wants to move the currently-focused window to a different workspace, should call this script and nothing else!
-# This wrapper ensures the status bar reflects the fullscreen state after window movement
 
 if [ -z "$1" ]; then
     echo "Usage: move-current-window-to-workspace.sh <workspace_number>"
@@ -15,8 +14,3 @@ echo "Moving current window to workspace $WORKSPACE..."
 
 # Move the current window to the target workspace in Hyprland
 hyprctl dispatch movetoworkspace "$WORKSPACE"
-
-# Wait a moment for Hyprland to process the window movement
-sleep 0.1
-
-_sync-current-workspace-fullscreen-state

@@ -1,17 +1,19 @@
-{ config, pkgs, ... }:
-
+{ config, pkgs, lib, ... }:
+let
+  wallpaperCandidates = [
+    ./wallpapers/wallpaper.png
+    ./wallpapers/wallpaper.jpg
+    ./wallpapers/wallpaper.jpeg
+  ];
+  CustomWallpaper_BuiltOSPaths = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
+  Wallpaper_BuiltOSPath = if CustomWallpaper_BuiltOSPaths == [] then ./wallpapers/wallpaper.png else builtins.head CustomWallpaper_BuiltOSPaths;
+in
 {
-  imports = [ ./session/default.nix ./omniwidgets-overlay/default.nix ];
+  imports = [ ./cog/default.nix ];
   
   config = {
     environment.systemPackages = with pkgs; [ 
       gtkgreet 
-      # Atomic action scripts (preserved architecture)
-      (pkgs.writeShellScriptBin "toggle-current-window-fullscreen" (builtins.readFile ./toggle-current-window-fullscreen.sh))
-      (pkgs.writeShellScriptBin "switch-to-workspace" (builtins.readFile ./switch-to-workspace.sh))
-      (pkgs.writeShellScriptBin "close-current-window" (builtins.readFile ./close-current-window.sh))
-      (pkgs.writeShellScriptBin "move-current-window-to-workspace" (builtins.readFile ./move-current-window-to-workspace.sh))
-      (pkgs.writeShellScriptBin "_sync-current-workspace-fullscreen-state" (builtins.readFile ./_sync-current-workspace-fullscreen-state.sh))
     ];
     
     services.xserver.enable = false;  # We are using Wayland, not X11.
@@ -30,7 +32,7 @@
     services.greetd.enable = true;
     services.greetd.settings = {
       default_session = {
-        command = config.cognito.hyprland.startCmd;  # VM-safe Hyprland session launcher
+        command = "exec Hyprland -c /etc/hypr/hyprland.conf";
         user = "ulysses";
       };
       greeter = {
@@ -51,14 +53,20 @@
       WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
     };
 
+
+    # Hyprpaper wallpaper config; replace the path with your PNG if desired
+    environment.etc."hypr/hyprpaper.conf".text = ''
+    preload = ${Wallpaper_BuiltOSPath}
+    wallpaper = ,${Wallpaper_BuiltOSPath}
+    ipc = off
+    '';
+
     environment.etc."hypr/hyprland.conf".text = ''
     monitor=,preferred,auto,1  # Auto-detect primary monitor resolution
     env = XCURSOR_SIZE,24  # TODO make this custom
 
     # Start window-manager environment programs
     exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
-    exec-once = systemctl --user start hyprland-session.target
-    exec-once = _launch-ags-omniwidget-overlay
 
     input {
       kb_layout = us
@@ -84,21 +92,6 @@
     $mod = SUPER
     # META+SPACE: Toggle omnibar overlay (closes if open, opens if closed)
     bind = $mod,SPACE,exec,toggle-omnibar-overlay
-    bind = $mod,RETURN,exec,kitty
-    # META+F: Toggle current window fullscreen (atomic operation with status bar update)
-    bind = $mod,F,exec,toggle-current-window-fullscreen
-    
-    # Hyprshot screenshot commands
-    bind = $mod,PRINT,exec,hyprshot -m output
-    bind = $mod SHIFT,PRINT,exec,hyprshot -m window
-    bind = $mod CTRL,PRINT,exec,hyprshot -m region
-    
-    # Workspace switching with status bar sync
-    bind = $mod,1,exec,switch-to-workspace 1
-    bind = $mod,2,exec,switch-to-workspace 2
-    bind = $mod,3,exec,switch-to-workspace 3
-    bind = $mod,4,exec,switch-to-workspace 4
-    bind = $mod,5,exec,switch-to-workspace 5
     '';
   };
 }

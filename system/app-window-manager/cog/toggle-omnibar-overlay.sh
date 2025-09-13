@@ -17,15 +17,11 @@
 if pgrep rofi >/dev/null; then
   echo "Omnibar is open - closing it"
   pkill rofi
-  # Update status bar state after closing rofi
-  _sync-current-workspace-fullscreen-state 2>/dev/null || true
   exit 0
 fi
 
 # Omnibar is not running - open it
 echo "Omnibar is closed - opening it"
-# Update status bar state before opening rofi
-_sync-current-workspace-fullscreen-state 2>/dev/null || true
 
 # Minimal inline overlay via rofi message (keeps config tiny and robust)
 MESG="$(date '+%H:%M')  •  placeholder"

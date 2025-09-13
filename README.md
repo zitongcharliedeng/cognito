@@ -1,17 +1,7 @@
 # WARNING THE CURRENT README IS A JARBLE OF AI SLOP AND RANDOM IDEAS I HAVE... STAY TUNED ONCE I GET PAST THE EXPERIMENTATION PERIOD FOR NIXOS
 
-HOW THE FUCK DO I ORGANISE NIX PROJECTS FUCK IT WE INVENT IS AS WE GO. HOME MANAGER? NAH. I'D HASKELL!
-Say Hi to Cognito, my PROJECT:u17553z OS.
-sudo nixos-generate-config
-to create the hardware config in case the nixos didnt auto gen it for your machine in /etc/nixos
+File structure explained for this project:
 
-Great question — this goes right to the heart of the flakes vs legacy config.nix model 👌.
-
-🔑 The key idea:
-
-With flakes, /etc/nixos no longer has to be your source of truth.
-
-Your repo can live anywhere (e.g. $HOME/cognito), because you explicitly tell Nix to build from it with:
 
 ```mermaid
 flowchart LR
@@ -41,6 +31,34 @@ flowchart LR
     L:::host
     M:::host
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HOW THE FUCK DO I ORGANISE NIX PROJECTS FUCK IT WE INVENT IS AS WE GO. HOME MANAGER? NAH. I'D HASKELL!
+Say Hi to Cognito, my PROJECT:u17553z OS.
+sudo nixos-generate-config
+to create the hardware config in case the nixos didnt auto gen it for your machine in /etc/nixos
+
+Great question — this goes right to the heart of the flakes vs legacy config.nix model 👌.
+
+🔑 The key idea:
+
+With flakes, /etc/nixos no longer has to be your source of truth.
+
+Your repo can live anywhere (e.g. $HOME/cognito), because you explicitly tell Nix to build from it with:
+
 Keep in mind the _modules/ directory is just custom made pkgs that I CBA to upload to the Nix Repo to import from there.
 
 📖 How to use this model

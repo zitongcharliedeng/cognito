@@ -1,16 +1,6 @@
 { config, pkgs, lib, ... }:
-
-let
-  # Noto is the best practical base with broad symbol coverage ("no more tofu").
-  # Prefer Noto Sans Mono; Noto Mono is older and narrower in glyph coverage.
-  # Fallback will use non-mono Noto families when a glyph is missing.
-  fontFamily = "Noto Sans Mono";
-in
 {
   imports = [ 
-    ./00-lockscreen/default.nix
-    ./01-cog/default.nix
-    ./02-ito/default.nix
   ];
 
   # Export system username for other modules to use
@@ -21,37 +11,28 @@ in
   };
 
   config = {
-    services.openssh.enable = false; # Explicitly off; prevents accidental enablement by other modules. I never want to remote access via SSH, into my main OS.
-    systemd.oomd.enable = false;     # Don't auto kill big processes. Cognito is a free land.
+    programs.niri.enable = true;
 
-    i18n.defaultLocale = "en_GB.UTF-8";
-    i18n.supportedLocales = [ "en_GB.UTF-8/UTF-8" ];
-    time.timeZone = "UTC";
-
-    # Standard pattern: keep daily user as a normal account in the historical
-    # "wheel" group (name comes from early Unix privileged users). This grants
-    # sudo-based elevation for admin tasks while preserving a regular login/home
-    # experience a typical non-root "customer" user would have.
-    users.users.${config.systemUsername} = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
-      initialPassword = "password";
+    # Autostart a terminal inside the session for testing
+    environment.systemPackages = with pkgs; [ kitty ];
+    systemd.user.services.kitty-autostart = {
+      description = "Autostart kitty under Niri";
+      after = [ "niri.service" ];
+      partOf = [ "graphical-session.target" ];
+      wantedBy = [ "graphical-session.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.kitty}/bin/kitty";
+        Restart = "on-failure";
+        RestartSec = 2;
+      };
     };
-    security.sudo.enable = true; # Enable sudo for members of "wheel" when needed.
 
-    # Fonts across the system
-    fonts = {
-      packages = with pkgs; [
-        noto-fonts
-        noto-fonts-cjk-sans
-        noto-fonts-emoji
-      ];
-      fontconfig = {
-        enable = true;
-        defaultFonts = {
-          monospace = [ fontFamily ];
-          emoji = [ "Noto Color Emoji" ];
-        };
+    # Minimal greetd autologin straight into niri
+    services.greetd = {
+      enable = true;
+      settings.initial_session = {
+        command = "niri-session";
+        user = "ulysses";
       };
     };
   };

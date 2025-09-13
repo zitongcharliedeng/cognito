@@ -13,6 +13,9 @@
 # enough that even someone with amnesia could navigate the system using only
 # English language understanding.
 
+# Set Wayland environment for rofi
+export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+
 # Check if rofi is already running and close it
 if pgrep rofi >/dev/null; then
   echo "Omnibar is open - closing it"
@@ -49,11 +52,11 @@ choice=$(printf '%s\n' \
   "--- System Controls ---" \
   "System Controls" \
   "--- Screenshots ---" \
-  "Screenshots" | rofi-wayland -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 6; }')
+  "Screenshots" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 6; }')
 
 case "$choice" in
   "Apps")
-    rofi-wayland -show drun -i -theme-str 'window { width: 20%; } listview { lines: 8; }'
+    rofi -show drun -i -theme-str 'window { width: 20%; } listview { lines: 8; }'
     ;;
   "Open Terminal")
     kitty &
@@ -64,7 +67,7 @@ case "$choice" in
       "Close Active Window" \
       "Toggle Fullscreen on Active Window" \
       "Switch to Workspace" \
-      "Move Window to Workspace" | rofi-wayland -dmenu -i -p "Window Manipulation" -theme-str 'window { width: 20%; } listview { lines: 4; }')
+      "Move Window to Workspace" | rofi -dmenu -i -p "Window Manipulation" -theme-str 'window { width: 20%; } listview { lines: 4; }')
     
     case "$window_choice" in
       "Close Active Window")
@@ -75,14 +78,14 @@ case "$choice" in
         ;;
       "Switch to Workspace")
         # Show input dialog for workspace number
-        workspace_num=$(rofi-wayland -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
+        workspace_num=$(rofi -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
         if [ -n "$workspace_num" ] && [ "$workspace_num" -eq "$workspace_num" ] 2>/dev/null; then
           switch-to-workspace "$workspace_num"
         fi
         ;;
       "Move Window to Workspace")
         # Show input dialog for workspace number
-        workspace_num=$(rofi-wayland -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
+        workspace_num=$(rofi -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
         if [ -n "$workspace_num" ] && [ "$workspace_num" -eq "$workspace_num" ] 2>/dev/null; then
           move-current-window-to-workspace "$workspace_num"
         fi
@@ -96,7 +99,7 @@ case "$choice" in
       "Audio Control (Pavucontrol)" \
       "Brightness Control" \
       "Display Manager (wlr-randr)" \
-      "Display Profiles (Kanshi)" | rofi-wayland -dmenu -i -p "System Controls" -theme-str 'window { width: 20%; } listview { lines: 6; }')
+      "Display Profiles (Kanshi)" | rofi -dmenu -i -p "System Controls" -theme-str 'window { width: 20%; } listview { lines: 6; }')
     
     case "$system_choice" in
       "XFCE Settings")
@@ -122,7 +125,7 @@ case "$choice" in
       "Screenshot region (grim+slurp)" \
       "Screenshot full screen (grim)" \
       "Screenshot window (grim+slurp)" \
-      "Screenshot output (grim)" | rofi-wayland -dmenu -i -p "Screenshots" -theme-str 'window { width: 20%; } listview { lines: 4; }')
+      "Screenshot output (grim)" | rofi -dmenu -i -p "Screenshots" -theme-str 'window { width: 20%; } listview { lines: 4; }')
     
     case "$screenshot_choice" in
       "Screenshot region (grim+slurp)")

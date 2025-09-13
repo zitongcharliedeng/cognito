@@ -17,41 +17,16 @@
     };
 
     environment.etc."niri/config.kdl".text = ''
-    // Niri configuration
     input {
-        xkb {
-            layout "us"
+        keyboard {
+            xkb {
+                layout "us"
+            }
         }
     }
-    
-    // Set modifier key to Super for window resizing and scrolling
-    modifier "Super"
-    
-    cursor {
-        xcursor_theme "default"
-        xcursor_size 24
-    }
-    
-    outputs {
-        // Auto-detect primary monitor resolution
-        "*" {
-            scale 1.0
-        }
-    }
-    
-    // Start window-manager environment programs
-    // (No startup programs configured)
-    
-    // Window rules (commented out due to KDL syntax issues)
-    // window-rule {
-    //     match app-id ".*"
-    //     fullscreen { borders = false }
-    // }
-    
-    // Key bindings
+
     binds {
-        // SUPER on release: Toggle omnibar overlay (with workspace overview)
-        Super { spawn "toggle-omnibar-overlay"; }
+        Mod { spawn "toggle-omnibar-overlay"; }
     }
     '';
   };

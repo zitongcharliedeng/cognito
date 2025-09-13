@@ -19,6 +19,10 @@
       enable32Bit = true;
     };
 
+    # Ensure KMS driver loads early in VMs (harmless if unused)
+    boot.initrd.kernelModules = [ "virtio_gpu" ];
+    boot.kernelModules = [ "virtio_gpu" ];
+
     # Autostart a terminal inside the session for testing
     systemd.user.services.kitty-autostart = {
       description = "Autostart kitty under Niri";

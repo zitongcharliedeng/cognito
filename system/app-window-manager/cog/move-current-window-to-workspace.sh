@@ -12,5 +12,5 @@ WORKSPACE="$1"
 
 echo "Moving current window to workspace $WORKSPACE..."
 
-# Move the current window to the target workspace in Hyprland
-hyprctl dispatch movetoworkspace "$WORKSPACE"
+# Move the current window to the target workspace in Niri
+niri action move-window-to-workspace "$WORKSPACE"

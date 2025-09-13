@@ -7,7 +7,7 @@
   config = {
     environment.systemPackages = with pkgs; [
       # 🖥️ XFCE Settings Manager
-      xfce4-settings
+      xfce.xfce4-settings
       # → General "control center" (keyboard, mouse, themes, power, accessibility).
       # → Works fine under Wayland EXCEPT the Display panel (because it uses XRandR).
 

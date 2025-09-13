@@ -12,5 +12,5 @@ WORKSPACE="$1"
 
 echo "Switching to workspace $WORKSPACE..."
 
-# Switch to the workspace in Hyprland
-hyprctl dispatch workspace "$WORKSPACE"
+# Switch to the workspace in Niri
+niri action focus-workspace "$WORKSPACE"

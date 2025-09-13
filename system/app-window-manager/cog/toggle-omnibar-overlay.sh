@@ -17,11 +17,24 @@
 if pgrep rofi >/dev/null; then
   echo "Omnibar is open - closing it"
   pkill rofi
+  # Also close workspace overview when closing omnibar
+  niri action set-workspace-overview false
   exit 0
 fi
 
 # Omnibar is not running - open it
 echo "Omnibar is closed - opening it"
+# Open workspace overview when opening omnibar
+niri action set-workspace-overview true
+
+# Start a background process to monitor rofi and close workspace overview when rofi exits
+(
+  while pgrep rofi >/dev/null; do
+    sleep 0.1
+  done
+  # Rofi has exited, close workspace overview
+  niri action set-workspace-overview false
+) &
 
 # Minimal inline overlay via rofi message (keeps config tiny and robust)
 MESG="$(date '+%H:%M')  •  placeholder"
@@ -38,24 +51,19 @@ choice=$(printf '%s\n' \
   "Switch to Workspace 3" \
   "Switch to Workspace 4" \
   "Switch to Workspace 5" \
-  "Exit Hyprland" \
+  "Exit Niri" \
   "--- System Controls ---" \
-  "XFCE Settings" \
-  "Audio Control (Pavucontrol)" \
-  "Brightness Control" \
-  "Display Manager (wlr-randr)" \
-  "Display Profiles (Kanshi)" \
+  "System Controls" \
   "--- Screenshots ---" \
   "Screenshot region (grim+slurp)" \
   "Screenshot full screen (grim)" \
-  "Screenshot region (hyprshot)" \
-  "Screenshot window (hyprshot)" \
-  "Screenshot output (hyprshot)" \
+  "Screenshot window (grim+slurp)" \
+  "Screenshot output (grim)" \
   "--- Debug ---" \
-  "[Debug] Force renderer: pixman" \
-  "[Debug] Force renderer: gl" \
-  "[Debug] Remove renderer override" \
-  "[Debug] Show renderer status" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 18; }')
+  "[Debug] Show Niri status" \
+  "[Debug] Reload Niri config" \
+  "[Debug] Show window info" \
+  "[Debug] Show workspace info" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 14; }')
 
 case "$choice" in
   "Apps")
@@ -85,8 +93,8 @@ case "$choice" in
   "Switch to Workspace 5")
     switch-to-workspace 5
     ;;
-  "Exit Hyprland")
-    hyprctl dispatch exit
+  "Exit Niri")
+    niri action quit
     ;;
   "Screenshot region (grim+slurp)")
     grim -g "$(slurp)" ~/screenshot-$(date +%Y%m%d-%H%M%S).png
@@ -94,41 +102,50 @@ case "$choice" in
   "Screenshot full screen (grim)")
     grim ~/screenshot-$(date +%Y%m%d-%H%M%S).png
     ;;
-  "Screenshot region (hyprshot)")
-    hyprshot -m region
+  "Screenshot window (grim+slurp)")
+    grim -g "$(slurp -o)" ~/screenshot-$(date +%Y%m%d-%H%M%S).png
     ;;
-  "Screenshot window (hyprshot)")
-    hyprshot -m window
+  "Screenshot output (grim)")
+    grim ~/screenshot-$(date +%Y%m%d-%H%M%S).png
     ;;
-  "Screenshot output (hyprshot)")
-    hyprshot -m output
+  "System Controls")
+    # Show system control applications in a rofi menu
+    system_choice=$(printf '%s\n' \
+      "XFCE Settings" \
+      "Audio Control (Pavucontrol)" \
+      "Brightness Control" \
+      "Display Manager (wlr-randr)" \
+      "Display Profiles (Kanshi)" | rofi -dmenu -i -p "System Controls" -theme-str 'window { width: 20%; } listview { lines: 6; }')
+    
+    case "$system_choice" in
+      "XFCE Settings")
+        xfce4-settings &
+        ;;
+      "Audio Control (Pavucontrol)")
+        pavucontrol &
+        ;;
+      "Brightness Control")
+        kitty -e brightnessctl --help &
+        ;;
+      "Display Manager (wlr-randr)")
+        kitty -e wlr-randr --help &
+        ;;
+      "Display Profiles (Kanshi)")
+        kitty -e kanshi --help &
+        ;;
+    esac
     ;;
-  "XFCE Settings")
-    xfce4-settings &
+  "[Debug] Show Niri status")
+    niri action debug-damage
     ;;
-  "Audio Control (Pavucontrol)")
-    pavucontrol &
+  "[Debug] Reload Niri config")
+    niri action reload-config
     ;;
-  "Brightness Control")
-    kitty -e brightnessctl --help &
+  "[Debug] Show window info")
+    niri action debug-window-info
     ;;
-  "Display Manager (wlr-randr)")
-    kitty -e wlr-randr --help &
-    ;;
-  "Display Profiles (Kanshi)")
-    kitty -e kanshi --help &
-    ;;
-  "[Debug] Force renderer: pixman")
-    hyprctl keyword renderer:pixman
-    ;;
-  "[Debug] Force renderer: gl")
-    hyprctl keyword renderer:gl
-    ;;
-  "[Debug] Remove renderer override")
-    hyprctl keyword renderer:auto
-    ;;
-  "[Debug] Show renderer status")
-    hyprctl keyword renderer:auto
+  "[Debug] Show workspace info")
+    niri action debug-workspace-info
     ;;
   *[0-9]*)
     NUM=$(echo "$choice" | grep -o '[0-9]\+')

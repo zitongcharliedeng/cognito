@@ -4,5 +4,5 @@
 
 echo "Toggling fullscreen..."
 
-# Command to toggle fullscreen in Hyprland
-hyprctl dispatch fullscreen
+# Command to toggle fullscreen in Niri
+niri action toggle-fullscreen

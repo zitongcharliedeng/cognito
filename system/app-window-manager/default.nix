@@ -1,13 +1,4 @@
 { config, pkgs, lib, ... }:
-let
-  wallpaperCandidates = [
-    ./wallpaper.png
-    ./wallpaper.jpg
-    ./wallpaper.jpeg
-  ];
-  CustomWallpaper_BuiltOSPaths = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
-  Wallpaper_BuiltOSPath = if CustomWallpaper_BuiltOSPaths == [] then ./wallpaper.png else builtins.head CustomWallpaper_BuiltOSPaths;
-in
 {
   imports = [ ./cog/default.nix ];
   
@@ -22,8 +13,8 @@ in
       enable = true;
       enable32Bit = true;
     };
-    programs.hyprland.enable = true;  # Wayland isn't a global toggle...
-    # ... Wayland implicitly enabled by setting i.e. Hyprland as my window manager after signing in.
+    programs.niri.enable = true;  # Wayland isn't a global toggle...
+    # ... Wayland implicitly enabled by setting i.e. Niri as my window manager after signing in.
     environment.sessionVariables = {
         NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
     };
@@ -32,7 +23,7 @@ in
     services.greetd.enable = true;
     services.greetd.settings = {
       default_session = {
-        command = "Hyprland -c /etc/hypr/hyprland.conf";
+        command = "niri";
         user = "ulysses";
       };
       greeter = {
@@ -54,44 +45,64 @@ in
     };
 
 
-    # Hyprpaper wallpaper config; replace the path with your PNG if desired
-    environment.etc."hypr/hyprpaper.conf".text = ''
-    preload = ${Wallpaper_BuiltOSPath}
-    wallpaper = ,${Wallpaper_BuiltOSPath}
-    ipc = off
-    '';
 
-    environment.etc."hypr/hyprland.conf".text = ''
-    monitor=,preferred,auto,1  # Auto-detect primary monitor resolution
-    env = XCURSOR_SIZE,24  # TODO make this custom
-
-    # Start window-manager environment programs
-    exec-once = hyprpaper -c /etc/hypr/hyprpaper.conf &
-
+    environment.etc."niri/config.kdl".text = ''
+    // Niri configuration
     input {
-      kb_layout = us
-    }
-    general {
-      gaps_in = 2 # Hyprland Default is 5 ಠ_ಠ
-      gaps_out = 2 # Hyprland Default is 20 ಠ_ಠ
-      border_size = 2 # Hyprland Default is 2 ಠ_ಠ
-      # Hyprland does not guarantee the same default colors in new releases.
-      col.active_border = rgba(ffffffff) # White
-      col.inactive_border = rgba(000000ff) # Black
+        xkb {
+            layout "us"
+        }
     }
     
-    # When any app is fullscreen on a workspace, remove gaps and borders
-    workspace = f[1], gapsin:0, gapsout:0  # f[1] targets workspaces with maximized windows
-    ## NOTE: f[0] (fullscreen) doesn't work, but f[1] (maximized) does work
-    ## HYPOTHESIS: Some apps or Hyprland versions may interpret fullscreen states as maximized
-    ## instead of true fullscreen, or there may be Wayland protocol differences in how
-    ## fullscreen state is detected. f[1] works because maximized windows are more reliably
-    ## detected by the workspace selector. See: https://wiki.hyprland.org/Configuring/Workspace-Rules/
-    windowrulev2 = noborder,fullscreen:1
-
-    $mod = SUPER
-    # META+SPACE: Toggle omnibar overlay (closes if open, opens if closed)
-    bind = $mod,SPACE,exec,toggle-omnibar-overlay
+    // Set modifier key to Super for window resizing and scrolling
+    modifier "Mod4"
+    
+    cursor {
+        xcursor_theme "default"
+        xcursor_size 24
+    }
+    
+    outputs {
+        // Auto-detect primary monitor resolution
+        "*" {
+            scale 1.0
+        }
+    }
+    
+    // Start window-manager environment programs
+    spawn-at-startup [
+    ]
+    
+    // Window rules
+    window-rules [
+        // Remove borders for fullscreen windows
+        {
+            condition { app_id = ".*" }
+            fullscreen { borders = false }
+        }
+    ]
+    
+    // Key bindings
+    key-bindings {
+        // SUPER on release: Toggle omnibar overlay (with workspace overview)
+        Mod4 { spawn "toggle-omnibar-overlay" }
+        // SUPER+O: Toggle workspace overview independently
+        Mod4+O { spawn "niri action toggle-workspace-overview" }
+        // META+RETURN: Open terminal
+        Mod4+Return { spawn "kitty" }
+        // META+F: Toggle fullscreen
+        Mod4+F { focus-window-or-workspace 1 }
+        // META+1-5: Switch workspaces
+        Mod4+1 { focus-workspace 1 }
+        Mod4+2 { focus-workspace 2 }
+        Mod4+3 { focus-workspace 3 }
+        Mod4+4 { focus-workspace 4 }
+        Mod4+5 { focus-workspace 5 }
+        // Screenshot bindings
+        Mod4+Print { spawn "grim ~/screenshot-$(date +%Y%m%d-%H%M%S).png" }
+        Mod4+Shift+Print { spawn "grim -g \"$(slurp -o)\" ~/screenshot-$(date +%Y%m%d-%H%M%S).png" }
+        Mod4+Ctrl+Print { spawn "grim -g \"$(slurp)\" ~/screenshot-$(date +%Y%m%d-%H%M%S).png" }
+    }
     '';
   };
 }

@@ -5,4 +5,4 @@
 echo "Toggling fullscreen..."
 
 # Command to toggle fullscreen in Niri
-niri action toggle-fullscreen
+niri msg action toggle-fullscreen

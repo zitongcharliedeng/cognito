@@ -5,4 +5,4 @@
 echo "Closing current window..."
 
 # Close the current window in Niri
-niri action close-window
+niri msg action close-window

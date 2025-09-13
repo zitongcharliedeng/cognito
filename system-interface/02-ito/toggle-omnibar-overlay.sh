@@ -18,14 +18,14 @@ if pgrep rofi >/dev/null; then
   echo "Omnibar is open - closing it"
   pkill rofi
   # Also close workspace overview when closing omnibar
-  niri action set-workspace-overview false
+  niri msg action set-workspace-overview false
   exit 0
 fi
 
 # Omnibar is not running - open it
 echo "Omnibar is closed - opening it"
 # Open workspace overview when opening omnibar
-niri action set-workspace-overview true
+niri msg action set-workspace-overview true
 
 # Start a background process to monitor rofi and close workspace overview when rofi exits
 (
@@ -33,7 +33,7 @@ niri action set-workspace-overview true
     sleep 0.1
   done
   # Rofi has exited, close workspace overview
-  niri action set-workspace-overview false
+  niri msg action set-workspace-overview false
 ) &
 
 # Minimal inline overlay via rofi message (keeps config tiny and robust)

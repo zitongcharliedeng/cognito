@@ -32,7 +32,7 @@ in
     services.greetd.enable = true;
     services.greetd.settings = {
       default_session = {
-        command = "exec Hyprland -c /etc/hypr/hyprland.conf";
+        command = "Hyprland -c /etc/hypr/hyprland.conf";
         user = "ulysses";
       };
       greeter = {

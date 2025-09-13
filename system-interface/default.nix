@@ -44,7 +44,6 @@
     # Minimal greetd autologin straight into niri via wrapper
     services.greetd = {
       enable = true;
-      vt = 1;
       settings.initial_session = {
         command = "niri-autologin";
         user = "ulysses";

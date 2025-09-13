@@ -20,6 +20,8 @@
       WLR_NO_HARDWARE_CURSORS = "1";
       # Ensure wlroots/Niri find matching GBM backends from the same nixpkgs mesa
       GBM_BACKENDS_PATH = "${pkgs.mesa.drivers}/lib/gbm";
+      # Force software renderer temporarily to bypass EGL/DRM issues in VM
+      WLR_RENDERER = "pixman";
     };
 
     # Do not ship a custom niri config; rely on module defaults while debugging

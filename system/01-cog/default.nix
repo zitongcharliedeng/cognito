@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [ ];
+  imports = [ 
+    ./apps/default.nix
+  ];
   
   config = {
     services.xserver.enable = false;  # We are using Wayland, not X11.

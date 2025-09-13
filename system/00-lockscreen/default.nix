@@ -1,5 +1,8 @@
 { config, pkgs, lib, ... }:
 
+let
+  systemUsername = config.systemUsername;
+in
 {
   config = {
     environment.systemPackages = with pkgs; [ 
@@ -11,7 +14,7 @@
     services.greetd.settings = {
       default_session = {
         command = "niri";
-        user = "ulysses";
+        user = systemUsername;
       };
       greeter = {
         command = "${pkgs.gtkgreet}/bin/gtkgreet -l";

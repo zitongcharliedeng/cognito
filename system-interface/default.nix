@@ -40,6 +40,7 @@
         set -eu
         export WLR_RENDERER=pixman
         export WLR_NO_HARDWARE_CURSORS=1
+        export WLR_DRM_DEVICES=/dev/dri/card0
         export GBM_BACKENDS_PATH=${pkgs.mesa}/lib/gbm
         export LIBGL_DRIVERS_PATH=${pkgs.mesa}/lib/dri
         export __EGL_VENDOR_LIBRARY_DIRS=${pkgs.mesa}/share/glvnd/egl_vendor.d

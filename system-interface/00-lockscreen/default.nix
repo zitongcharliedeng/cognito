@@ -19,17 +19,17 @@ in
           user = "greeter";
         };
       };
-      # Set environment variables for Wayland
-      environment = {
-        WAYLAND_DISPLAY = "wayland-0";
-        XDG_SESSION_TYPE = "wayland";
-      };
     };
 
     # Configure gtkgreet to start niri after login
     environment.etc."greetd/environments".text = ''
       niri
     '';
+
+    # Set Wayland environment variables for the system
+    environment.variables = {
+      XDG_SESSION_TYPE = "wayland";
+    };
 
     # Create greeter user for greetd
     users.users.greeter = {

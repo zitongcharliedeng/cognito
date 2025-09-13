@@ -16,6 +16,12 @@
 # Set Wayland environment for rofi
 export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
 
+# Check if niri is ready (NIRI_SOCKET is set)
+if [ -z "$NIRI_SOCKET" ]; then
+  echo "Niri is not ready, cannot open omnibar"
+  exit 1
+fi
+
 # Check if rofi is already running and close it
 if pgrep rofi >/dev/null; then
   echo "Omnibar is open - closing it"

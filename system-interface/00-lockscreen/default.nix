@@ -28,6 +28,7 @@ in
 
     # Set Wayland environment variables for the system
     environment.variables = {
+      WAYLAND_DISPLAY = "wayland-0";
       XDG_SESSION_TYPE = "wayland";
     };
 

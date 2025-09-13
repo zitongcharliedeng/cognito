@@ -10,13 +10,9 @@ in
       cage
     ];
 
-    # Sign-in Screen.
+    # Sign-in Screen default fixed to vt/tty1.
     services.greetd = {
       enable = true;
-
-      # Run on TTY1
-      vt = 1;
-
       settings = {
         default_session = {
           # Launch gtkgreet inside cage (minimal Wayland compositor)

@@ -23,22 +23,16 @@
     input {
         mod-key "Super"
         mod-key-nested "Super" // For use in a VM/ nested window manager. Not convenient to have as the same key as for the wrapping window manager.
-        keyboard {
-            xkb {
-                layout "us"
-            }
-        }
+        // keyboard {
+        //     xkb {
+        //         layout "us"  //  This idea should be in the hardware-configuration.nix file.
+        //     }
+        // }
     }
 
     binds {
         Mod+Space { spawn "toggle-omnibar-overlay"; }
         Mod+Return { spawn "kitty"; }
-    }
-
-    // Basic layout configuration
-    layout {
-        default-column-width 0.5
-        default-column-count 3
     }
     '';
   };

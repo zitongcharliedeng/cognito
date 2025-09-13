@@ -1,9 +1,9 @@
 { config, pkgs, lib, ... }:
 {
   imports = [ 
-    ./Nito/default.nix 
-    ./Nito/actions/window-manipulation/default.nix 
-    ./Nito/actions/screenshotting/default.nix 
+    ./02-ito/default.nix 
+    ./02-ito/actions/window-manipulation/default.nix 
+    ./02-ito/actions/screenshotting/default.nix 
   ];
   
   config = {

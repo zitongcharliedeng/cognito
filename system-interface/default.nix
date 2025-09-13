@@ -13,6 +13,12 @@
   config = {
     programs.niri.enable = true;
 
+    # Ensure Mesa/DRM stack and GBM are available for KMS (required on TTY)
+    hardware.graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+
     # Autostart a terminal inside the session for testing
     systemd.user.services.kitty-autostart = {
       description = "Autostart kitty under Niri";

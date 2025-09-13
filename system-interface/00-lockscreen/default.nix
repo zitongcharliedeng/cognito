@@ -7,11 +7,14 @@ in
   config = {
     environment.systemPackages = with pkgs; [ 
       tuigreet
-      # Minimal wrapper: allow software renderer for wlroots to validate VM renderer path
-      (pkgs.writeShellScriptBin "niri-session-soft" ''
+      # Minimal wrapper: allow software renderer and capture logs for TTY2 debugging
+      (pkgs.writeShellScriptBin "niri-session-soft-logged" ''
         #!/bin/sh
+        set -eu
         export WLR_RENDERER_ALLOW_SOFTWARE=1
-        exec niri-session
+        mkdir -p "$HOME/.local/share"
+        # Redirect stdout/stderr to a user log for inspection from TTY2
+        exec niri-session >> "$HOME/.local/share/niri-session.log" 2>&1
       '')
     ];
 
@@ -22,8 +25,8 @@ in
         default_session = {
           # Tuigreet with Wayland compatibility, remember username, show time
           # Launch niri via its session wrapper to ensure proper env/dbus setup
-          # Temporarily use software renderer wrapper for confirmation
-          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri-session-soft";
+          # Temporarily use software renderer wrapper with logging for confirmation
+          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri-session-soft-logged";
           user = "greeter"; # greetd should always run as a system greeter user
         };
       };

@@ -22,20 +22,6 @@
       GBM_BACKENDS_PATH = "${pkgs.mesa.drivers}/lib/gbm";
     };
 
-    # Minimal niri config to ensure interactive keys on blank session
-    environment.etc."niri/config.kdl".text = ''
-    input {
-        mod-key "Super"
-        keyboard { xkb { layout "us" } }
-    }
-
-    binds {
-        Mod+Return { spawn "kitty"; }
-        Mod+Q { quit; }
-    }
-    
-    # Autostart a visible client so we can see/detect draw/input even without binds
-    spawn-at-startup "kitty";
-    '';
+    # Do not ship a custom niri config; rely on module defaults while debugging
   };
 }

@@ -1,10 +1,6 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [ 
-    ./02-ito/default.nix 
-    ./02-ito/actions/window-manipulation/default.nix 
-    ./02-ito/actions/screenshotting/default.nix 
-  ];
+  imports = [ ];
   
   config = {
     services.xserver.enable = false;  # We are using Wayland, not X11.
@@ -19,8 +15,6 @@
         NIXOS_OZONE_WL = "1";  # Tells Chromium-based apps to use Wayland.
         WLR_NO_HARDWARE_CURSORS = "1";  # Fixes invisible/glitchy cursors i.e. in screenshots, etc.
     };
-
-
 
     environment.etc."niri/config.kdl".text = ''
     // Niri configuration

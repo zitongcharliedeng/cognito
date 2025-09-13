@@ -10,7 +10,10 @@ in
 {
   imports = [ 
     ./00-lockscreen/default.nix
-    ./app-window-manager/default.nix
+    ./01-cog/default.nix
+    ./02-ito/default.nix
+    ./02-ito/actions/window-manipulation/default.nix
+    ./02-ito/actions/screenshotting/default.nix
     ./apps/default.nix
   ];
 

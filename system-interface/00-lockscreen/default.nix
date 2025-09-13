@@ -13,14 +13,15 @@ in
     services.greetd.enable = true;
     services.greetd.settings = {
       default_session = {
-        command = "niri";
-        user = systemUsername;
-      };
-      greeter = {
         command = "${pkgs.gtkgreet}/bin/gtkgreet -l";
         user = "greeter";
       };
     };
+
+    # Configure gtkgreet to start niri after login
+    environment.etc."greetd/environments".text = ''
+      niri
+    '';
     
     # Create greeter user for greetd
     users.users.greeter = {

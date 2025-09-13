@@ -6,8 +6,7 @@ in
 {
   config = {
     environment.systemPackages = with pkgs; [ 
-      gtkgreet 
-      cage
+      tuigreet
     ];
 
     # Sign-in Screen default fixed to vt/tty1.
@@ -15,22 +14,17 @@ in
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.cage}/bin/cage -s -- ${pkgs.gtkgreet}/bin/gtkgreet -l -u ${systemUsername}";
-          user = "greeter";
+          # Tuigreet with Wayland compatibility, remember username, show time
+          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri";
+          user = "greeter"; # greetd should always run as a system greeter user
         };
       };
     };
 
-    # Configure gtkgreet to start niri after login
+    # Configure tuigreet to list available sessions
     environment.etc."greetd/environments".text = ''
       niri
     '';
-
-    # Set Wayland environment variables for the system
-    environment.variables = {
-      WAYLAND_DISPLAY = "wayland-0";
-      XDG_SESSION_TYPE = "wayland";
-    };
 
     # Create greeter user for greetd
     users.users.greeter = {

@@ -15,9 +15,14 @@ in
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.cage}/bin/cage -s -- ${pkgs.gtkgreet}/bin/gtkgreet -l";
-          user = systemUsername;
+          command = "${pkgs.cage}/bin/cage -s -- ${pkgs.gtkgreet}/bin/gtkgreet -l -u ${systemUsername}";
+          user = "greeter";
         };
+      };
+      # Set environment variables for Wayland
+      environment = {
+        WAYLAND_DISPLAY = "wayland-0";
+        XDG_SESSION_TYPE = "wayland";
       };
     };
 

@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./actions/default.nix
+  ];
+
   config = {
     environment.systemPackages = with pkgs; [
       # Omnibar overlay script

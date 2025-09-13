@@ -11,8 +11,6 @@ in
     ./00-lockscreen/default.nix
     ./01-cog/default.nix
     ./02-ito/default.nix
-    ./02-ito/actions/window-manipulation/default.nix
-    ./02-ito/actions/screenshotting/default.nix
   ];
 
   # Export system username for other modules to use

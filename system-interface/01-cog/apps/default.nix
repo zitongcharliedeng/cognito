@@ -10,5 +10,8 @@
     wl-clipboard grim slurp
     kitty xfce.thunar firefox gnome-control-center libnotify alsa-utils papirus-icon-theme
     git htop
+    # Additional packages for omnibar functionality
+    procps # for pgrep/pkill commands
+    coreutils # for basic shell utilities
   ];
 }

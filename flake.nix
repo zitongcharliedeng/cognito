@@ -14,7 +14,7 @@
       mkHost = name: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./system/default.nix
+          ./system-interface/default.nix
           ./system-hardware-shims/${name}/configuration.nix
           # Pass flake inputs down so any descendant modules can use them
           {

@@ -1,6 +1,10 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [ ./cog/default.nix ];
+  imports = [ 
+    ./Nito/default.nix 
+    ./Nito/actions/window-manipulation/default.nix 
+    ./Nito/actions/screenshotting/default.nix 
+  ];
   
   config = {
     environment.systemPackages = with pkgs; [ 
@@ -70,8 +74,7 @@
     }
     
     // Start window-manager environment programs
-    spawn-at-startup [
-    ]
+    // (No startup programs configured)
     
     // Window rules
     window-rules [

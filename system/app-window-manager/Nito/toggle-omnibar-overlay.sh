@@ -44,19 +44,12 @@ MESG="$(date '+%H:%M')  •  placeholder"
 choice=$(printf '%s\n' \
   "Apps" \
   "Open Terminal" \
-  "Close Active Window" \
-  "Toggle Fullscreen on Active Window" \
-  "Switch to Workspace 1" \
-  "Switch to Workspace 2" \
-  "Switch to Workspace 3" \
-  "Switch to Workspace 4" \
-  "Switch to Workspace 5" \
-  "--- System Controls ---" \
-  "System Controls" \
   "--- Window Manipulation ---" \
   "Window Manipulation" \
+  "--- System Controls ---" \
+  "System Controls" \
   "--- Screenshots ---" \
-  "Screenshots" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 8; }')
+  "Screenshots" | rofi -dmenu -i -p "$MESG" -theme-str 'window { width: 20%; } listview { lines: 6; }')
 
 case "$choice" in
   "Apps")
@@ -65,26 +58,36 @@ case "$choice" in
   "Open Terminal")
     kitty &
     ;;
-  "Close Active Window")
-    close-current-window
-    ;;
-  "Toggle Fullscreen on Active Window")
-    toggle-current-window-fullscreen
-    ;;
-  "Switch to Workspace 1")
-    switch-to-workspace 1
-    ;;
-  "Switch to Workspace 2")
-    switch-to-workspace 2
-    ;;
-  "Switch to Workspace 3")
-    switch-to-workspace 3
-    ;;
-  "Switch to Workspace 4")
-    switch-to-workspace 4
-    ;;
-  "Switch to Workspace 5")
-    switch-to-workspace 5
+  "Window Manipulation")
+    # Show window manipulation commands in a rofi menu
+    window_choice=$(printf '%s\n' \
+      "Close Active Window" \
+      "Toggle Fullscreen on Active Window" \
+      "Switch to Workspace" \
+      "Move Window to Workspace" | rofi -dmenu -i -p "Window Manipulation" -theme-str 'window { width: 20%; } listview { lines: 4; }')
+    
+    case "$window_choice" in
+      "Close Active Window")
+        close-current-window
+        ;;
+      "Toggle Fullscreen on Active Window")
+        toggle-current-window-fullscreen
+        ;;
+      "Switch to Workspace")
+        # Show input dialog for workspace number
+        workspace_num=$(rofi -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
+        if [ -n "$workspace_num" ] && [ "$workspace_num" -eq "$workspace_num" ] 2>/dev/null; then
+          switch-to-workspace "$workspace_num"
+        fi
+        ;;
+      "Move Window to Workspace")
+        # Show input dialog for workspace number
+        workspace_num=$(rofi -dmenu -i -p "Enter workspace number:" -theme-str 'window { width: 20%; }')
+        if [ -n "$workspace_num" ] && [ "$workspace_num" -eq "$workspace_num" ] 2>/dev/null; then
+          move-current-window-to-workspace "$workspace_num"
+        fi
+        ;;
+    esac
     ;;
   "System Controls")
     # Show system control applications in a rofi menu
@@ -113,41 +116,6 @@ case "$choice" in
         ;;
     esac
     ;;
-  "Window Manipulation")
-    # Show window manipulation commands in a rofi menu
-    window_choice=$(printf '%s\n' \
-      "Close Active Window" \
-      "Toggle Fullscreen on Active Window" \
-      "Switch to Workspace 1" \
-      "Switch to Workspace 2" \
-      "Switch to Workspace 3" \
-      "Switch to Workspace 4" \
-      "Switch to Workspace 5" | rofi -dmenu -i -p "Window Manipulation" -theme-str 'window { width: 20%; } listview { lines: 7; }')
-    
-    case "$window_choice" in
-      "Close Active Window")
-        close-current-window
-        ;;
-      "Toggle Fullscreen on Active Window")
-        toggle-current-window-fullscreen
-        ;;
-      "Switch to Workspace 1")
-        switch-to-workspace 1
-        ;;
-      "Switch to Workspace 2")
-        switch-to-workspace 2
-        ;;
-      "Switch to Workspace 3")
-        switch-to-workspace 3
-        ;;
-      "Switch to Workspace 4")
-        switch-to-workspace 4
-        ;;
-      "Switch to Workspace 5")
-        switch-to-workspace 5
-        ;;
-    esac
-    ;;
   "Screenshots")
     # Show screenshot commands in a rofi menu
     screenshot_choice=$(printf '%s\n' \
@@ -170,11 +138,5 @@ case "$choice" in
         grim ~/screenshot-$(date +%Y%m%d-%H%M%S).png
         ;;
     esac
-    ;;
-  *[0-9]*)
-    NUM=$(echo "$choice" | grep -o '[0-9]\+')
-    if [ -n "$NUM" ]; then
-      move-current-window-to-workspace "$NUM"
-    fi
     ;;
 esac

@@ -25,7 +25,7 @@ fi
 # Omnibar is not running - open it
 echo "Omnibar is closed - opening it"
 # Open workspace overview when opening omnibar
-niri msg action toggle-workspace-overview
+niri msg action toggle-overview
 
 # Start a background process to monitor rofi and close workspace overview when rofi exits
 (

@@ -35,5 +35,12 @@
         user = "ulysses";
       };
     };
+
+    # Ensure the autologin user exists
+    users.users.${config.systemUsername} = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
+      initialPassword = "password";
+    };
   };
 }

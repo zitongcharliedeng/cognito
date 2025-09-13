@@ -19,10 +19,10 @@
     };
 
     environment.etc."niri/config.kdl".text = ''
-    # By default, Mod is equal to Super when running niri on a TTY, and to Alt when running niri as a nested winit window.
+    // By default, Mod is equal to Super when running niri on a TTY, and to Alt when running niri as a nested winit window.
     input {
         mod-key "Super"
-        mod-key-nested "Super" # For use in a VM/ nested window manager. Not convinient to have as the same key as for the wrapping window manager.
+        mod-key-nested "Super" // For use in a VM/ nested window manager. Not convenient to have as the same key as for the wrapping window manager.
         keyboard {
             xkb {
                 layout "us"
@@ -33,6 +33,12 @@
     binds {
         Mod+Space { spawn "toggle-omnibar-overlay"; }
         Mod+Return { spawn "kitty"; }
+    }
+
+    // Basic layout configuration
+    layout {
+        default-column-width 0.5
+        default-column-count 3
     }
     '';
   };

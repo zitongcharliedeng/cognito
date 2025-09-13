@@ -14,7 +14,6 @@
     programs.niri.enable = true;
 
     # Autostart a terminal inside the session for testing
-    environment.systemPackages = with pkgs; [ kitty ];
     systemd.user.services.kitty-autostart = {
       description = "Autostart kitty under Niri";
       after = [ "niri.service" ];
@@ -28,8 +27,9 @@
     };
 
     # Provide a wrapper that forces software renderer for VM compatibility
-    environment.systemPackages = environment.systemPackages ++ [
-      (pkgs.writeShellScriptBin "niri-autologin" ''
+    environment.systemPackages = with pkgs; [
+      kitty
+      (writeShellScriptBin "niri-autologin" ''
         #!/bin/sh
         set -eu
         export WLR_RENDERER=pixman

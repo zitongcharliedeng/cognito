@@ -13,5 +13,6 @@
     # Additional packages for omnibar functionality
     procps # for pgrep/pkill commands
     coreutils # for basic shell utilities
+    xdg-utils
   ];
 }

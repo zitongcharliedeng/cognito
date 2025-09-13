@@ -27,11 +27,26 @@
       };
     };
 
-    # Minimal greetd autologin straight into niri
+    # Provide a wrapper that forces software renderer for VM compatibility
+    environment.systemPackages = environment.systemPackages ++ [
+      (pkgs.writeShellScriptBin "niri-autologin" ''
+        #!/bin/sh
+        set -eu
+        export WLR_RENDERER=pixman
+        export WLR_NO_HARDWARE_CURSORS=1
+        export GBM_BACKENDS_PATH=${pkgs.mesa}/lib/gbm
+        export LIBGL_DRIVERS_PATH=${pkgs.mesa}/lib/dri
+        export __EGL_VENDOR_LIBRARY_DIRS=${pkgs.mesa}/share/glvnd/egl_vendor.d
+        exec niri-session
+      '')
+    ];
+
+    # Minimal greetd autologin straight into niri via wrapper
     services.greetd = {
       enable = true;
+      vt = 1;
       settings.initial_session = {
-        command = "niri-session";
+        command = "niri-autologin";
         user = "ulysses";
       };
     };

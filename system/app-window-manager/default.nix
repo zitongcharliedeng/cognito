@@ -1,12 +1,12 @@
 { config, pkgs, lib, ... }:
 let
   wallpaperCandidates = [
-    ./wallpapers/wallpaper.png
-    ./wallpapers/wallpaper.jpg
-    ./wallpapers/wallpaper.jpeg
+    ./wallpaper.png
+    ./wallpaper.jpg
+    ./wallpaper.jpeg
   ];
   CustomWallpaper_BuiltOSPaths = builtins.filter (p: builtins.pathExists p) wallpaperCandidates;
-  Wallpaper_BuiltOSPath = if CustomWallpaper_BuiltOSPaths == [] then ./wallpapers/wallpaper.png else builtins.head CustomWallpaper_BuiltOSPaths;
+  Wallpaper_BuiltOSPath = if CustomWallpaper_BuiltOSPaths == [] then ./wallpaper.png else builtins.head CustomWallpaper_BuiltOSPaths;
 in
 {
   imports = [ ./cog/default.nix ];

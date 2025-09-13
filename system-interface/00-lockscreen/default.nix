@@ -15,9 +15,8 @@ in
       enable = true;
       settings = {
         default_session = {
-          # Launch gtkgreet inside cage (minimal Wayland compositor)
           command = "${pkgs.cage}/bin/cage -s -- ${pkgs.gtkgreet}/bin/gtkgreet -l";
-          user = "greeter";
+          user = "ulysses";
         };
       };
     };

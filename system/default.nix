@@ -9,6 +9,7 @@ let
 in
 {
   imports = [ 
+    ./00-lockscreen/default.nix
     ./app-window-manager/default.nix
     ./apps/default.nix
   ];

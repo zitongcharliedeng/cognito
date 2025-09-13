@@ -16,7 +16,7 @@ in
       settings = {
         default_session = {
           command = "${pkgs.cage}/bin/cage -s -- ${pkgs.gtkgreet}/bin/gtkgreet -l";
-          user = "ulysses";
+          user = systemUsername;
         };
       };
     };

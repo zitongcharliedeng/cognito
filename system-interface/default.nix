@@ -36,33 +36,16 @@
       };
     };
 
-    # Provide a wrapper that forces software renderer for VM compatibility
-    environment.systemPackages = with pkgs; [
-      kitty
-      (writeShellScriptBin "niri-autologin" ''
-        #!/bin/sh
-        set -eu
-        export WLR_RENDERER=pixman
-        export WLR_NO_HARDWARE_CURSORS=1
-        export WLR_DRM_DEVICES=/dev/dri/card0
-        export GBM_BACKENDS_PATH=${pkgs.mesa}/lib/gbm
-        export LIBGL_DRIVERS_PATH=${pkgs.mesa}/lib/dri
-        export __EGL_VENDOR_LIBRARY_DIRS=${pkgs.mesa}/share/glvnd/egl_vendor.d
-        exec niri-session
-      '')
-    ];
+    # Minimal userland for testing
+    environment.systemPackages = with pkgs; [ kitty tuigreet ];
 
     # Minimal greetd autologin straight into niri via wrapper
     services.greetd = {
       enable = true;
       settings = {
         default_session = {
-          command = "niri-autologin";
-          user = "ulysses";
-        };
-        initial_session = {
-          command = "niri-autologin";
-          user = "ulysses";
+          command = "${pkgs.tuigreet}/bin/tuigreet --remember --time --cmd niri-session";
+          user = "greeter";
         };
       };
     };

@@ -11,8 +11,8 @@
   # About updates:
   # - You follow GLF's curated channel via `glf-channels` and `nixpkgs.follows` above.
   # - "Automatic updates" are performed by NixOS's built-in auto-upgrade service (a systemd timer
-  #   that periodically rebuilds from a flake), not by a custom GLF binary.
-  # - Enable this in a module (e.g. `customConfig/default.nix`) using `system.autoUpgrade.enable = true;`
+  #   that periodically rebuilds from a flake source), not by a custom GLF binary.
+  # - You would explicitly enable this auto-upgrade service in config using `system.autoUpgrade.enable = true;`
   #   and point `system.autoUpgrade.flake` at your system flake (e.g. "path:/etc/nixos").
 
   outputs =
@@ -44,7 +44,7 @@
         inherit system; # Now `system` is defined
         pkgs = pkgsStable; 
         modules = [
-          ./configuration.nix 
+          ./system-interface 
           glf.nixosModules.default 
         ];
 

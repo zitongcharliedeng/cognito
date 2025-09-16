@@ -1,0 +1,70 @@
+{ inputs, config, pkgs, lib, ... }:
+{
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  imports =
+    [ # Include the results of the hardware scan + GLF modules
+      ./hardware-configuration.nix
+      ./customConfig 
+
+    ];
+
+  glf.environment.type = "gnome";
+  glf.environment.edition = "standard";
+
+  glf.nvidia_config = {
+    enable = true;
+    laptop = false;
+    # NVIDIA Corporation GA102 [GeForce RTX 3080] (rev a1)
+    nvidiaBusId = "PCI:1:0:0";
+  };
+
+  # Bootloader.
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "nodev";
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  networking.hostName = "GLF-OS"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  networking.networkmanager.enable = true;
+
+  # Set your time zone.
+  time.timeZone = "Europe/London";
+
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_GB.UTF-8";
+
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_GB.UTF-8";
+    LC_IDENTIFICATION = "en_GB.UTF-8";
+    LC_MEASUREMENT = "en_GB.UTF-8";
+    LC_MONETARY = "en_GB.UTF-8";
+    LC_NAME = "en_GB.UTF-8";
+    LC_NUMERIC = "en_GB.UTF-8";
+    LC_PAPER = "en_GB.UTF-8";
+    LC_TELEPHONE = "en_GB.UTF-8";
+    LC_TIME = "en_GB.UTF-8";
+  };
+
+  # Configure keymap in X11
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.zitchaden = {
+    isNormalUser = true;
+    description = "zitchaden";
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "disk" "input" "render" "video" ];
+  };
+
+  
+  system.stateVersion = "25.05"; # DO NOT TOUCH 
+}

@@ -1,8 +1,5 @@
 { inputs, config, pkgs, lib, ... }:
 
-let
-  azeronFix = pkgs.writeShellScriptBin "azeron-fix" (builtins.readFile ./_azeron-fix.sh);
-in
 { 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   imports =
@@ -22,6 +19,13 @@ in
   };
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d
+
+  # Azeron Cyborg II support via xpad driver patch
+  nixpkgs.overlays = [
+    (import ../xpad-azeron-overlay.nix)
+  ];
+
+  boot.kernelModules = [ "xpad" ];
 
   # Bootloader.
   boot.loader.grub.enable = true;
@@ -71,13 +75,4 @@ in
   };
 
   system.stateVersion = "25.05"; # DO NOT TOUCH 
-
-  environment.systemPackages = [
-    azeronFix
-  ];
-
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="16d0", ATTR{idProduct}=="12f7", \
-      RUN+="${azeronFix}/bin/azeron-fix"
-  '';
 }

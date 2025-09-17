@@ -20,6 +20,15 @@
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d
 
+  services.xserver.libinput = {
+    enable = true;
+    # libinput is the default mouse-pointer input driver used by most
+    # desktop environments and Wayland compositors. Enabling it is graceful and harmless.
+    # So explictly removing any possibility of shitty default mouse accel is a win-win for me:
+    mouse.accelProfile = "flat";
+    touchpad.accelProfile = "flat";
+  };
+
   # Maccel mouse acceleration configuration
   hardware.maccel = {
     enable = true;

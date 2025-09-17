@@ -18,7 +18,7 @@
     nvidiaBusId = "PCI:1:0:0";
   };
 
-  # TODO: remove armour-games, lutris, easy flatpakcba;d
+  # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
 
   services.xserver.libinput = {
     enable = true;

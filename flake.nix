@@ -6,6 +6,7 @@
     nixpkgs.follows = "glf-channels/nixpkgs";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     glf.url = "git+https://framagit.org/gaming-linux-fr/glf-os/glf-os.git?ref=main"; # References the GLF-OS root flake
+    maccel.url = "github:Gnarus-G/maccel"; # Official maccel repo with NixOS support
   };
 
   # About updates:
@@ -20,6 +21,7 @@
       nixpkgs,
       nixpkgs-unstable,
       glf,
+      maccel,
       self,
       ...
     }: 
@@ -46,6 +48,7 @@
         modules = [
           ./system-interface 
           glf.nixosModules.default 
+          maccel.nixosModules.default
         ];
 
         specialArgs = {

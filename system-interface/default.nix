@@ -20,6 +20,18 @@
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d
 
+  # Maccel mouse acceleration configuration
+  hardware.maccel = {
+    enable = true;
+    enableCli = true; # optional: lets you run `maccel tui` and `maccel set`
+    parameters = {
+      mode = "synchronous"; # No acceleration curve
+      angleRotation = 10.0;
+    };
+  };
+  # So you can run CLI/TUI without sudo
+  users.groups.maccel.members = [ "zitchaden" ];
+
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "nodev";

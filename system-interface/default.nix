@@ -1,58 +1,34 @@
 { inputs, config, pkgs, lib, ... }:
 
 { 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   imports =
     [ # Include the results of the hardware scan + GLF modules
       ../hardware-configuration.nix
       ../customConfig
     ];
-  
-  glf.environment.type = "gnome";
-  glf.environment.edition = "studio";
 
-  # GNOME Minimal + Forced Tiling Configuration
-  environment.systemPackages = with pkgs; [
-    gnomeExtensions.just-perfection      # Hide ALL UI elements permanently
-    gnomeExtensions.tiling-shell        # Advanced tiling with Windows 11 Snap Assistant
-    
-    # Streaming layout script
-    (pkgs.writeShellScriptBin "streaming-layout" ''
-      #!/bin/bash
-      # Streaming Layout Script - Launch apps and let Tiling Shell auto-tile them
+  config = {
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    glf.environment.type = "gnome";
+    glf.environment.edition = "studio";
+    # GNOME Minimal + Forced Tiling Configuration
+    environment.systemPackages = with pkgs; [
+      gnomeExtensions.just-perfection      # Hide ALL UI elements permanently
+      gnomeExtensions.tiling-shell        # Advanced tiling with Windows 11 Snap Assistant
+      
+      # Streaming layout script - Programmatic 1:4:1 layout generation
+      (pkgs.writeShellScriptBin "streaming-layout" (builtins.readFile ./streaming-layout.sh))
+    ];
 
-      echo "Launching streaming applications..."
+    # Enable GNOME extensions management
+    services.gnome.gnome-browser-connector.enable = true;
 
-      # Launch applications
-      obs &
-      steam &
-      discord &
-
-      echo "Applications launched. Tiling Shell will automatically tile them."
-      echo "Use Super+Arrow keys to arrange windows as needed:"
-      echo "  - Super+Up: Move window up"
-      echo "  - Super+Down: Move window down" 
-      echo "  - Super+Left: Move window left"
-      echo "  - Super+Right: Move window right"
-      echo ""
-      echo "For 1:4:1 layout manually:"
-      echo "1. Position OBS at top (1/6 height)"
-      echo "2. Position Steam in center (4/6 height)" 
-      echo "3. Position Discord at bottom (1/6 height)"
-      echo ""
-      echo "Or drag windows to screen edges to snap them!"
-    '')
-  ];
-
-  # Enable GNOME extensions management
-  services.gnome.gnome-browser-connector.enable = true;
-
-  # GNOME dconf settings - MINIMAL AND FORCED
-  programs.dconf.enable = true;
-  programs.dconf.profiles.user.databases = [{
-    settings = {
-      # Enable extensions for minimal UI + tiling
-      "org/gnome/shell" = {
+    # GNOME dconf settings - MINIMAL AND FORCED
+    programs.dconf.enable = true;
+    programs.dconf.profiles.user.databases = [{
+      settings = {
+        # Enable extensions for minimal UI + tiling
+        "org/gnome/shell" = {
         enabled-extensions = [
           "just-perfection-desktop@just-perfection"
           "tilingshell@ferrarodomenico.com"
@@ -77,9 +53,9 @@
         mouse-sensitive-fullscreen-window = false;  # No reveal for dash or panel even in fullscreen
       };
       
-      # Tiling Shell - Advanced tiling with Window Snap Assistant
+      # Tiling Shell - MANDATORY TILING ENFORCEMENT
       "org/gnome/shell/extensions/tilingshell" = {
-        # Core tiling settings - MANDATORY TILING
+        # Core tiling settings - FORCE MANDATORY TILING
         "enable-tiling-system" = true;           # Enable tiling system
         "enable-autotiling" = true;              # Automatically tile new windows (MANDATORY)
         "enable-snap-assist" = true;             # Enable Windows 11-style snap assistant
@@ -87,6 +63,10 @@
         # Force all windows to be tiled - NO FLOATING ALLOWED
         "tiling-system-activation-key" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # No key needed - always active
         "enable-span-multiple-tiles" = false;    # Disable spanning to prevent floating behavior
+        
+        # Additional enforcement settings - ENABLED for aggressive tiling
+        "enable-tiling-system-windows-suggestions" = true;  # Force window suggestions for tiling
+        "enable-snap-assistant-windows-suggestions" = true; # Force snap assistant suggestions
         
         # Gap settings - NO GAPS
         "inner-gaps" = lib.gvariant.mkUint32 0;  # No gaps between windows
@@ -108,24 +88,20 @@
         "untile-window" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # NO keyboard shortcut to untile
         "tiling-system-deactivation-key" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # NO key to deactivate tiling system
         
+        # Window constraints - AGGRESSIVE TILING ENFORCEMENT
+        "enable-screen-edges-windows-suggestions" = true;  # Force screen edge suggestions
+        "quarter-tiling-threshold" = lib.gvariant.mkUint32 0;  # Immediate quarter tiling
+        "snap-assistant-threshold" = lib.gvariant.mkInt32 0;   # Immediate snap assistant
+        
         # Screen edge behavior
         "active-screen-edges" = true;            # Enable screen edge dragging
         "top-edge-maximize" = false;             # Don't maximize on top edge drag
-        
-        # Snap assistant settings
-        "snap-assistant-threshold" = lib.gvariant.mkInt32 54;  # Snap assistant threshold
-        "quarter-tiling-threshold" = lib.gvariant.mkUint32 40; # Quarter tiling threshold
         "enable-blur-snap-assistant" = false;    # No blur on snap assistant
         "enable-blur-selected-tilepreview" = false; # No blur on tile preview
         
         # Animation settings
         "snap-assistant-animation-time" = lib.gvariant.mkUint32 180; # Snap assistant animation
         "tile-preview-animation-time" = lib.gvariant.mkUint32 100;   # Tile animation
-        
-        # Window suggestions (disabled for clean experience)
-        "enable-tiling-system-windows-suggestions" = false;
-        "enable-snap-assistant-windows-suggestions" = false;
-        "enable-screen-edges-windows-suggestions" = false;
         
         # Keyboard shortcuts
         "enable-move-keybindings" = true;        # Enable keyboard shortcuts
@@ -353,5 +329,6 @@
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "disk" "input" "render" "video" ];
   };
 
-  system.stateVersion = "25.05"; # DO NOT TOUCH 
+    system.stateVersion = "25.05"; # DO NOT TOUCH 
+  };
 }

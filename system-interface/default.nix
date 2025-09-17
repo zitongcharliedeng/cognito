@@ -24,7 +24,7 @@
   programs.dconf.enable = true;
   programs.dconf.profiles.user.databases = [{
     settings = {
-      # Enable ONLY the essential extensions
+      # Enable extensions for minimal UI + tiling
       "org/gnome/shell" = {
         enabled-extensions = [
           "just-perfection-desktop@just-perfection"
@@ -33,12 +33,12 @@
         disable-user-extensions = false;
       };
       
-      # Just Perfection - HIDE EVERYTHING PERMANENTLY
+      # Just Perfection - Clean desktop, tp status panel only in overview
       "org/gnome/shell/extensions/just-perfection" = {
         # Core UI hiding
         dash = false;                    # No bottom dock/dash
-        panel = false;                   # No top panel/status bar
-        panel-in-overview = false;       # No panel in overview mode
+        panel = false;                   # No top panel on desktop
+        panel-in-overview = true;        # Show panel ONLY in overview mode (Super key)
         show-apps-button = true;         # Keep omnibar access (Super key)
         
         # Window behavior
@@ -83,23 +83,24 @@
         move-window-down = ["<Super>Down"];
       };
       
-      # GNOME Shell - Minimal interface
+      
+      # GNOME Shell - Battery info in overview mode
       "org/gnome/desktop/interface" = {
-        show-battery-percentage = true;  # Battery in omnibar only
+        show-battery-percentage = true;  # Battery percentage in top panel (visible in overview)
       };
       
-      # Window manager - Focus behavior
+      # Window manager - Focus behavior (still relevant with Tiling Shell)
       "org/gnome/desktop/wm/preferences" = {
         focus-mode = "sloppy";           # Focus follows mouse
-        auto-raise = false;  #  Windows don't automatically come to front when focused, not that it matters on single layer tiling setups like mine.
-        raise-on-click = true;  # Windows would only come to front when clicked
+        auto-raise = false;              # Don't auto-raise windows
+        raise-on-click = true;           # Raise windows when clicked
       };
       
-      # Mutter - Workspace management
+      # Mutter - Workspace management (still relevant with Tiling Shell)
       "org/gnome/mutter" = {
-        dynamic-workspaces = true;       # Dynamic workspaces
+        dynamic-workspaces = true;       # Dynamic workspaces - automatically creates/destroys workspaces as needed, no fixed number
         workspaces-only-on-primary = true;  # Only show workspaces on primary display
-        center-new-windows = false;      # Don't center - let tiling handle it
+        center-new-windows = false;      # Don't center - let Tiling Shell handle it
       };
     };
   }];

@@ -15,20 +15,17 @@
     glf.environment.edition = "studio";
     
     environment.systemPackages = with pkgs; [
-      # Application Launcher - Fuzzel (modern Wayland launcher)
-      fuzzel
-      
-      # Screen lock
-      swaylock
-      
+      fuzzel # Application Launcher - Fuzzel (modern Wayland launcher)
+      swaylock # Screen lock
+      (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./additional-fuzzel-commands.sh))
       # GNOME System Controls (preserved for hardware management)
-      gnome-control-center
-      gnome-settings-daemon
-      gnome-system-monitor
-      gnome-disk-utility
-      gnome-terminal
-      gnome-calculator
-      gnome-screenshot
+      # gnome-control-center
+      # gnome-settings-daemon
+      # gnome-system-monitor
+      # gnome-disk-utility
+      # gnome-terminal
+      # gnome-calculator
+      # gnome-screenshot
     ];
 
     # Enable Niri window manager
@@ -38,49 +35,28 @@
     # Fuzzel will be available as fuzzel in system packages
     # Configuration will be handled via AGS in the future
     
-    # Niri configuration with Fuzzel key bindings
+    # Niri configuration - minimal keyboard shortcuts, everything else via Fuzzel
     environment.etc."niri/config".text = ''
-      # Niri configuration with Fuzzel launcher
-      
-      # Key bindings
+      # Key bindings - ONLY Super+Space for launcher
       keybindings = [
-        # Application launcher
+        # Application launcher - ONLY this keyboard shortcut
         "Super+Space" = "spawn fuzzel";
-       
-        # Window management
-        "Super+Q" = "close-window";
-        "Super+F" = "toggle-fullscreen";
-        "Super+M" = "toggle-maximize";
-        
-        # Lock screen
-        "Super+Shift+L" = "spawn swaylock";
- 
-        # Screenshot
-        "Print" = "spawn gnome-screenshot";
-        "Super+Print" = "spawn gnome-screenshot -a";
-      ];
-      
-      # Default layout
-      layout = "tile";
-      
-      # Window rules
-      window-rules = [
-        # Floating windows
-        { match = { app-id = "org.gnome.Calculator"; }; mode = "floating"; }
-        { match = { app-id = "org.gnome.Nautilus"; }; mode = "floating"; }
       ];
     '';
     
-    # Override GLF GNOME environment to disable GUI components
-    # Keep only system controls, disable GNOME Shell and display manager
-    services.gnome.gnome-settings-daemon.enable = true;
-    services.gnome.gnome-keyring.enable = true;
+    # Essential GNOME services for hardware support (mouse, keyboard, audio, etc.)
+    # These are needed even without GNOME Shell for basic input device functionality
+    # services.gnome.gnome-settings-daemon.enable = true;
+    # services.gnome.gnome-keyring.enable = true;
     
-    # Disable GNOME GUI components that conflict with Niri
-    services.xserver.desktopManager.gnome.enable = false;
-    services.xserver.displayManager.gdm.enable = false;
-    services.gnome.core-shell.enable = false;
-    services.gnome.core-apps.enable = false;
+    # Disable GNOME GUI components that may (TODO: check) conflict with Niri
+    # services.xserver.desktopManager.gnome.enable = false;
+    # services.xserver.displayManager.gdm.enable = false;
+    # services.gnome.core-shell.enable = false;
+    # services.gnome.core-apps.enable = false;
+    # services.gnome.gnome-browser-connector.enable = false;
+    # services.gnome.evolution-data-server.enable = false;
+    # services.gnome.gnome-online-accounts.enable = false;
     
     # GNOME dconf - ESSENTIAL for system controls to work properly
     # dconf is GNOME's configuration database that stores settings for:
@@ -89,7 +65,7 @@
     # - GNOME Keyring (encrypted password storage)
     # - GNOME applications (terminal, screenshot, calculator preferences)
     # Without dconf, GNOME system controls cannot save or load settings
-    programs.dconf.enable = true;
+    # programs.dconf.enable = true;
     
     # TODO: Future AGS integration for advanced status bar and launcher
     # TODO: Implement streaming layout script for Niri using:

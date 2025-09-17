@@ -15,6 +15,33 @@
   environment.systemPackages = with pkgs; [
     gnomeExtensions.just-perfection      # Hide ALL UI elements permanently
     gnomeExtensions.tiling-shell        # Advanced tiling with Windows 11 Snap Assistant
+    
+    # Streaming layout script
+    (pkgs.writeShellScriptBin "streaming-layout" ''
+      #!/bin/bash
+      # Streaming Layout Script - Launch apps and let Tiling Shell auto-tile them
+
+      echo "Launching streaming applications..."
+
+      # Launch applications
+      obs &
+      steam &
+      discord &
+
+      echo "Applications launched. Tiling Shell will automatically tile them."
+      echo "Use Super+Arrow keys to arrange windows as needed:"
+      echo "  - Super+Up: Move window up"
+      echo "  - Super+Down: Move window down" 
+      echo "  - Super+Left: Move window left"
+      echo "  - Super+Right: Move window right"
+      echo ""
+      echo "For 1:4:1 layout manually:"
+      echo "1. Position OBS at top (1/6 height)"
+      echo "2. Position Steam in center (4/6 height)" 
+      echo "3. Position Discord at bottom (1/6 height)"
+      echo ""
+      echo "Or drag windows to screen edges to snap them!"
+    '')
   ];
 
   # Enable GNOME extensions management
@@ -52,35 +79,60 @@
       
       # Tiling Shell - Advanced tiling with Window Snap Assistant
       "org/gnome/shell/extensions/tilingshell" = {
-        auto-tile = true;                # Automatically tile new windows
-        auto-tile-dialogs = false;        # Tile dialogs and popups
-        auto-tile-utilities = false;      # Tile utility windows
+        # Core tiling settings - MANDATORY TILING
+        "enable-tiling-system" = true;           # Enable tiling system
+        "enable-autotiling" = true;              # Automatically tile new windows (MANDATORY)
+        "enable-snap-assist" = true;             # Enable Windows 11-style snap assistant
         
-        # Tiling behavior
-        show-tiling-buttons = true;      # Show tiling buttons in context menu
-        show-snap-assistant = true;      # Enable Windows 11-style snap assistant
-        show-tiling-hint = true;         # Show tiling hints when dragging
+        # Force all windows to be tiled - NO FLOATING ALLOWED
+        "tiling-system-activation-key" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # No key needed - always active
+        "enable-span-multiple-tiles" = false;    # Disable spanning to prevent floating behavior
         
-        # Layout settings
-        default-layout = "columns";      # Default to column layout
-        per-workspace-layout = true;     # Different layouts per workspace
+        # Gap settings - NO GAPS
+        "inner-gaps" = lib.gvariant.mkUint32 0;  # No gaps between windows
+        "outer-gaps" = lib.gvariant.mkUint32 0;  # No gaps at screen edges
         
         # Visual settings
-        show-border = false;              # Show border around tiled windows
-        border-radius = lib.gvariant.mkUint32 0;  # No rounded corners for sharp edges
-        border-width = lib.gvariant.mkUint32 0;   # Thin border
-        border-color = "#ffffff";        # White border
+        "enable-window-border" = false;          # No border around tiled windows
+        "window-border-width" = lib.gvariant.mkUint32 0;  # No border width
+        "window-border-color" = "#ffffff";       # White border (if enabled)
         
-        # Gap settings
-        inner-gap = lib.gvariant.mkUint32 0;  # No gaps between windows
-        outer-gap = lib.gvariant.mkUint32 0;  # No gaps at screen edges
+        # Tiling behavior - MANDATORY TILING
+        "show-indicator" = false;                # Hide indicator on top panel
+        "override-window-menu" = true;           # Add tiling buttons to window menu
+        "restore-window-original-size" = false;  # NEVER restore to floating size
+        "resize-complementing-windows" = true;   # Auto-resize other tiled windows
+        "enable-wraparound-focus" = true;        # Wrap around when focusing windows
         
-        # Keyboard shortcuts (can be customized)
-        enable-keybindings = true;       # Enable keyboard shortcuts
-        move-window-left = ["<Super>Left"];
-        move-window-right = ["<Super>Right"];
-        move-window-up = ["<Super>Up"];
-        move-window-down = ["<Super>Down"];
+        # Disable untiling - FORCE MANDATORY TILING
+        "untile-window" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # NO keyboard shortcut to untile
+        "tiling-system-deactivation-key" = lib.gvariant.mkEmptyArray lib.gvariant.type.string;  # NO key to deactivate tiling system
+        
+        # Screen edge behavior
+        "active-screen-edges" = true;            # Enable screen edge dragging
+        "top-edge-maximize" = false;             # Don't maximize on top edge drag
+        
+        # Snap assistant settings
+        "snap-assistant-threshold" = lib.gvariant.mkInt32 54;  # Snap assistant threshold
+        "quarter-tiling-threshold" = lib.gvariant.mkUint32 40; # Quarter tiling threshold
+        "enable-blur-snap-assistant" = false;    # No blur on snap assistant
+        "enable-blur-selected-tilepreview" = false; # No blur on tile preview
+        
+        # Animation settings
+        "snap-assistant-animation-time" = lib.gvariant.mkUint32 180; # Snap assistant animation
+        "tile-preview-animation-time" = lib.gvariant.mkUint32 100;   # Tile animation
+        
+        # Window suggestions (disabled for clean experience)
+        "enable-tiling-system-windows-suggestions" = false;
+        "enable-snap-assistant-windows-suggestions" = false;
+        "enable-screen-edges-windows-suggestions" = false;
+        
+        # Keyboard shortcuts
+        "enable-move-keybindings" = true;        # Enable keyboard shortcuts
+        "move-window-left" = ["<Super>Left"];
+        "move-window-right" = ["<Super>Right"];
+        "move-window-up" = ["<Super>Up"];
+        "move-window-down" = ["<Super>Down"];
       };
       
       

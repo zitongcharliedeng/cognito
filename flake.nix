@@ -44,16 +44,16 @@
       # Discover all host configs programmatically inside ./system-hardware-shims/
       hosts = builtins.attrNames (builtins.readDir ./system-hardware-shims);
       # Function to create a host configuration
-      mkHost = name: nixpkgs.lib.nixosSystem {
-        inherit system;
-        pkgs = pkgsStable;
-        modules = [
-          ./system-interface/default.nix
-          ./system-hardware-shims/${name}/hardware-configuration.nix
-          ./system-hardware-shims/${name}/firmware-configuration.nix
-          glf.nixosModules.default 
-          maccel.nixosModules.default
-        ];
+        mkHost = name: nixpkgs.lib.nixosSystem {
+          inherit system;
+          pkgs = pkgsStable;
+          modules = [
+            ./system-interface/software-configuration.nix
+            ./system-hardware-shims/${name}/hardware-configuration.nix
+            ./system-hardware-shims/${name}/firmware-configuration.nix
+            glf.nixosModules.default 
+            maccel.nixosModules.default
+          ];
 
         specialArgs = {
           pkgs-unstable = pkgsUnstable;

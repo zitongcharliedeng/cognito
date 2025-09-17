@@ -21,7 +21,7 @@ This repository is a flake-based NixOS configuration that uses GLF-OS as a base.
 
 ### System-Agnostic vs Hardware-Specific Settings
 
-**System-Agnostic** (stays in `system-interface/default.nix`):
+**System-Agnostic** (stays in `system-interface/software-configuration.nix`):
 - `glf.environment.type` and `glf.environment.edition` - same across all cognito OS systems
 - GNOME configuration and extensions
 - Application packages and user scripts
@@ -50,7 +50,7 @@ flowchart TD
   A -->|inputs| F[glf (GLF-OS root flake)]
 
   B -->|modules| G[system-interface/]
-  G --> H[system-interface/default.nix]
+  G --> H[system-interface/software-configuration.nix]
   H --> I[system-hardware-shims/device-name/]
   I --> J[hardware-configuration.nix]
   I --> K[firmware-configuration.nix]
@@ -104,7 +104,7 @@ When you change your desktop hardware (new GPU, motherboard, etc.):
 ### Notes
 
 - GLF curated channels are followed via `inputs.glf-channels` and `nixpkgs.follows` in `flake.nix`.
-- System-agnostic configuration lives in `system-interface/default.nix`.
+- System-agnostic configuration lives in `system-interface/software-configuration.nix`.
 - Hardware-specific configuration lives in `system-hardware-shims/device-name/`.
 - Device-specific settings (NVIDIA, bootloader, hostname, timezone, etc.) live in `system-hardware-shims/{device}/firmware-configuration.nix`.
 - The `hosts` list in `flake.nix` is automatically generated from the `system-hardware-shims/` directory structure.

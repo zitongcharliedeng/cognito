@@ -20,13 +20,6 @@
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d
 
-  # Azeron Cyborg II support via xpad driver patch
-  nixpkgs.overlays = [
-    (import ../xpad-azeron-overlay.nix)
-  ];
-
-  boot.kernelModules = [ "xpad" ];
-
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "nodev";

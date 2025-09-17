@@ -1,6 +1,0 @@
---- a/drivers/input/joystick/xpad.c
-+++ b/drivers/input/joystick/xpad.c
-@@ static const struct usb_device_id xpad_table[] = {
-+
-+	/* Azeron Cyborg II (pretend to be Xbox360) */
-+	{ USB_DEVICE(0x16d0, 0x12f7), .driver_info = XPAD_XBOX360 },

@@ -14,7 +14,7 @@
   # GNOME Minimal + Forced Tiling Configuration
   environment.systemPackages = with pkgs; [
     gnomeExtensions.just-perfection      # Hide ALL UI elements permanently
-    gnomeExtensions.pop-shell           # Force tiling for ALL windows
+    gnomeExtensions.tiling-shell        # Advanced tiling with Windows 11 Snap Assistant
   ];
 
   # Enable GNOME extensions management
@@ -28,7 +28,7 @@
       "org/gnome/shell" = {
         enabled-extensions = [
           "just-perfection-desktop@just-perfection"
-          "pop-shell@system76.com"
+          "tilingshell@ferrarodomenico.com"
         ];
         disable-user-extensions = false;
       };
@@ -50,20 +50,37 @@
         mouse-sensitive-fullscreen-window = false;  # No reveal for dash or panel even in fullscreen
       };
       
-      # Pop Shell - FORCE TILING ON EVERYTHING
-      "org/gnome/shell/extensions/pop-shell" = {
-        tile-by-default = true;          # FORCE tiling for ALL windows
-        active-hint = true;              # Show active window border
-        smart-gaps = false;              # No automatic gap management
-        gap-inner = lib.gvariant.mkUint32 0;  # No gaps between windows
-        gap-outer = lib.gvariant.mkUint32 0;  # No gaps at screen edges
-        show-title = false;              # No window title bars
-        mouse-cursor-follows-active-window = true;  # Cursor follows focused window
+      # Tiling Shell - Advanced tiling with Window Snap Assistant
+      "org/gnome/shell/extensions/tilingshell" = {
+        auto-tile = true;                # Automatically tile new windows
+        auto-tile-dialogs = false;        # Tile dialogs and popups
+        auto-tile-utilities = false;      # Tile utility windows
         
-        # Force tiling even for dialogs/popups (NOT notifications)
-        tile-by-default-dialog = true;   # File dialogs, Steam launcher, etc.
-        tile-by-default-popup = true;    # Application popups
-        tile-by-default-utility = true;  # Utility windows
+        # Tiling behavior
+        show-tiling-buttons = true;      # Show tiling buttons in context menu
+        show-snap-assistant = true;      # Enable Windows 11-style snap assistant
+        show-tiling-hint = true;         # Show tiling hints when dragging
+        
+        # Layout settings
+        default-layout = "columns";      # Default to column layout
+        per-workspace-layout = true;     # Different layouts per workspace
+        
+        # Visual settings
+        show-border = false;              # Show border around tiled windows
+        border-radius = 0;               # No rounded corners for sharp edges
+        border-width = 0;                # Thin border
+        border-color = "#ffffff";        # White border
+        
+        # Gap settings
+        inner-gap = 0;                   # No gaps between windows
+        outer-gap = 0;                   # No gaps at screen edges
+        
+        # Keyboard shortcuts (can be customized)
+        enable-keybindings = true;       # Enable keyboard shortcuts
+        move-window-left = ["<Super>Left"];
+        move-window-right = ["<Super>Right"];
+        move-window-up = ["<Super>Up"];
+        move-window-down = ["<Super>Down"];
       };
       
       # GNOME Shell - Minimal interface
@@ -91,7 +108,7 @@
   system.userActivationScripts.gnomeExtensions = ''
     if [ -x "$(command -v gnome-extensions)" ]; then
       gnome-extensions enable just-perfection-desktop@just-perfection
-      gnome-extensions enable pop-shell@system76.com
+      gnome-extensions enable tilingshell@ferrarodomenico.com
     fi
   '';
 
@@ -117,7 +134,7 @@
     # Create the actual streaming layout script
     cat > /home/zitchaden/streaming-layout.sh << 'EOF'
     #!/bin/bash
-    # Streaming Layout Script - Programmatic 1:4:1 arrangement
+    # Streaming Layout Script - Programmatic 1:4:1 arrangement using Tiling Shell
     
     # Launch applications
     obs &
@@ -127,26 +144,50 @@
     # Wait for applications to load
     sleep 5
     
-    # Use Pop Shell's native tiling to create 1:4:1 layout
-    # This works with the tiling window manager instead of against it
+    # Use Tiling Shell's API to create custom 1:4:1 layout
+    # Tiling Shell supports custom layouts via JavaScript API
     
-    # Create a custom layout using Pop Shell's JavaScript API
+    # Create a custom 1:4:1 layout using Tiling Shell's API
     gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell --method org.gnome.Shell.Eval "
+      // Get Tiling Shell extension
+      const tilingShell = global.get_extension('tilingshell@ferrarodomenico.com');
+      if (!tilingShell) {
+        console.log('Tiling Shell extension not found');
+        return;
+      }
+      
+      const tilingManager = tilingShell.imports.manager;
+      
+      // Find windows by class name
       const windows = global.get_window_actors();
       const obs = windows.find(a => a.get_meta_window().get_wm_class() === 'obs');
       const steam = windows.find(a => a.get_meta_window().get_wm_class() === 'steam');
       const discord = windows.find(a => a.get_meta_window().get_wm_class() === 'discord');
       
       if (obs && steam && discord) {
-        // Use Pop Shell's tiling system to create 1:4:1 ratio
-        // This ensures perfect borders and no pixel overlap
-        obs.get_meta_window().tile(0, 0, 1, 1/6);  // Top row
-        steam.get_meta_window().tile(0, 1/6, 1, 4/6);  // Center row (4/6 height)
-        discord.get_meta_window().tile(0, 5/6, 1, 1/6);  // Bottom row
+        // Create custom 1:4:1 layout using Tiling Shell's layout system
+        const layout = {
+          name: 'Streaming Setup',
+          columns: 1,
+          rows: 3,
+          tiles: [
+            { x: 0, y: 0, width: 1, height: 1/6 },    // OBS - Top row
+            { x: 0, y: 1/6, width: 1, height: 4/6 },  // Steam - Center row (4/6 height)
+            { x: 0, y: 5/6, width: 1, height: 1/6 }   // Discord - Bottom row
+          ]
+        };
+        
+        // Apply the layout to the current workspace
+        tilingManager.setLayout(layout);
+        
+        // Tile the windows to their respective positions
+        obs.get_meta_window().tile(0, 0, 1, 1/6);
+        steam.get_meta_window().tile(0, 1/6, 1, 4/6);
+        discord.get_meta_window().tile(0, 5/6, 1, 1/6);
       }
     "
     
-    echo "Streaming layout applied: 1:4:1 (OBS:Steam:Discord)"
+    echo "Streaming layout applied: 1:4:1 (OBS:Steam:Discord) using Tiling Shell"
     EOF
     
     chmod +x /home/zitchaden/streaming-layout.sh

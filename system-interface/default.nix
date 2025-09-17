@@ -33,7 +33,7 @@
         disable-user-extensions = false;
       };
       
-      # Just Perfection - Clean desktop, tp status panel only in overview
+      # Just Perfection - Clean desktop, top status panel shows only in omnibar overview (Super key)
       "org/gnome/shell/extensions/just-perfection" = {
         # Core UI hiding
         dash = false;                    # No bottom dock/dash
@@ -67,13 +67,13 @@
         
         # Visual settings
         show-border = false;              # Show border around tiled windows
-        border-radius = 0;               # No rounded corners for sharp edges
-        border-width = 0;                # Thin border
+        border-radius = lib.gvariant.mkUint32 0;  # No rounded corners for sharp edges
+        border-width = lib.gvariant.mkUint32 0;   # Thin border
         border-color = "#ffffff";        # White border
         
         # Gap settings
-        inner-gap = 0;                   # No gaps between windows
-        outer-gap = 0;                   # No gaps at screen edges
+        inner-gap = lib.gvariant.mkUint32 0;  # No gaps between windows
+        outer-gap = lib.gvariant.mkUint32 0;  # No gaps at screen edges
         
         # Keyboard shortcuts (can be customized)
         enable-keybindings = true;       # Enable keyboard shortcuts
@@ -86,7 +86,7 @@
       
       # GNOME Shell - Battery info in overview mode
       "org/gnome/desktop/interface" = {
-        show-battery-percentage = true;  # Battery percentage in top panel (visible in overview)
+        show-battery-percentage = true;  # Enable battery percentage in top status panel (hidden by default)
       };
       
       # Window manager - Focus behavior (still relevant with Tiling Shell)

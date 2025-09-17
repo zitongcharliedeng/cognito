@@ -55,8 +55,8 @@
         tile-by-default = true;          # FORCE tiling for ALL windows
         active-hint = true;              # Show active window border
         smart-gaps = false;              # No automatic gap management
-        gap-inner = 0;                   # No gaps between windows
-        gap-outer = 0;                   # No gaps at screen edges
+        gap-inner = lib.gvariant.mkUint32 0;  # No gaps between windows
+        gap-outer = lib.gvariant.mkUint32 0;  # No gaps at screen edges
         show-title = false;              # No window title bars
         mouse-cursor-follows-active-window = true;  # Cursor follows focused window
         
@@ -165,7 +165,7 @@
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
   # TODO: remove firefox for chromium or something that web-driver software plays well with.
-  services.xserver.libinput = {
+  services.libinput = {
     enable = true;
     # libinput is the default mouse-pointer input driver used by most
     # desktop environments and Wayland compositors. Enabling it is graceful and harmless.

@@ -55,8 +55,8 @@
         tile-by-default = true;          # FORCE tiling for ALL windows
         active-hint = true;              # Show active window border
         smart-gaps = false;              # No automatic gap management
-        gap-inner = 0;                   # No gaps between windows
-        gap-outer = 0;                   # No gaps at screen edges
+        gap-inner = lib.gvariant.mkUint32 0;  # No gaps between windows
+        gap-outer = lib.gvariant.mkUint32 0;  # No gaps at screen edges
         show-title = false;              # No window title bars
         mouse-cursor-follows-active-window = true;  # Cursor follows focused window
         

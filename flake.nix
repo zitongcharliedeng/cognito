@@ -57,7 +57,6 @@
 
         specialArgs = {
           pkgs-unstable = pkgsUnstable;
-          inputs = { inherit self; };
         };
       };
     in

@@ -5,6 +5,8 @@
     [ # Include the results of the hardware scan + GLF modules
       ../system-hardware-shims/my-desktop/hardware-configuration.nix
       ../system-hardware-shims/my-desktop/firmware-configuration.nix
+      # Include modular configuration components
+      ./modules/mouse-pointer.nix
     ];
 
   config = {
@@ -144,10 +146,10 @@
   # Programmatic 1:4:1 layout launcher
   system.userActivationScripts.appLauncher = ''
     # Create .desktop file for streaming apps
-    mkdir -p /home/zitchaden/.local/share/applications
+    mkdir -p /home/${config._module.args.systemUsername}/.local/share/applications
     
     # Streaming Setup Launcher - Programmatic 1:4:1 layout
-    cat > /home/zitchaden/.local/share/applications/streaming-setup.desktop << 'EOF'
+    cat > /home/${config._module.args.systemUsername}/.local/share/applications/streaming-setup.desktop << 'EOF'
     [Desktop Entry]
     Version=1.0
     Type=Application
@@ -161,7 +163,7 @@
     EOF
     
     # Create the actual streaming layout script
-    cat > /home/zitchaden/streaming-layout.sh << 'EOF'
+    cat > /home/${config._module.args.systemUsername}/streaming-layout.sh << 'EOF'
     #!/bin/bash
     # Streaming Layout Script - Programmatic 1:4:1 arrangement using Tiling Shell
     
@@ -219,38 +221,15 @@
     echo "Streaming layout applied: 1:4:1 (OBS:Steam:Discord) using Tiling Shell"
     EOF
     
-    chmod +x /home/zitchaden/streaming-layout.sh
-    chown zitchaden:zitchaden /home/zitchaden/streaming-layout.sh
+    chmod +x /home/${config._module.args.systemUsername}/streaming-layout.sh
+    chown ${config._module.args.systemUsername}:${config._module.args.systemUsername} /home/${config._module.args.systemUsername}/streaming-layout.sh
     
-    chown -R zitchaden:zitchaden /home/zitchaden/.local/share/applications
-    chmod +x /home/zitchaden/.local/share/applications/*.desktop
+    chown -R ${config._module.args.systemUsername}:${config._module.args.systemUsername} /home/${config._module.args.systemUsername}/.local/share/applications
+    chmod +x /home/${config._module.args.systemUsername}/.local/share/applications/*.desktop
   '';
 
   # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
   # TODO: remove firefox for chromium or something that web-driver software plays well with.
-  services.libinput = {
-    enable = true;
-    # libinput is the default mouse-pointer input driver used by most
-    # desktop environments and Wayland compositors. Enabling it is graceful and harmless.
-    # So explictly removing any possibility of shitty default mouse accel is a win-win for me:
-    mouse.accelProfile = "flat";
-    touchpad.accelProfile = "flat";
-  };
-
-  # Maccel mouse acceleration configuration
-  hardware.maccel = {
-    enable = true;
-    enableCli = true; # optional: lets you run `maccel tui` and `maccel set`
-    parameters = {
-      sensMultiplier = 0.7;
-      inputDpi = 2000.0;
-      yxRatio = 1.0;
-      mode = "no_accel"; # No acceleration curve
-      angleRotation = 9.0;
-    };
-  };
-  # So you can run CLI/TUI without sudo
-  users.groups.maccel.members = [ "zitchaden" ];
 
   # TODO: CONFIRM THESE UDEV RULES WORK FOR WEB SOFTWARE BROWSER DEVICE ACCESS. 
   # LAST BEHAVIOUR WAS mouse.wiki not working, wootility working but not able to update or access the restore device.

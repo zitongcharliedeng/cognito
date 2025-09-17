@@ -1,5 +1,5 @@
 {
-  description = "GLF-OS ISO Configuration - Installer Evaluation Flake";
+  description = "Cognito OS - GLF-OS based NixOS configuration";
   
   inputs = {
     glf-channels.url = "git+https://framagit.org/gaming-linux-fr/glf-os/channels-glfos/glf-os-channels.git?ref=main"; # Repository responsible for switching from one GLF stable to another
@@ -28,7 +28,7 @@
 
     let
       system = "x86_64-linux"; 
-
+      
       # Configuration for stable nixpkgs (will be the default `pkgs`)
       pkgsStable = import nixpkgs {
         inherit system;
@@ -40,13 +40,17 @@
         inherit system;
         config.allowUnfree = true;
       };
-    in
-    {
-      nixosConfigurations."GLF-OS" = nixpkgs.lib.nixosSystem {
-        inherit system; # Now `system` is defined
-        pkgs = pkgsStable; 
+
+      # Discover all host configs programmatically inside ./system-hardware-shims/
+      hosts = builtins.attrNames (builtins.readDir ./system-hardware-shims);
+      # Function to create a host configuration
+      mkHost = name: nixpkgs.lib.nixosSystem {
+        inherit system;
+        pkgs = pkgsStable;
         modules = [
-          ./system-interface 
+          ./system-interface/default.nix
+          ./system-hardware-shims/${name}/hardware-configuration.nix
+          ./system-hardware-shims/${name}/firmware-configuration.nix
           glf.nixosModules.default 
           maccel.nixosModules.default
         ];
@@ -56,5 +60,9 @@
           inputs = { inherit self; };
         };
       };
+    in
+    {
+      nixosConfigurations =
+        builtins.listToAttrs (map (name: { name = name; value = mkHost name; }) hosts);
     };
 }

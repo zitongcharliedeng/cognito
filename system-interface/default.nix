@@ -34,8 +34,8 @@
     enable = true;
     enableCli = true; # optional: lets you run `maccel tui` and `maccel set`
     parameters = {
-      mode = "synchronous"; # No acceleration curve
-      angleRotation = 10.0;
+      mode = "no_accel"; # No acceleration curve
+      angleRotation = 9.0;
     };
   };
   # So you can run CLI/TUI without sudo

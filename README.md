@@ -79,18 +79,35 @@ The script will present you with:
    - **Build and switch** to configuration
    - **Build, switch, and reboot** (perfect for testing new builds)
    - **Test configuration** (dry run)
+   - **Regenerate hardware configuration** (for hardware changes)
    - **List available devices**
    - **Exit**
 3. Option to perform multiple actions in one session
 
 No parameters needed - just run `./build.sh` and follow the interactive prompts!
 
+### Hardware Changes
+
+When you change your desktop hardware (new GPU, motherboard, etc.):
+
+1. **For basic hardware changes** (CPU, RAM, storage):
+   - Use the **"Regenerate hardware configuration"** option in `build.sh`
+   - This runs `nixos-generate-config` to detect new hardware
+   - Updates `hardware-configuration.nix` with new hardware detection
+
+2. **For firmware/driver changes** (NVIDIA GPU, bootloader, etc.):
+   - **Recommended**: Run a fresh GLFOS installer
+   - The installer generates both `hardware-configuration.nix` AND `firmware-configuration.nix`
+   - Gets you the latest GLF optimizations and driver configurations
+   - Ensures proper NVIDIA setup, bootloader config, and other firmware-specific settings
+
 ### Notes
 
 - GLF curated channels are followed via `inputs.glf-channels` and `nixpkgs.follows` in `flake.nix`.
 - System-agnostic configuration lives in `system-interface/default.nix`.
 - Hardware-specific configuration lives in `system-hardware-shims/device-name/`.
+- Device-specific settings (NVIDIA, bootloader, hostname, timezone, etc.) live in `system-hardware-shims/{device}/firmware-configuration.nix`.
+- The `hosts` list in `flake.nix` is automatically generated from the `system-hardware-shims/` directory structure.
 - Automatic updates use NixOS's built-in auto-upgrade service (a systemd timer) that periodically rebuilds from this flake and switches to it.
-- When adding a new device, remember to add it to the `hosts` list in `flake.nix`.
 
 

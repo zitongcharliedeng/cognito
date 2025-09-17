@@ -119,12 +119,13 @@ select_action() {
     echo "  2. Build and switch configuration (configuration applied after reboot)"
     echo "  3. Build, switch, and auto-reboot to new configuration"
     echo "  4. Test configuration (dry run)"
-    echo "  5. List available devices"
-    echo "  6. Exit"
+    echo "  5. Regenerate hardware configuration"
+    echo "  6. List available devices"
+    echo "  7. Exit"
     echo ""
     
     while true; do
-        read -p "Select action (1-6): " choice
+        read -p "Select action (1-7): " choice
         case "$choice" in
             1)
                 selected_action="build"
@@ -143,15 +144,19 @@ select_action() {
                 break
                 ;;
             5)
-                selected_action="list"
+                selected_action="regenerate"
                 break
                 ;;
             6)
+                selected_action="list"
+                break
+                ;;
+            7)
                 selected_action="exit"
                 break
                 ;;
             *)
-                print_error "Invalid selection. Please enter a number between 1 and 6"
+                print_error "Invalid selection. Please enter a number between 1 and 7"
                 ;;
         esac
     done
@@ -192,6 +197,26 @@ execute_action() {
             print_status "Testing configuration for device: $device"
             nixos-rebuild test --flake ".#$device"
             print_success "Configuration test passed for $device"
+            ;;
+        "regenerate")
+            print_status "Regenerating hardware configuration for device: $device"
+            echo ""
+            print_warning "This will regenerate the hardware-configuration.nix file for $device"
+            print_warning "Make sure you have the correct hardware connected before proceeding."
+            echo ""
+            read -p "Continue with hardware regeneration? (y/N): " confirm
+            if [[ "$confirm" =~ ^[Yy]$ ]]; then
+                print_status "Running nixos-generate-config for $device..."
+                sudo nixos-generate-config --dir ./system-hardware-shims/$device/
+                print_success "Hardware configuration regenerated for $device"
+                echo ""
+                print_warning "IMPORTANT: For firmware configuration changes (NVIDIA, bootloader, etc.),"
+                print_warning "consider running a fresh GLFOS installer to get updated firmware shims."
+                print_warning "The installer will generate both hardware-configuration.nix and firmware-configuration.nix"
+                print_warning "with the latest GLF optimizations for your hardware."
+            else
+                print_status "Hardware regeneration cancelled."
+            fi
             ;;
         "list")
             print_status "Available devices:"

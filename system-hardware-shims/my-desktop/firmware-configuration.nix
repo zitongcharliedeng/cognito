@@ -63,4 +63,9 @@ in
     LC_TELEPHONE = "en_GB.UTF-8";
     LC_TIME = "en_GB.UTF-8";
   };
+
+  # System State Version - Hardware/Installation Specific
+  # This is tied to the specific NixOS installation and hardware setup
+  # Different devices may have different state versions based on when they were installed
+  system.stateVersion = "25.05"; # DO NOT TOUCH
 }

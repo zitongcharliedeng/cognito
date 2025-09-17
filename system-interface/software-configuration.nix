@@ -7,6 +7,7 @@
       ../system-hardware-shims/my-desktop/firmware-configuration.nix
       # Include modular configuration components
       ./modules/mouse-pointer.nix
+      ./modules/web-driver-device-access.nix
     ];
 
   config = {
@@ -231,30 +232,7 @@
   # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
   # TODO: remove firefox for chromium or something that web-driver software plays well with.
 
-  # TODO: CONFIRM THESE UDEV RULES WORK FOR WEB SOFTWARE BROWSER DEVICE ACCESS. 
-  # LAST BEHAVIOUR WAS mouse.wiki not working, wootility working but not able to update or access the restore device.
-  # Enable official Wooting udev rules for browser access
-  services.udev.packages = [ pkgs.wooting-udev-rules ];
-  # Additional udev rules for other gaming devices
-  services.udev.extraRules = ''
-    # Universal HID raw device access for browser/WebHID
-    SUBSYSTEM=="hidraw", TAG+="uaccess"
-    
-    # Universal input device access for browser/WebHID  
-    SUBSYSTEM=="input", TAG+="uaccess"
-    
-    # Specific gaming device rules
-    # Azeron devices (keypad)
-    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="12f7", TAG+="uaccess"
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="12f7", TAG+="uaccess"
-    
-    # G-Wolves HSK Pro mouse
-    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="33e4", ATTRS{idProduct}=="5803", TAG+="uaccess"
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="33e4", ATTRS{idProduct}=="5803", TAG+="uaccess"
-  '';
-  # TODO: handle this programmatically for all devices if it works in the future.
 
 
-    system.stateVersion = "25.05"; # DO NOT TOUCH 
   };
 }

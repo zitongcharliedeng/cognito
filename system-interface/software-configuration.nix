@@ -1,5 +1,12 @@
 { inputs, config, pkgs, lib, pkgs-unstable, ... }:
 
+let
+  possibleGnomeExtensions = with pkgs.gnomeExtensions; [
+    vertical-workspaces
+    paperwm
+    just-perfection
+  ];
+in
 { 
   imports =
     [ # Include the results of the hardware scan + GLF modules
@@ -15,6 +22,8 @@
     glf.environment.type = "gnome";
     glf.environment.edition = "studio";  # Contains stuff like OBS, Steam, etc.
 
+    environment.systemPackages = possibleGnomeExtensions;
+
     # Enable dconf system-wide for users to configure GNOME per user
     programs.dconf.enable = true;
 
@@ -28,6 +37,10 @@
 
     # Default user configuration - this is user-specific, not system-wide
     home-manager.users.${config._module.args.defaultUsername} = {
+      # Ensure HM activation runs at switch and starts user units
+      programs.home-manager.enable = true;
+      systemd.user.startServices = "sd-switch";
+
       imports = [ ./users/default_user.nix ];
     };
     

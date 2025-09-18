@@ -2,7 +2,7 @@
 
 # User configuration for the default user created during GLF-OS installation
 let
-  gnomeExtensions = with pkgs.gnomeExtensions; [
+  userEnabledGnomeExtensions = with pkgs.gnomeExtensions; [
     vertical-workspaces
     paperwm
     just-perfection
@@ -19,14 +19,14 @@ in
   home.stateVersion = "25.05"; # Please read the comment before changing.
 
   # Install user packages
-  home.packages = gnomeExtensions ++ (with pkgs; [
+  home.packages = with pkgs; [
     osu-lazer-bin
-  ]);
+  ];
   
   # User-specific configuration managed by home-manager
   dconf.settings = {
     "org/gnome/shell" = {
-      enabled-extensions = map (x: x.extensionUuid) gnomeExtensions;
+      enabled-extensions = map (x: x.extensionUuid) userEnabledGnomeExtensions;
       disable-user-extensions = false;
     };
     "org/gnome/shell/extensions/just-perfection" = {

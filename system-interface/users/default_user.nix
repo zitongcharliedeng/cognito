@@ -2,12 +2,12 @@
 
 # User configuration for the default user created during GLF-OS installation
 let
-  userEnabledGnomeExtensions = with pkgs.gnomeExtensions; [
-    vertical-workspaces
-    paperwm
-    hide-top-bar
+  userEnabledGnomeExtensions = [
+    pkgs.gnomeExtensions.vertical-workspaces
+    pkgs.gnomeExtensions.paperwm
+    pkgs-unstable.gnomeExtensions.just-perfection
   ];
-in
+ in
 {
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -29,13 +29,11 @@ in
       enabled-extensions = map (x: x.extensionUuid) userEnabledGnomeExtensions;
       disable-user-extensions = false;
     };
-    "org/gnome/shell/extensions/hide-top-bar" = {
-      enable-active-window = false;  # keep hidden even with no active window
-      show-in-overview = true;       # show only in overview
-      mouse-sensitive = false;       # do NOT reveal on mouse hover
-      pressure-sensitive = false;    # do NOT reveal on pressure push
-      enable-multi-monitor = false;  # single-monitor setup
-      only-primary = true;           # restrict to primary (no effect with one monitor)
+
+    "org/gnome/shell/extensions/just-perfection" = {
+      panel = true;
+      panel-in-overview = true;
+      top-panel-position = 1; # 0 = top, 1 = bottom
     };
   };
 }

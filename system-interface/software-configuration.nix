@@ -1,10 +1,10 @@
 { inputs, config, pkgs, lib, pkgs-unstable, ... }:
 
 let
-  possibleGnomeExtensions = with pkgs.gnomeExtensions; [
-    vertical-workspaces
-    paperwm
-    hide-top-bar
+  possibleGnomeExtensions = [
+    pkgs.gnomeExtensions.vertical-workspaces
+    pkgs.gnomeExtensions.paperwm
+    pkgs-unstable.gnomeExtensions.just-perfection
   ];
 in
 { 

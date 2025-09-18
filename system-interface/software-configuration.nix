@@ -17,7 +17,7 @@
     environment.systemPackages = with pkgs; [
       fuzzel # Application Launcher - Fuzzel (modern Wayland launcher)
       swaylock # Screen lock
-      (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./additional-fuzzel-commands.sh))
+      (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./modules/additional-fuzzel-commands.sh))
       # GNOME System Controls (preserved for hardware management)
       # gnome-control-center
       # gnome-settings-daemon
@@ -26,6 +26,7 @@
       # gnome-terminal
       # gnome-calculator
       # gnome-screenshot
+      osu-lazer-bin
     ];
 
     # Enable Niri window manager

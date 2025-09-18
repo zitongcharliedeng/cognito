@@ -32,7 +32,7 @@ in
     # Enable dconf for GNOME extension configuration
     programs.dconf = {
       enable = true;
-      profiles."user".databases = [
+      profiles."${config._module.args.systemUsername}".databases = [
         {
           settings = {
             "org/gnome/shell" = {

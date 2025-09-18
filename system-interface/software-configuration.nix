@@ -16,6 +16,32 @@
     glf.environment.edition = "studio";
     environment.systemPackages = with pkgs; [
       osu-lazer-bin
+      gnomeExtensions.vertical-workspaces # More intuitive since PaperVM has infinite horizontal space per workspace.
+      gnomeExtensions.paperwm
+      gnomeExtensions.just-perfection
+    ];
+
+    # Enable dconf for GNOME extension configuration
+    programs.dconf.enable = true;
+
+    # Configure GNOME extensions and status bar visibility
+    programs.dconf.profiles."user".databases = [
+      {
+        settings = {
+          "org/gnome/shell" = {
+            enabled-extensions = [
+              "paperwm@paperwm.github.com"
+              "just-perfection-desktop@just-perfection"
+              "vertical-workspaces@G-dH.github.com"
+            ];
+            disable-user-extensions = false;
+          };
+          "org/gnome/shell/extensions/just-perfection" = {
+            panel = false;  # Hide the top panel in normal mode
+            panel-in-overview = true;  # Show the top panel in overview mode
+          };
+        };
+      }
     ];
 
     

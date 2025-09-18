@@ -1,11 +1,11 @@
-{ config, pkgs, lib, pkgs-unstable, ... }:
+{ config, pkgs, lib, ... }:
 
 # User configuration for the default user created during GLF-OS installation
 let
   userEnabledGnomeExtensions = [
     pkgs.gnomeExtensions.vertical-workspaces
     pkgs.gnomeExtensions.paperwm
-    pkgs-unstable.gnomeExtensions.just-perfection
+    pkgs.gnomeExtensions.just-perfection
   ];
  in
 {
@@ -31,7 +31,7 @@ let
     };
 
     "org/gnome/shell/extensions/just-perfection" = {
-      panel = true;
+      panel = false;
       panel-in-overview = true;
       top-panel-position = 1; # 0 = top, 1 = bottom
     };

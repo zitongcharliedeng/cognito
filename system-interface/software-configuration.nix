@@ -32,8 +32,9 @@ in
                                         # Prevents duplicate packages in Nix store and package conflicts
                                         # Faster builds since packages are already available from system
     home-manager.useUserPackages = true; # Install packages to user profile (~/.nix-profile) instead of system-wide
-                                         # Keeps user-specific packages separate from system packages
-                                         # Better for multi-user systems and cleaner separation of concerns
+
+    # Make pkgs-unstable available within Home Manager modules
+    home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
 
     # Default user configuration - this is user-specific, not system-wide
     home-manager.users.${config._module.args.defaultUsername} = {
@@ -44,7 +45,5 @@ in
       imports = [ ./users/default_user.nix ];
     };
     
-  # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
-  # TODO: remove firefox for chromium or something that web-driver software plays well with.
   };
 }

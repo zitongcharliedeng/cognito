@@ -7,6 +7,8 @@ let
     just-perfection
   ];
   gnomeExtensionUuids = map (x: x.extensionUuid) gnomeExtensions;
+  # Convert extension UUIDs to dconf format: 'uuid1', 'uuid2', 'uuid3'
+  commaListOfGnomeExtensionUuids = lib.concatMapStringsSep ", " (uuid: "'${uuid}'") gnomeExtensionUuids;
 in
 
 { 
@@ -30,31 +32,13 @@ in
     ] ++ gnomeExtensions;
 
     # Enable dconf for GNOME extension configuration
-    programs.dconf = {
-      enable = true;
-      profiles."${config._module.args.systemUsername}" = {
-        databases = [
-          {
-            settings = {
-              "org/gnome/shell" = {
-                enabled-extensions = gnomeExtensionUuids;
-                disable-user-extensions = false;
-              };
-              "org/gnome/shell/extensions/just-perfection" = {
-                panel = false;
-                panel-in-overview = true;
-              };
-            };
-          }
-        ];
-      };
-    };
+    programs.dconf.enable = true;
 
     # Create dconf database files in /etc/dconf/db/ so they can be loaded
     environment.etc."dconf/db/${config._module.args.systemUsername}.d/00-gnome-extensions" = {
       text = ''
         [org/gnome/shell]
-        enabled-extensions=['vertical-workspaces@G-dH.github.com', 'paperwm@paperwm.github.com', 'just-perfection-desktop@just-perfection']
+        enabled-extensions=[${commaListOfGnomeExtensionUuids}]
         disable-user-extensions=false
         
         [org/gnome/shell/extensions/just-perfection]

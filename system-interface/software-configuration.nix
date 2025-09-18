@@ -47,6 +47,11 @@ in
       '';
     };
 
+    # Ensure dconf database directory exists during system activation for us to put our dconf settings in.
+    # NixOS environment.etc cannot create directories that don't exist in the Nix store, so we must create them first.
+    system.activationScripts.dconf-db-setup = ''
+      mkdir -p /etc/dconf/db/${config._module.args.systemUsername}.d
+    '';
     # Load dconf settings on login to ensure our configuration takes effect upon every session
     # Changes to GNOME Shell preferences are session-ephemeral, permanent changes must change the NixOS configuration.
     systemd.user.services.dconf-load = {
@@ -55,8 +60,6 @@ in
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${pkgs.bash}/bin/bash -c ''
-          # Create dconf database directory if it doesn't exist i.e. on a new machine
-          mkdir -p /etc/dconf/db/${config._module.args.systemUsername}.d
           # Load our GNOME extension settings
           ${pkgs.dconf}/bin/dconf load / < /etc/dconf/db/${config._module.args.systemUsername}.d/00-gnome-extensions
         ''";

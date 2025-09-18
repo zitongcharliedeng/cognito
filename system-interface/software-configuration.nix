@@ -13,24 +13,21 @@
   config = {
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     glf.environment.type = "gnome";
-    glf.environment.edition = "studio";
-    
-    # Install system packages
-    environment.systemPackages = with pkgs; [
-      osu-lazer-bin
-    ];
+    glf.environment.edition = "studio";  # Contains stuff like OBS, Steam, etc.
 
-    # Enable dconf for GNOME configuration
+    # Enable dconf system-wide for users to configure GNOME per user
     programs.dconf.enable = true;
 
-    # Enable home-manager for user configuration management
+    # Enable home-manager for per-user configuration management
     home-manager.useGlobalPkgs = true;  # Use system's nixpkgs instead of home-manager's own copy
                                         # Prevents duplicate packages in Nix store and package conflicts
                                         # Faster builds since packages are already available from system
     home-manager.useUserPackages = true; # Install packages to user profile (~/.nix-profile) instead of system-wide
                                          # Keeps user-specific packages separate from system packages
                                          # Better for multi-user systems and cleaner separation of concerns
-    home-manager.users.${config._module.args.systemUsername} = {
+
+    # Default user configuration - this is user-specific, not system-wide
+    home-manager.users.${config._module.args.defaultUsername} = {
       imports = [ ./users/default_user.nix ];
     };
     

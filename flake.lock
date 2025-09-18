@@ -41,6 +41,27 @@
         "url": "https://framagit.org/gaming-linux-fr/glf-os/channels-glfos/glf-os-channels.git"
       }
     },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1757808926,
+        "narHash": "sha256-K6PEI5PYY94TVMH0mX3MbZNYFme7oNRKml/85BpRRAo=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "f21d9167782c086a33ad53e2311854a8f13c281e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.05",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "maccel": {
       "locked": {
         "lastModified": 1757387438,
@@ -140,6 +161,7 @@
       "inputs": {
         "glf": "glf",
         "glf-channels": "glf-channels",
+        "home-manager": "home-manager",
         "maccel": "maccel",
         "nixpkgs": [
           "glf-channels",

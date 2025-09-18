@@ -24,5 +24,5 @@
     };
   };
   # So you can run CLI/TUI without sudo
-  users.groups.maccel.members = [ config._module.args.systemUsername ];
+  users.groups.maccel.members = [ config._module.args.defaultUsername ];
 }

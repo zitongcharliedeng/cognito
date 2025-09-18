@@ -4,7 +4,7 @@ let
   possibleGnomeExtensions = with pkgs.gnomeExtensions; [
     vertical-workspaces
     paperwm
-    just-perfection
+    hide-top-bar
   ];
 in
 { 

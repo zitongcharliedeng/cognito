@@ -5,7 +5,7 @@ let
   userEnabledGnomeExtensions = with pkgs.gnomeExtensions; [
     vertical-workspaces
     paperwm
-    just-perfection
+    hide-top-bar
   ];
 in
 {
@@ -29,9 +29,13 @@ in
       enabled-extensions = map (x: x.extensionUuid) userEnabledGnomeExtensions;
       disable-user-extensions = false;
     };
-    "org/gnome/shell/extensions/just-perfection" = {
-      panel = false;
-      panel-in-overview = true;
+    "org/gnome/shell/extensions/hide-top-bar" = {
+      enable-active-window = false;  # keep hidden even with no active window
+      show-in-overview = true;       # show only in overview
+      mouse-sensitive = false;       # do NOT reveal on mouse hover
+      pressure-sensitive = false;    # do NOT reveal on pressure push
+      enable-multi-monitor = false;  # single-monitor setup
+      only-primary = true;           # restrict to primary (no effect with one monitor)
     };
   };
 }

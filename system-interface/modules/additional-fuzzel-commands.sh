@@ -2,14 +2,32 @@
 # Fuzzel additional commands (has app launching by default)
 
 case "$1" in
-  "lock-screen")
-    swaylock
-    ;;
   "screenshot")
     gnome-screenshot
     ;;
   "screenshot-area")
     gnome-screenshot -a
+    ;;
+  "terminal")
+    gnome-terminal
+    ;;
+  "shutdown")
+    systemctl poweroff
+    ;;
+  "reboot")
+    systemctl reboot
+    ;;
+  "suspend")
+    systemctl suspend
+    ;;
+  "logout")
+    loginctl terminate-session $XDG_SESSION_ID
+    ;;
+  "file-manager")
+    nautilus
+    ;;
+  "settings")
+    gnome-control-center
     ;;
   "maximize-window")
     # This would need Niri API integration

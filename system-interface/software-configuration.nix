@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, lib, ... }:
+{ inputs, config, pkgs, lib, pkgs-unstable, ... }:
 
 { 
   imports =
@@ -16,58 +16,40 @@
     # TODO: reintroduce notifications via mako (or AGS later) this is the only thing lost by just removing the GNOME SHELL (front end)
     environment.systemPackages = with pkgs; [
       fuzzel # Application Launcher - Fuzzel (modern Wayland launcher)
-      swaylock # Screen lock
       (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./modules/additional-fuzzel-commands.sh))
-      # GNOME System Controls (preserved for hardware management)
-      # gnome-control-center
-      # gnome-settings-daemon
-      # gnome-system-monitor
-      # gnome-disk-utility
-      # gnome-terminal
-      # gnome-calculator
-      # gnome-screenshot
+      pkgs-unstable.xwayland-satellite # X11 support for Niri via xwayland-satellite (unstable)
       osu-lazer-bin
     ];
 
-    # Enable Niri window manager
+    # Enable Niri window manager (using unstable version for xwayland-satellite support)
     programs.niri.enable = true;
+    programs.niri.package = pkgs-unstable.niri;
     
     # Fuzzel configuration (minimal setup, will replace with AGS later)
     # Fuzzel will be available as fuzzel in system packages
     # Configuration will be handled via AGS in the future
     
+    # Ensure fuzzel can find applications
+    # XDG_DATA_DIRS is the standard convention that fuzzel uses to find .desktop files
+    # Add our paths to the existing XDG_DATA_DIRS from GLF-OS base (via NixOS display manager)
+    environment.sessionVariables = {
+      XDG_DATA_DIRS = lib.mkAfter [ "/usr/share/applications" "/usr/share/gnome/applications" ];
+      # TODO: check if Wayland environment variables for Niri + Fuzzel are needed
+      XDG_CURRENT_DESKTOP = "niri";
+      XDG_SESSION_DESKTOP = "niri";
+      XDG_SESSION_TYPE = "wayland";
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      MOZ_ENABLE_WAYLAND = "1";
+    };
+    
     # Niri configuration - minimal keyboard shortcuts, everything else via Fuzzel
-    environment.etc."niri/config".text = ''
-      # Key bindings - ONLY Super+Space for launcher
-      keybindings = [
-        # Application launcher - ONLY this keyboard shortcut
-        "Super+Space" = "spawn fuzzel";
-      ];
+    environment.etc."niri/config.kdl".text = ''
+      binds {
+        Super+Space { spawn "fuzzel"; }
+      }
     '';
-    
-    # Essential GNOME services for hardware support (mouse, keyboard, audio, etc.)
-    # These are needed even without GNOME Shell for basic input device functionality
-    # services.gnome.gnome-settings-daemon.enable = true;
-    # services.gnome.gnome-keyring.enable = true;
-    
-    # Disable GNOME GUI components that may (TODO: check) conflict with Niri
-    services.xserver.desktopManager.gnome.enable = false;
-    # services.xserver.displayManager.gdm.enable = true;
-    # services.gnome.core-shell.enable = false;
-    # services.gnome.core-apps.enable = false;
-    # services.gnome.gnome-browser-connector.enable = false;
-    # services.gnome.evolution-data-server.enable = false;
-    # services.gnome.gnome-online-accounts.enable = false;
-    
-    # GNOME dconf - ESSENTIAL for system controls to work properly
-    # dconf is GNOME's configuration database that stores settings for:
-    # - GNOME Control Center (hardware settings, display, audio, input devices)
-    # - GNOME Settings Daemon (system-wide preferences and hardware integration)
-    # - GNOME Keyring (encrypted password storage)
-    # - GNOME applications (terminal, screenshot, calculator preferences)
-    # Without dconf, GNOME system controls cannot save or load settings
-    # programs.dconf.enable = true;
-    
+  
     # TODO: Future AGS integration for advanced status bar and launcher
     # TODO: Implement streaming layout script for Niri using:
     # - Niri's layout system for 1:4:1 arrangement

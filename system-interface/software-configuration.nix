@@ -32,21 +32,47 @@ in
     # Enable dconf for GNOME extension configuration
     programs.dconf = {
       enable = true;
-      profiles."user".databases = [
-        {
-          settings = {
-            "org/gnome/shell" = {
-              enabled-extensions = gnomeExtensionUuids;
-              disable-user-extensions = false;
+      profiles."${config._module.args.systemUsername}" = {
+        databases = [
+          {
+            settings = {
+              "org/gnome/shell" = {
+                enabled-extensions = gnomeExtensionUuids;
+                disable-user-extensions = false;
+              };
+              "org/gnome/shell/extensions/just-perfection" = {
+                panel = false;
+                panel-in-overview = true;
+              };
             };
-            # Only include Just Perfection settings that change from default
-            "org/gnome/shell/extensions/just-perfection" = {
-              panel = false;  # Hide the top panel in normal mode
-              panel-in-overview = true;  # Show the top panel in overview mode
-            };
-          };
-        }
-      ];
+          }
+        ];
+      };
+    };
+
+    # Create dconf database files in /etc/dconf/db/ so they can be loaded
+    environment.etc."dconf/db/${config._module.args.systemUsername}.d/00-gnome-extensions" = {
+      text = ''
+        [org/gnome/shell]
+        enabled-extensions=['vertical-workspaces@G-dH.github.com', 'paperwm@paperwm.github.com', 'just-perfection-desktop@just-perfection']
+        disable-user-extensions=false
+        
+        [org/gnome/shell/extensions/just-perfection]
+        panel=false
+        panel-in-overview=true
+      '';
+    };
+
+    # Load dconf settings on login to ensure our configuration takes effect upon every session
+    # Changes to GNOME Shell preferences are session-ephemeral, permanent changes must change the NixOS configuration.
+    systemd.user.services.dconf-load = {
+      description = "Load dconf settings from system configuration";
+      wantedBy = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.dconf}/bin/dconf load / < /etc/dconf/db/${config._module.args.systemUsername}.d/00-gnome-extensions'";
+        User = "${config._module.args.systemUsername}";
+      };
     };
 
     

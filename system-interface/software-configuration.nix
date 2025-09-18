@@ -13,11 +13,11 @@
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     glf.environment.type = "gnome";
     glf.environment.edition = "studio";
-    
+    # TODO: reintroduce notifications via mako (or AGS later) this is the only thing lost by just removing the GNOME SHELL (front end)
     environment.systemPackages = with pkgs; [
       fuzzel # Application Launcher - Fuzzel (modern Wayland launcher)
       swaylock # Screen lock
-      (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./additional-fuzzel-commands.sh))
+      (pkgs.writeShellScriptBin "fuzzel-commands" (builtins.readFile ./modules/additional-fuzzel-commands.sh))
       # GNOME System Controls (preserved for hardware management)
       # gnome-control-center
       # gnome-settings-daemon
@@ -26,6 +26,7 @@
       # gnome-terminal
       # gnome-calculator
       # gnome-screenshot
+      osu-lazer-bin
     ];
 
     # Enable Niri window manager
@@ -50,8 +51,8 @@
     # services.gnome.gnome-keyring.enable = true;
     
     # Disable GNOME GUI components that may (TODO: check) conflict with Niri
-    # services.xserver.desktopManager.gnome.enable = false;
-    # services.xserver.displayManager.gdm.enable = false;
+    services.xserver.desktopManager.gnome.enable = false;
+    # services.xserver.displayManager.gdm.enable = true;
     # services.gnome.core-shell.enable = false;
     # services.gnome.core-apps.enable = false;
     # services.gnome.gnome-browser-connector.enable = false;

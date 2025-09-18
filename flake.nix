@@ -7,6 +7,8 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     glf.url = "git+https://framagit.org/gaming-linux-fr/glf-os/glf-os.git?ref=main"; # References the GLF-OS root flake
     maccel.url = "github:Gnarus-G/maccel"; # Official maccel repo with NixOS support
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # About updates:
@@ -22,6 +24,7 @@
       nixpkgs-unstable,
       glf,
       maccel,
+      home-manager,
       self,
       ...
     }: 
@@ -53,6 +56,7 @@
             ./system-hardware-shims/${name}/firmware-configuration.nix
             glf.nixosModules.default 
             maccel.nixosModules.default
+            home-manager.nixosModules.home-manager
           ];
 
         specialArgs = {

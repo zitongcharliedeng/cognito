@@ -4,7 +4,7 @@ let
   possibleGnomeExtensions = [
     pkgs.gnomeExtensions.vertical-workspaces
     pkgs.gnomeExtensions.paperwm
-    pkgs-unstable.gnomeExtensions.just-perfection
+    pkgs.gnomeExtensions.just-perfection
   ];
 in
 { 
@@ -14,13 +14,13 @@ in
       ../system-hardware-shims/my-desktop/firmware-configuration.nix
       ./modules/mouse-pointer.nix
       ./modules/web-driver-device-access.nix
-      # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM.
+      # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 
   config = {
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     glf.environment.type = "gnome";
-    glf.environment.edition = "studio";  # Contains stuff like OBS, Steam, etc.
+    glf.environment.edition = "studio-pro";  # Contains stuff like OBS, Steam, Davinci Resolve Studio (paid) etc.
 
     environment.systemPackages = possibleGnomeExtensions;
 

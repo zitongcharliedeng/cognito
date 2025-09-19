@@ -27,6 +27,9 @@ in
     # Enable dconf system-wide for users to configure GNOME per user
     programs.dconf.enable = true;
 
+    # Enable AppArmor (required by DigitalZen app)
+    security.apparmor.enable = true;
+
     # Enable home-manager for per-user configuration management
     home-manager.useGlobalPkgs = true;  # Use system's nixpkgs instead of home-manager's own copy
                                         # Prevents duplicate packages in Nix store and package conflicts

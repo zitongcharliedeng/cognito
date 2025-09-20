@@ -14,7 +14,7 @@ in
       ../system-hardware-shims/my-desktop/firmware-configuration.nix
       ./modules/mouse-pointer.nix
       ./modules/web-driver-device-access.nix
-      ./modules/davinci-mic-fix.nix
+      # ./modules/davinci-mic-fix.nix TODO: fix this, it doesnt work
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 

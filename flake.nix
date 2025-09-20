@@ -36,7 +36,7 @@
         inherit system;
         config = {
           allowUnfree = true;
-          pulseaudio = true; # ✅ ensure packages build with PulseAudio support
+          # pulseaudio = true; # ✅ ensure packages build with PulseAudio support avinci-mic-fix.nix
         };
       };
 
@@ -44,7 +44,7 @@
         inherit system;
         config = {
           allowUnfree = true;
-          pulseaudio = true; # ✅ match stable to avoid mismatch
+          # pulseaudio = true; # ✅ match stable to avoid mismatch avinci-mic-fix.nix
         };
       };
 

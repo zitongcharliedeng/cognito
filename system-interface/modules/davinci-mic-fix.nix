@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
+  # WHY IS THIS NOT WORKING?!?>!?  CANT EVEN GET AUDIO TO PLAY LET ALONE ALSA TO WORK WITH PULSE
   # Real-time scheduling for low-latency audio threads
   security.rtkit.enable = true;
 

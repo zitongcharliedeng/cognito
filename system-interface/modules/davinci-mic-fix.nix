@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }:
-# This still doesnt actually fix the 
+# This still doesnt actually fix the problem still... TODO
 {
   security.rtkit.enable = true;  # real-time scheduling for low-latency audio
-  services.pulseaudio.enable = false;  # we want PipeWire's PulseAudio, not legacy PA
+  services.pulseaudio.enable = lib.mkForce false;  # we want PipeWire's PulseAudio, not legacy PA
   services.pipewire = {
     enable = true;
     alsa.enable = true;        # Let pipewire have API to emulate ALSA to apps like Resolve
@@ -17,7 +17,4 @@
     # The trick is that alsa-plugins ships little .so modules (like libasound_module_pcm_pulse.so) that ALSA can auto-load.
     # These plugins can intercept pcm.default and forward it somewhere else (PulseAudio, PipeWire, Jack…).
   ];
-  # Expose our ALSA to our ALSA-Pulse bridge configs location from nix-store 
-  environment.etc."alsa/conf.d/99-pulse.conf".source =
-    "${pkgs.alsa-plugins}/lib/alsa-lib/conf.pulse";
 }

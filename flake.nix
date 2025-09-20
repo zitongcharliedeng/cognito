@@ -32,16 +32,20 @@
     let
       system = "x86_64-linux"; 
       
-      # Configuration for stable nixpkgs (will be the default `pkgs`)
       pkgsStable = import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
+        config = {
+          allowUnfree = true;
+          pulseaudio = true; # ✅ ensure packages build with PulseAudio support
+        };
       };
 
-      # Configuration for nixpkgs unstable (passed as a special argument)
       pkgsUnstable = import nixpkgs-unstable {
         inherit system;
-        config.allowUnfree = true;
+        config = {
+          allowUnfree = true;
+          pulseaudio = true; # ✅ match stable to avoid mismatch
+        };
       };
 
       # Discover all host configs programmatically inside ./system-hardware-shims/

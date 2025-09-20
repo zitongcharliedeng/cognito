@@ -1,25 +1,36 @@
 { config, pkgs, lib, ... }:
 
 {
-  security.rtkit.enable = true;  # real-time scheduling for low-latency audio
-  services.pulseaudio.enable = false;  # we want PipeWire’s PulseAudio, not legacy PA
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;        # Let pipewire have API to emulate ALSA to apps like Resolve
-    alsa.support32Bit = true;  # only if you run 32-bit apps (Wine/Steam plugins)
-    pulse.enable = true;       # Let pipewire have API to emulate PulseAudio — helps with mic input in ALSA apps like Resolve.
-    jack.enable = true;         # JACK compatibility (optional but harmless)
+  # Real-time scheduling for low-latency audio threads
+  security.rtkit.enable = true;
+
+  # ✅ Switch to native PulseAudio
+  services.pulseaudio = {
+    enable = true;     # Start PulseAudio daemon
+    package = pkgs.pulseaudioFull; # Includes extra modules (Bluetooth, etc.)
+    support32Bit = true; # 32-bit app compatibility (Wine/legacy plugins)
   };
-  # Important: ensure ALSA → Pulse bridge is installed
+  
+  # ❌ Disable PipeWire completely
+  services.pipewire.enable = lib.mkForce false;
+
+  # Add user to audio group if not already
+  users.users.${config._module.args.defaultUsername}.extraGroups = [ "audio" ];
+
+  # Provide ALSA → Pulse bridge modules and tools
   environment.systemPackages = with pkgs; [
-    alsa-plugins   # provides libasound_module_pcm_pulse.so
-    alsa-utils     # for aplay/arecord to test
-    # The trick is that alsa-plugins ships little .so modules (like libasound_module_pcm_pulse.so) that ALSA can auto-load.
-    # These plugins can intercept pcm.default and forward it somewhere else (PulseAudio, PipeWire, Jack…).
+    alsa-plugins   # ships libasound_module_pcm_pulse.so for ALSA→Pulse
+    alsa-utils     # gives you arecord/aplay to test
+    pavucontrol    # optional but handy: GUI control for routing, verifying mic
   ];
-  # Expose our ALSA to our ALSA-Pulse bridge configs location from nix-store 
+
   environment.etc."alsa/conf.d/99-pulse.conf".source =
-    "${pkgs.alsa-plugins}/lib/alsa-lib/conf.pulse";
+  "${pkgs.alsa-plugins}/lib/alsa-lib/conf.pulse";
+
+  # Rationale:
+  # - DaVinci Resolve only supports ALSA. It will pick up “ALSA 1–8” devices.
+  # - With PulseAudio running natively, ALSA apps use the alsa-plugins bridge
+  #   (pcm.pulse + ctl.pulse) to forward audio/mic into PulseAudio.
+  # - This setup is older and more widely tested than PipeWire’s emulation layer,
+  #   so Resolve should finally see mic input working.
 }
-
-

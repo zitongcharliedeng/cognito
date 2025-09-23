@@ -16,7 +16,7 @@
     enable = true;
     enableCli = true; # optional: lets you run `maccel tui` and `maccel set`
     parameters = {
-      sensMultiplier = 0.12;
+      sensMultiplier = 0.2;
       inputDpi = 2000.0;
       yxRatio = 1.0;
       mode = "no_accel"; # No acceleration curve

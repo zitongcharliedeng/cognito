@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, lib, pkgs-unstable, ... }:
+{ config, pkgs, lib, pkgs-unstable, ... }:
 # This current configuration works and runs steam games, albeit a bit laggy. It runs fine even with GNOME
 # as the main session - the GNOME login manager is smart enough to create a new drop down session for Niri.
 # (As long as other WM like PaperWM? is not installed)

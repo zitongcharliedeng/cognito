@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, lib, pkgs-unstable, ... }:
+{ config, pkgs, lib, pkgs-unstable, ... }:
 
 let
   possibleGnomeExtensions = [
@@ -15,6 +15,7 @@ in
       ./modules/mouse-pointer.nix
       ./modules/web-driver-device-access.nix
       ./modules/davinci-mic-fix.nix
+      ./modules/glf-overrides.nix
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 

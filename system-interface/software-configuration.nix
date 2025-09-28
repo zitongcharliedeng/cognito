@@ -23,6 +23,7 @@ in
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     glf.environment.type = "gnome";
     glf.environment.edition = "studio-pro";  # Contains stuff like OBS, Steam, Davinci Resolve Studio (paid) etc.
+    security.rtkit.enable = true;  # real-time scheduling for low-latency audio, possibly stops the twitch lagging-behind on audio vs the visuals
 
     environment.systemPackages = possibleGnomeExtensions;
 

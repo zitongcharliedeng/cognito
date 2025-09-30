@@ -2,7 +2,7 @@
 
 let
   obsPlugins = with pkgs.obs-studio-plugins; [
-    obs-multi-rtmp             # multistream (Twitch + YouTube)
+    # Multi-streaming on Twitch and YT done using Restream as the receiving service.
     obs-pipewire-audio-capture # clean per-app audio capture
     obs-vkcapture              # Vulkan/OpenGL capture
     obs-scale-to-sound # poop avatar talking

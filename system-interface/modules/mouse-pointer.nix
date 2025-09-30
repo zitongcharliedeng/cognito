@@ -20,7 +20,7 @@
       inputDpi = 2000.0;
       yxRatio = 1.0;
       mode = "no_accel"; # No acceleration curve
-      angleRotation = 9.0;
+      angleRotation = 12.0;
     };
   };
   # So you can run CLI/TUI without sudo

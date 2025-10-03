@@ -27,7 +27,7 @@ let
     fuse                  # libfuse2 for older AppImages
     appimage-run
     desktop-file-utils    # provides update-desktop-database
-    
+
     # Audio apps and plugin suites for EasyEffects
     easyeffects
     qpwgraph
@@ -40,7 +40,6 @@ let
     x42-plugins
     dragonfly-reverb
     tap-plugins
-    artyfx
     guitarix
   ];
   

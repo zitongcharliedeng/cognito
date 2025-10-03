@@ -26,7 +26,7 @@ in {
   programs.firefox.enable = lib.mkForce false;
 
   # Also explicitly install vesktop at the system level for clarity in-case GLF-OS removes the default apps.
-  environment.systemPackages = [ pkgs.vesktop pkgs.ungoogled-chromium ];
+  environment.systemPackages = [ pkgs.vesktop pkgs.brave ];
 }
 
 

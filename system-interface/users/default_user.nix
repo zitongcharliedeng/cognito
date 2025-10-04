@@ -28,11 +28,12 @@ let
     appimage-run
     desktop-file-utils    # provides update-desktop-database
 
-    # Audio apps and plugin suites for EasyEffects
-    easyeffects
+    # Per app input and output effects i.e bitcrushed youtube music for streaming.
+    carla
     qpwgraph
 
     # Common LV2/VST plugin collections
+    lv2
     zam-plugins
     calf
     lsp-plugins

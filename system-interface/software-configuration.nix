@@ -34,6 +34,12 @@ in
     # Enable AppArmor (required by DigitalZen app)
     security.apparmor.enable = true;
 
+    # Enable desktop portal for window capture (required for OBS PipeWire Game Capture)
+    xdg.portal = {
+      enable = true;
+      extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+    };
+
     # Enable home-manager for per-user configuration management
     home-manager.useGlobalPkgs = true;  # Use system's nixpkgs instead of home-manager's own copy
                                         # Prevents duplicate packages in Nix store and package conflicts

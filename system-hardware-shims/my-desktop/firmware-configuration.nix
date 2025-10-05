@@ -22,7 +22,7 @@ in
   users.users.${defaultUsername} = {
     isNormalUser = true;
     description = defaultUsername;
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "disk" "input" "render" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "disk" "input" "render" "video" "pipewire" ];
   };
 
   # Bootloader Configuration - Hardware Specific

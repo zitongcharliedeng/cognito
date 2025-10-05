@@ -111,10 +111,86 @@ select_device() {
     return 0
 }
 
+# Function to perform first-time installation setup
+first_time_install() {
+    echo -e "${BOLD}First-Time Installation Setup${NC}"
+    echo ""
+    print_status "This will move GLFOS generated hardware configs to system-hardware-shims/"
+    echo ""
+    
+    # Ask for device name
+    while true; do
+        read -p "Enter device name (e.g., my-laptop, my-desktop): " device_name
+        if [ -z "$device_name" ]; then
+            print_error "Device name cannot be empty"
+            continue
+        fi
+        if [ -d "./system-hardware-shims/$device_name" ]; then
+            print_error "Device '$device_name' already exists in system-hardware-shims/"
+            read -p "Do you want to overwrite it? (y/N): " overwrite
+            if [[ ! "$overwrite" =~ ^[Yy]$ ]]; then
+                continue
+            fi
+        fi
+        break
+    done
+    
+    echo ""
+    print_status "Setting up device: $device_name"
+    
+    # Check if source files exist
+    if [ ! -f "/etc/nixos/hardware-configuration.nix" ]; then
+        print_error "/etc/nixos/hardware-configuration.nix not found"
+        print_error "Please run GLFOS installer first to generate hardware configs"
+        return 1
+    fi
+    
+    if [ ! -f "/etc/nixos/configuration.nix" ]; then
+        print_error "/etc/nixos/configuration.nix not found"
+        print_error "Please run GLFOS installer first to generate firmware configs"
+        return 1
+    fi
+    
+    # Create device folder
+    print_status "Creating device folder: system-hardware-shims/$device_name/"
+    mkdir -p "./system-hardware-shims/$device_name"
+    
+    # Copy and clean hardware-configuration.nix
+    print_status "Moving hardware-configuration.nix..."
+    sudo cp /etc/nixos/hardware-configuration.nix "./system-hardware-shims/$device_name/hardware-configuration.nix"
+    sudo chown $USER:$USER "./system-hardware-shims/$device_name/hardware-configuration.nix"
+    
+    # Remove glf.environment lines from hardware-configuration.nix
+    sed -i '/glf\.environment\.type/d' "./system-hardware-shims/$device_name/hardware-configuration.nix"
+    sed -i '/glf\.environment\.edition/d' "./system-hardware-shims/$device_name/hardware-configuration.nix"
+    
+    # Copy and clean configuration.nix -> firmware-configuration.nix
+    print_status "Moving configuration.nix as firmware-configuration.nix..."
+    sudo cp /etc/nixos/configuration.nix "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    sudo chown $USER:$USER "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    
+    # Remove glf.environment lines from firmware-configuration.nix
+    sed -i '/glf\.environment\.type/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    sed -i '/glf\.environment\.edition/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    
+    echo ""
+    print_success "Device '$device_name' has been set up successfully!"
+    print_status "Files created:"
+    print_status "  - system-hardware-shims/$device_name/hardware-configuration.nix"
+    print_status "  - system-hardware-shims/$device_name/firmware-configuration.nix"
+    echo ""
+    print_status "The device will be automatically detected by flake.nix"
+    print_status "You can now build with: ./build.sh"
+    echo ""
+    
+    return 0
+}
+
 # Function to display action selection menu
 select_action() {
     echo -e "${BOLD}Available actions:${NC}"
     echo ""
+    echo "  0. First-time installation (setup new device from GLFOS generated configs)"
     echo "  1. Build configuration (compile only)"
     echo "  2. Build and switch configuration (configuration applied after reboot)"
     echo "  3. Build, switch, and auto-reboot to new configuration"
@@ -125,8 +201,12 @@ select_action() {
     echo ""
     
     while true; do
-        read -p "Select action (1-7): " choice
+        read -p "Select action (0-7): " choice
         case "$choice" in
+            0)
+                selected_action="first-time-install"
+                break
+                ;;
             1)
                 selected_action="build"
                 break
@@ -156,7 +236,7 @@ select_action() {
                 break
                 ;;
             *)
-                print_error "Invalid selection. Please enter a number between 1 and 7"
+                print_error "Invalid selection. Please enter a number between 0 and 7"
                 ;;
         esac
     done
@@ -171,6 +251,9 @@ execute_action() {
     local action=$2
     
     case "$action" in
+        "first-time-install")
+            first_time_install
+            ;;
         "build")
             print_status "Building configuration for device: $device"
             nixos-rebuild build --flake ".#$device"
@@ -237,25 +320,38 @@ main() {
     print_header
     
     while true; do
-        # Select device
-        if ! select_device; then
-            break
-        fi
-        
-        # Check device and files
-        if ! check_device "$selected_device"; then
-            break
-        fi
-        
-        if ! check_device_files "$selected_device"; then
-            break
-        fi
-        
-        # Select action
+        # Select action first
         select_action
         
-        # Execute action
-        execute_action "$selected_device" "$selected_action"
+        # For first-time install, skip device selection
+        if [ "$selected_action" = "first-time-install" ]; then
+            execute_action "" "$selected_action"
+        elif [ "$selected_action" = "list" ] || [ "$selected_action" = "exit" ]; then
+            # List and exit don't need device selection either
+            execute_action "" "$selected_action"
+        else
+            # Select device for other actions
+            if ! select_device; then
+                break
+            fi
+            
+            # Check device and files
+            if ! check_device "$selected_device"; then
+                break
+            fi
+            
+            if ! check_device_files "$selected_device"; then
+                break
+            fi
+            
+            # Execute action
+            execute_action "$selected_device" "$selected_action"
+        fi
+        
+        # Break if exit was selected
+        if [ "$selected_action" = "exit" ]; then
+            break
+        fi
         
         echo ""
         echo -e "${BOLD}${CYAN}================================${NC}"

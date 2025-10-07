@@ -169,11 +169,27 @@ first_time_install() {
     sudo cp /etc/nixos/configuration.nix "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sudo chown $USER:$USER "./system-hardware-shims/$device_name/firmware-configuration.nix"
     
-    print_status "Cleaning up unneeded GLF-OS auto-generated lines"
+    print_status "Cleaning up unneeded GLF-OS auto-generated lines..."
     sed -i '/glf\.environment\.type/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sed -i '/glf\.environment\.edition/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sed -i '/\.\/hardware-configuration\.nix/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sed -i '/\.\/customConfig/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    
+    # Extract username from users.users.<username> line
+    print_status "Extracting username from configuration..."
+    local username=$(grep -oP 'users\.users\.\K[^.=\s{]+' "./system-hardware-shims/$device_name/firmware-configuration.nix" | head -1)
+    
+    if [ -z "$username" ]; then
+        print_error "Could not find username in configuration file"
+        print_error "Expected to find 'users.users.<username>' in firmware-configuration.nix"
+        return 1
+    fi
+    
+    print_status "Found username: $username"
+    
+    # Add username module export right before users.users line
+    print_status "Adding username module export..."
+    sed -i "/users\.users\./i\  # Export default username as a special argument for other modules\n  _module.args.defaultUsername = \"$username\";\n" "./system-hardware-shims/$device_name/firmware-configuration.nix"
     
     # Stage changes in git so they can be used for building
     print_status "Staging changes in git..."

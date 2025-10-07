@@ -177,7 +177,7 @@ first_time_install() {
     
     # Stage changes in git so they can be used for building
     print_status "Staging changes in git..."
-    sudo git add .
+    git add .
     
     echo ""
     print_success "Device '$device_name' has been set up successfully!"

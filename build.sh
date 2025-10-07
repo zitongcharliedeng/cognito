@@ -169,9 +169,15 @@ first_time_install() {
     sudo cp /etc/nixos/configuration.nix "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sudo chown $USER:$USER "./system-hardware-shims/$device_name/firmware-configuration.nix"
     
-    # Remove glf.environment lines from firmware-configuration.nix
+    print_status "Cleaning up unneeded GLF-OS auto-generated lines"
     sed -i '/glf\.environment\.type/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
     sed -i '/glf\.environment\.edition/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    sed -i '/\.\/hardware-configuration\.nix/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    sed -i '/\.\/customConfig/d' "./system-hardware-shims/$device_name/firmware-configuration.nix"
+    
+    # Stage changes in git so they can be used for building
+    print_status "Staging changes in git..."
+    sudo git add .
     
     echo ""
     print_success "Device '$device_name' has been set up successfully!"

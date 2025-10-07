@@ -10,9 +10,7 @@ let
 in
 { 
   imports =
-    [ # Include the results of the hardware scan + GLF modules
-      ../system-hardware-shims/my-desktop/hardware-configuration.nix
-      ../system-hardware-shims/my-desktop/firmware-configuration.nix
+    [ # Include custom modules
       ./modules/mouse-pointer.nix
       ./modules/web-driver-device-access.nix
       ./modules/davinci-mic-fix.nix

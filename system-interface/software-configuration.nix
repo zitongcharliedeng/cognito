@@ -5,6 +5,7 @@ let
     pkgs.gnomeExtensions.vertical-workspaces
     pkgs.gnomeExtensions.paperwm
     pkgs.raysession # TODO move outside of gnome extensions
+    pkgs.syncthing
   ];
 in
 { 
@@ -14,6 +15,7 @@ in
       ./modules/web-driver-device-access.nix
       ./modules/davinci-mic-fix.nix
       ./modules/glf-overrides.nix
+      ./modules/syncing-application-data.nix
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 

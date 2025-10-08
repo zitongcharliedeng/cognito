@@ -5,7 +5,6 @@ let
   userEnabledGnomeExtensions = [
     pkgs.gnomeExtensions.vertical-workspaces
     pkgs.gnomeExtensions.paperwm
-    pkgs.gnomeExtensions.just-perfection
   ];
  in
 {
@@ -49,12 +48,6 @@ let
     "org/gnome/shell" = {
       enabled-extensions = map (x: x.extensionUuid) userEnabledGnomeExtensions;
       disable-user-extensions = false;
-    };
-
-    "org/gnome/shell/extensions/just-perfection" = {
-      panel = false;
-      panel-in-overview = true;
-      top-panel-position = 1; # 0 = top, 1 = bottom
     };
   };
 

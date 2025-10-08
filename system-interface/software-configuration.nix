@@ -4,7 +4,6 @@ let
   possibleGnomeExtensions = [
     pkgs.gnomeExtensions.vertical-workspaces
     pkgs.gnomeExtensions.paperwm
-    pkgs-unstable.gnomeExtensions.just-perfection
     pkgs.raysession # TODO move outside of gnome extensions
   ];
 in

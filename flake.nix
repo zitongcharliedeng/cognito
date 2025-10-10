@@ -9,6 +9,7 @@
     maccel.url = "github:Gnarus-G/maccel"; # Official maccel repo with NixOS support
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };
 
   # About updates:
@@ -25,6 +26,7 @@
       glf,
       maccel,
       home-manager,
+      nix-minecraft,
       self,
       ...
     }: 
@@ -36,6 +38,7 @@
       pkgsStable = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        overlays = [ nix-minecraft.overlay ];
       };
 
       # Configuration for nixpkgs unstable (passed as a special argument)
@@ -57,6 +60,7 @@
             glf.nixosModules.default 
             maccel.nixosModules.default
             home-manager.nixosModules.home-manager
+            nix-minecraft.nixosModules.minecraft-servers
           ];
 
         specialArgs = {

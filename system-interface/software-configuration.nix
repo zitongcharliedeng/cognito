@@ -16,6 +16,7 @@ in
       ./modules/davinci-mic-fix.nix
       ./modules/glf-overrides.nix
       ./modules/syncing-application-data.nix
+      ./modules/mcserver.nix
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 

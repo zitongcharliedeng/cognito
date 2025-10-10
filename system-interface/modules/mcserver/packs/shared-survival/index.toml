@@ -1,0 +1,49 @@
+hash-format = "sha256"
+
+[[files]]
+file = "mods/controlling.pw.toml"
+hash = "1c3632cffeb0bcb78d4e897116bb7d3f123d6fde8f065b74085eadd64a687c36"
+metafile = true
+
+[[files]]
+file = "mods/essential-mod.pw.toml"
+hash = "ba246b7eb805f81b4ec41265cf46fce5a260a35fe2fd3e727119173504a5d2de"
+metafile = true
+
+[[files]]
+file = "mods/fabric-api.pw.toml"
+hash = "89fd86742345d5731eb8cdb74094169d291b737e4f3847a2109f18672a484ab1"
+metafile = true
+
+[[files]]
+file = "mods/mouse-tweaks.pw.toml"
+hash = "9a2cf1b5b5f996fdecc1c2b099fc715b20996bb0bd3b22b2af2588ec2abed567"
+metafile = true
+
+[[files]]
+file = "mods/searchables.pw.toml"
+hash = "7218273e8c94a936e046da3a54ce01cfd826c5cc48c648c06ee0a409ad0fabc4"
+metafile = true
+
+[[files]]
+file = "mods/sharedhealth-1.2.6.jar"
+hash = "2712361433ba2cb1fbcafeb76764aa041c23a9299011b80dd246bedaf94d923d"
+
+[[files]]
+file = "mods/sharedinv-1.2.2.jar"
+hash = "04a07be499894fb5d6bc67422b480474a2f268b38c26219b8c9552fc98da5623"
+
+[[files]]
+file = "mods/simple-voice-chat.pw.toml"
+hash = "722ef2ef821c23788290169be5496362a0c834d7aa0b71f9d7f0d8bb417cf83d"
+metafile = true
+
+[[files]]
+file = "mods/skin-layers-3d.pw.toml"
+hash = "715afea3c2bd7c59236b917927c05472825a1ad39181e359db35b7a80e458b1d"
+metafile = true
+
+[[files]]
+file = "mods/sodium.pw.toml"
+hash = "2bbbe84ce305111cb5cd483ddb75497da9fac5e29074ba527fcbb719c8f5e8f8"
+metafile = true

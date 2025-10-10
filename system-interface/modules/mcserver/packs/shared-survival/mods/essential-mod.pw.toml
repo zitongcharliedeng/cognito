@@ -1,0 +1,13 @@
+name = "Essential Mod"
+filename = "Essential_1-3-9_fabric_1-21-5.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "8d7874acb229a594342485b4771738d018b6e3c1"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 6828637
+project-id = 546670

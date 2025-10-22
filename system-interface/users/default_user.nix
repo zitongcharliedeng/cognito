@@ -23,6 +23,7 @@ let
 
   # Install user packages
   home.packages = with pkgs; [
+    davinci-resolve-studio # v20 better than GLFos
     osu-lazer-bin
     # For the digitalzen installer:
     curl

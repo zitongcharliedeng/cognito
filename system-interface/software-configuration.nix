@@ -1,13 +1,5 @@
 { config, pkgs, lib, pkgs-unstable, ... }:
 
-let
-  possibleGnomeExtensions = [
-    pkgs.gnomeExtensions.vertical-workspaces
-    pkgs.gnomeExtensions.paperwm
-    pkgs.raysession # TODO move outside of gnome extensions
-    pkgs.syncthing
-  ];
-in
 { 
   imports =
     [ # Include custom modules
@@ -22,11 +14,14 @@ in
 
   config = {
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
-    glf.environment.type = "gnome";
+    glf.environment.type = "plasma";
     glf.environment.edition = "studio-pro";  # Contains stuff like OBS, Steam, Davinci Resolve Studio (paid) etc.
     security.rtkit.enable = true;  # real-time scheduling for low-latency audio, possibly stops the twitch lagging-behind on audio vs the visuals
 
-    environment.systemPackages = possibleGnomeExtensions;
+    environment.systemPackages = [
+      pkgs.raysession
+      pkgs.syncthing
+    ];
 
     # Enable dconf system-wide for users to configure GNOME per user
     programs.dconf.enable = true;

@@ -20,7 +20,7 @@
       inputDpi = 2000.0;
       yxRatio = 1.0;
       mode = "no_accel"; # No acceleration curve
-      angleRotation = 12.0;
+      angleRotation = 0.0; # 12 for my HSK Pro Ace
     };
   };
   # So you can run CLI/TUI without sudo

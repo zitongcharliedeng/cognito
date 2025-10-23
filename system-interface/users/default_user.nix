@@ -1,12 +1,6 @@
 { config, pkgs, lib, ... }:
 
 # User configuration for the default user created during GLF-OS installation
-let
-  userEnabledGnomeExtensions = [
-    pkgs.gnomeExtensions.vertical-workspaces
-    pkgs.gnomeExtensions.paperwm
-  ];
- in
 {
   imports =
     [
@@ -31,31 +25,13 @@ let
     fuse                  # libfuse2 for older AppImages
     appimage-run
     desktop-file-utils    # provides update-desktop-database
-
+    code-cursor         # AI coding.
     # Per app input and output effects i.e bitcrushed youtube music for streaming.
     carla
     qpwgraph
-
-    # Common LV2/VST plugin collections
-    lv2
-    zam-plugins
-    calf
-    lsp-plugins
-    mda_lv2
-    x42-plugins
-    dragonfly-reverb
-    tap-plugins
-    guitarix
+    calf # General audio plugins like eq, limiters, compressors, reverbs, etc.
   ];
   
-  # User-specific configuration managed by home-manager
-  dconf.settings = {
-    "org/gnome/shell" = {
-      enabled-extensions = map (x: x.extensionUuid) userEnabledGnomeExtensions;
-      disable-user-extensions = false;
-    };
-  };
-
   # Install DigitalZen on user activation (idempotent), gracefully keeps you logged in on rebuild even after running the script again.
   home.activation.digitalzenInstall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "[HM] Installing DigitalZen in user context..."

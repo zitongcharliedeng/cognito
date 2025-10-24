@@ -2,45 +2,37 @@
 
 let
   # Upstream release details
-  version = "3.3.4";
+  version = "3.1.5";
   url = "https://github.com/lacymorrow/crossover/releases/download/v${version}/CrossOver-${version}-x86_64.AppImage";
-  sha256 = "0hczjy1aci635a24imgs7ckbdqsvfpbmgi1nhlh0pb0y8ryjkm5b";
+  sha256 = "0c7wj364pdyfr4n0fmk51lzkip8nily0jzmhsihz5m17bxm4z17b";
 
   app = pkgs.appimageTools.wrapType2 {
     inherit version;
     pname = "crossover";
     src = pkgs.fetchurl { url = url; sha256 = sha256; };
     extraPkgs = pkgs: [ ];
-    extraInstallCommands = ''
-      mkdir -p $out/bin $out/share/applications
-      cat > $out/bin/crossover-crosshair <<'EOF'
-      #!/usr/bin/env bash
-        set -euo pipefail
+  };
 
-        # Auto-select flags for Wayland vs X11
-        FLAGS=("--no-sandbox")
-        # if [ "${XDG_SESSION_TYPE:-}" = "wayland" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
-        #   export ELECTRON_OZONE_PLATFORM_HINT=wayland
-        #   # Wayland: keep GPU on for proper transparency
-        # else
-        #   export ELECTRON_OZONE_PLATFORM_HINT=x11
-        #   export LIBGL_ALWAYS_SOFTWARE=1
-        #   FLAGS+=("--disable-gpu" "--disable-gpu-compositing" "--enable-transparent-visuals")
-        # fi
+  # Install wrapper script inline for clarity/maintainability
+  wrapper = pkgs.writeShellScriptBin "crossover-crosshair" ''
+    #!/usr/bin/env bash
+    #
+    # CrossOver Crosshair launcher
+    # - Always launch with --no-sandbox to avoid black background issue on KDE6
+    # - See: https://github.com/lacymorrow/crossover/issues/302
 
-        exec "$(dirname "$0")/crossover" "${FLAGS[@]}" "$@"
+    set -euo pipefail
 
-            chmod +x $out/bin/crossover-crosshair
+    exec crossover --no-sandbox "$@"
+'';
 
-            cat > $out/share/applications/crossover-crosshair.desktop <<'EOF'
-      [Desktop Entry]
-      Name=CrossOver (Crosshair)
-      Exec=crossover-crosshair
-      Type=Application
-      Terminal=false
-      Categories=Utility;
-      EOF
-    '';
+  # Desktop entry for the wrapper
+  desktopItem = pkgs.makeDesktopItem {
+    name = "crossover-crosshair";
+    desktopName = "CrossOver (Crosshair)";
+    exec = "crossover-crosshair";
+    terminal = false;
+    categories = [ "Utility" ];
   };
 in
 {
@@ -49,6 +41,6 @@ in
   };
 
   config = lib.mkIf config.crossover.enable {
-    environment.systemPackages = [ app ];
+    environment.systemPackages = [ app wrapper desktopItem ];
   };
 }

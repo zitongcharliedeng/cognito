@@ -1,19 +1,22 @@
 { config, pkgs, lib, ... }:
 
-let
-  obsPlugins = with pkgs.obs-studio-plugins; [
-    # Multi-streaming on Twitch and YT done using Restream as the receiving service.
-    obs-pipewire-audio-capture # clean per-app audio capture
-    obs-vkcapture              # Vulkan/OpenGL capture
-    obs-scale-to-sound # poop avatar talking
-    # Live chat overlays like showing my YT and Twitch chat is done using a pinned steam browser in steam's shift-tab overlay.
-    # And using https://socialstream.ninja/docs/download.html for the pinned site.
-  ];
-in {
+{
   programs.obs-studio = {
     enable = true;
-    plugins = obsPlugins;
+    plugins = with pkgs.obs-studio-plugins; [
+      # Multi-streaming on Twitch and YT done using Restream as the receiving service.
+      obs-pipewire-audio-capture
+      obs-vkcapture
+      input-overlay
+      # Live chat overlays like showing my YT and Twitch chat is done using a pinned steam browser in steam's shift-tab overlay.
+      ##  And using Restream Chat for the pinned site.
+    ];
   };
+  # # Repo path: ./dotfiles/obs-studio (gittracked copy of the system's current ~/.config/obs-studio)
+  # xdg.configFile."obs-studio" = {
+  #   source = ./dotfiles/obs-studio;
+  #   recursive = true;
+  # };
 
   nixpkgs.overlays = [
     (final: prev: {

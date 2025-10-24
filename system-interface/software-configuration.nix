@@ -1,4 +1,4 @@
-{ config, pkgs, lib, pkgs-unstable, ... }:
+{ inputs, config, pkgs, lib, pkgs-unstable, ... }:
 
 { 
   imports =
@@ -55,7 +55,17 @@
       programs.home-manager.enable = true;
       systemd.user.startServices = "sd-switch";
 
-      imports = [ ./users/default_user.nix ];
+      imports = [
+      #   inputs.plasma-manager.homeManagerModules.plasma-manager
+      #   ./plasma.generated.nix
+        ./users/default_user.nix
+      ];
+
+      # programs.plasma = {
+      #   enable = true;
+      #   # Optional: make it fully declarative (resets unspecified KDE files to defaults on activation)
+      #   ## overrideConfig = true;
+      # };
     };
     
   # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.

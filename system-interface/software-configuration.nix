@@ -22,13 +22,21 @@
     environment.systemPackages = [
       pkgs.raysession
       pkgs.syncthing
+      pkgs.apparmor-parser
+      pkgs.apparmor-utils
     ];
 
     # Enable dconf system-wide for users to configure GNOME per user
     programs.dconf.enable = true;
 
-    # Enable AppArmor (required by DigitalZen app)
+    # Enable AppArmor (required by DigitalZen app and Flatpak)
     security.apparmor.enable = true;
+    systemd.services.snapd.path = lib.mkAfter [ pkgs.apparmor-parser pkgs.apparmor-utils ];
+    systemd.services."snapd.apparmor".path = lib.mkAfter [ pkgs.apparmor-parser pkgs.apparmor-utils ];
+    systemd.services.snapd.environment.PATH = lib.mkForce "${pkgs.apparmor-parser}/bin:${pkgs.apparmor-utils}/bin:${config.system.path}/bin";
+    systemd.services."snapd.apparmor".environment.PATH = lib.mkForce "${pkgs.apparmor-parser}/bin:${pkgs.apparmor-utils}/bin:${config.system.path}/bin";
+
+    
 
     # Enable desktop portal for window capture (required for OBS PipeWire Game Capture)
     xdg.portal = {

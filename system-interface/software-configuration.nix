@@ -15,6 +15,7 @@
   config = {
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     glf.environment.type = "plasma";
+    
     glf.environment.edition = "studio-pro";  # Contains stuff like OBS, Steam, Davinci Resolve Studio (paid) etc.
     security.rtkit.enable = true;  # real-time scheduling for low-latency audio, possibly stops the twitch lagging-behind on audio vs the visuals
 
@@ -40,7 +41,7 @@
                                         # Prevents duplicate packages in Nix store and package conflicts
                                         # Faster builds since packages are already available from system
     home-manager.useUserPackages = true; # Install packages to user profile (~/.nix-profile) instead of system-wide
-
+    home-manager.extraSpecialArgs.pkgsUnstable = pkgs-unstable;
     # Default user configuration - this is user-specific, not system-wide
     home-manager.users.${config._module.args.defaultUsername} = {
       # Ensure HM activation runs at switch and starts user units

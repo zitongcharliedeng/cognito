@@ -9,6 +9,7 @@
       ./modules/glf-overrides.nix
       ./modules/syncing-application-data.nix
       ./modules/mcserver/mcserver.nix
+      ./modules/crossover-appimage.nix
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 
@@ -31,12 +32,10 @@
 
     # Enable AppArmor (required by DigitalZen app and Flatpak)
     security.apparmor.enable = true;
-    systemd.services.snapd.path = lib.mkAfter [ pkgs.apparmor-parser pkgs.apparmor-utils ];
-    systemd.services."snapd.apparmor".path = lib.mkAfter [ pkgs.apparmor-parser pkgs.apparmor-utils ];
-    systemd.services.snapd.environment.PATH = lib.mkForce "${pkgs.apparmor-parser}/bin:${pkgs.apparmor-utils}/bin:${config.system.path}/bin";
-    systemd.services."snapd.apparmor".environment.PATH = lib.mkForce "${pkgs.apparmor-parser}/bin:${pkgs.apparmor-utils}/bin:${config.system.path}/bin";
 
     
+
+    crossover.enable = true;
 
     # Enable desktop portal for window capture (required for OBS PipeWire Game Capture)
     xdg.portal = {

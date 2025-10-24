@@ -10,8 +10,6 @@
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
-    nix-snapd.url = "github:nix-community/nix-snapd";
-    nix-snapd.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # About updates:
@@ -30,7 +28,6 @@
       home-manager,
       nix-minecraft,
       self,
-      nix-snapd,
       ...
     }: 
 
@@ -64,9 +61,6 @@
             maccel.nixosModules.default
             home-manager.nixosModules.home-manager
             nix-minecraft.nixosModules.minecraft-servers
-            # ↓ Snap (as per wiki)
-            nix-snapd.nixosModules.default
-            { services.snap.enable = true; }
           ];
 
         specialArgs = {

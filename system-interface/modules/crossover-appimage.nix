@@ -29,7 +29,7 @@ let
         # fi
 
         exec "$(dirname "$0")/crossover" "${FLAGS[@]}" "$@"
-      EOF
+
             chmod +x $out/bin/crossover-crosshair
 
             cat > $out/share/applications/crossover-crosshair.desktop <<'EOF'
@@ -52,5 +52,3 @@ in
     environment.systemPackages = [ app ];
   };
 }
-
-

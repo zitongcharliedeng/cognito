@@ -10,7 +10,6 @@
       ./modules/syncing-application-data.nix
       ./modules/mcserver/mcserver.nix
       ./modules/tty-return-hint.nix
-      ./setup_users/users/app-modules/crossover-appimage.nix
       ./setup_users
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
@@ -36,8 +35,6 @@
     security.apparmor.enable = true;
 
     
-
-    crossover.enable = true;
 
     # Enable desktop portal for window capture (required for OBS PipeWire Game Capture)
     xdg.portal = {

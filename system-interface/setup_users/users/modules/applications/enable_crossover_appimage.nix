@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 let
   version = "3.1.5";
@@ -16,7 +16,7 @@ let
     #!/usr/bin/env bash
     set -euo pipefail
     exec crossover --no-sandbox "$@"
-'';
+  '';
 
   desktopItem = pkgs.makeDesktopItem {
     name = "crossover-crosshair";
@@ -27,10 +27,7 @@ let
   };
 in
 {
-  options.crossover = { enable = lib.mkEnableOption "Enable CrossOver AppImage"; };
-  config = lib.mkIf config.crossover.enable {
-    environment.systemPackages = [ app wrapper desktopItem ];
-  };
+  home.packages = [ app wrapper desktopItem ];
 }
 
 

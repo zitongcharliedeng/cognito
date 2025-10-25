@@ -2,7 +2,8 @@
 
 {
   imports = [
-    ./modules/last_deadlock_game_redlight.nix
+    ./modules/services/enable_redlight.nix
+    ./modules/applications/enable_crossover_appimage.nix
   ];
 
   home.stateVersion = "25.05";

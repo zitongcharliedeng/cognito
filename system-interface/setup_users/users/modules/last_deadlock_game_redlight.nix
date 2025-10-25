@@ -55,7 +55,6 @@ in
   # Make sure xcalib is available (and our helper binaries)
   home.packages = lib.mkAfter [ pkgs.xcalib redscreen applyNow ];
 
-
   # systemd — user services (oneshot) + timers (OnCalendar, Persistent=true)
   systemd.user = {
     services = {
@@ -91,7 +90,6 @@ in
       "redscreen-apply-now" = {
         Unit = {
           Description = "Apply redscreen state based on current time at login";
-          # Make sure it waits until the X session is up in typical GNOME user sessions.
           After = [ "graphical-session.target" ];
           PartOf = [ "graphical-session.target" ];
         };
@@ -114,7 +112,7 @@ in
         Unit = { Description = "Schedule redscreen ON at 21:00 daily"; };
         Timer = {
           OnCalendar = "*-*-* 21:00";
-          Persistent = true;  # catch up if logged in after 21:00
+          Persistent = true;
           Unit = "redscreen-on.service";
         };
         Install = { WantedBy = [ "timers.target" ]; };
@@ -124,7 +122,7 @@ in
         Unit = { Description = "Schedule redscreen OFF at 06:00 daily"; };
         Timer = {
           OnCalendar = "*-*-* 06:00";
-          Persistent = true;  # catch up if the machine was off at 06:00
+          Persistent = true;
           Unit = "redscreen-off.service";
         };
         Install = { WantedBy = [ "timers.target" ]; };
@@ -132,3 +130,5 @@ in
     };
   };
 }
+
+

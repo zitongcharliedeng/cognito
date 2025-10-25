@@ -9,7 +9,8 @@
       ./modules/glf-overrides.nix
       ./modules/syncing-application-data.nix
       ./modules/mcserver/mcserver.nix
-      ./modules/crossover-appimage.nix
+      ./setup_users/users/app-modules/crossover-appimage.nix
+      ./setup_users
       # ./modules/experimental/niri-session.nix TODO: later to maybe replace PaperWM. It has nice per-window blacking for fullscreen recordings but i like the stability of GNOME for now.
     ];
 
@@ -49,25 +50,6 @@
                                         # Faster builds since packages are already available from system
     home-manager.useUserPackages = true; # Install packages to user profile (~/.nix-profile) instead of system-wide
     home-manager.extraSpecialArgs.pkgsUnstable = pkgs-unstable;
-    # Default user configuration - this is user-specific, not system-wide
-    home-manager.users.${config._module.args.defaultUsername} = {
-      # Ensure HM activation runs at switch and starts user units
-      programs.home-manager.enable = true;
-      systemd.user.startServices = "sd-switch";
-
-      imports = [
-      #   inputs.plasma-manager.homeManagerModules.plasma-manager
-      #   ./plasma.generated.nix
-        ./users/default_user.nix
-      ];
-
-      # programs.plasma = {
-      #   enable = true;
-      #   # Optional: make it fully declarative (resets unspecified KDE files to defaults on activation)
-      #   ## overrideConfig = true;
-      # };
-    };
-    
   # TODO: remove armour-games, lutris, easy flatpakcba;d, bitwarden/ gnome keyring with automatic login after the MASTER login is done on a new machine - same for all other application login, they should automatically login like magic - if i want to stay in GNOME maybe migrate to keyring, otherwise I will probably be a WM only NIRI god and need to find other tools.
   # TODO: remove firefox for chromium or something that web-driver software plays well with.
   };

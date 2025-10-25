@@ -1,0 +1,25 @@
+# Start Whitelist: track only curated safe config; ignore everything else by default
+*
+!.gitignore
+
+# Core OBS settings
+!global.ini
+!user.ini
+# Profiles and scenes
+!basic/
+!basic/scenes/
+!basic/scenes/**
+!basic/profiles/
+!basic/profiles/*/basic.ini
+
+# Project assets (manually place media here to keep scenes portable)
+!assets/
+!assets/**
+
+# TODO(SECRETS):
+# On first NixOS build, use a single MASTER sign-in to decrypt secrets across entire system.
+# (e.g., SOPS/age or git-crypt) and materialize cookie/auth state
+# locally. Eventually we will store (encrypted versions) of these in the repo and remove need for whitelisting like this when we get there.
+
+# (Whitelist model means locally installed plugin binaries are ignored by default.)
+

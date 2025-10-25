@@ -4,6 +4,7 @@
   imports = [
     ./modules/services/enable_redlight.nix
     ./modules/applications/enable_crossover_appimage.nix
+    ./modules/applications/enable_obs
   ];
 
   home.stateVersion = "25.05";

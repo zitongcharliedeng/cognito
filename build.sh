@@ -287,16 +287,16 @@ execute_action() {
             print_success "Successfully switched to configuration for $device"
             ;;
         "switch-reboot")
-            print_status "Building and switching to configuration for device: $device"
-            nixos-rebuild switch --flake ".#$device"
-            print_success "Successfully switched to configuration for $device"
+            print_status "Caching sudo credentials..."
+            sudo -v || { print_error "Sudo authentication failed"; exit 1; }
+            print_status "Building configuration for device: $device (will apply on next boot)"
+            nixos-rebuild boot --flake ".#$device"
+            print_success "Configuration built and set as next boot for $device"
             echo ""
-            print_warning "The system will reboot in 10 seconds to apply the new configuration."
-            print_warning "Press Ctrl+C to cancel the reboot."
+            print_warning "Rebooting now to apply the new configuration."
             echo ""
-            sleep 10
-            print_status "Rebooting system..."
-            sudo reboot
+            print_status "Rebooting system now..."
+            sudo bash -c 'loginctl reboot || systemctl reboot -i || systemctl reboot --force --force || shutdown -r now || reboot -f -n'
             ;;
         "test")
             print_status "Testing configuration for device: $device"

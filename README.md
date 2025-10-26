@@ -1,3 +1,5 @@
+# Deprecated, working on the full-life OS as a locally hosted, private project. Once I am confident in my encryption techniques, I will share my dotfiles with the world. Hope, I become a Nix God. This legacy attempt served me well, and I racked thousands of gaming, editing and browsing hours on this humble beast.
+
 ## GLF-OS based NixOS configuration
 
 This repository is a flake-based NixOS configuration that uses GLF-OS as a base.

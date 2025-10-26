@@ -272,6 +272,16 @@ execute_action() {
     local device=$1
     local action=$2
     
+    # Ensure a stable repo anchor at ~/cognito for live-write dotfiles
+    # - If ~/cognito is a symlink to elsewhere, leave it
+    # - If ~/cognito is a directory with contents, leave it
+    # - If ~/cognito does not exist, link the current repo root there
+    repo_root_abs="$(pwd -P)"
+    target_link="$HOME/cognito"
+    if [ ! -e "$target_link" ]; then
+        ln -sT "$repo_root_abs" "$target_link"
+    fi
+
     case "$action" in
         "first-time-install")
             first_time_install

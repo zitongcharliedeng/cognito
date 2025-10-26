@@ -22,7 +22,7 @@
   #   and point `system.autoUpgrade.flake` at your system flake (e.g. "path:/etc/nixos").
 
   outputs =
-    {
+    inputs@{
       nixpkgs,
       nixpkgs-unstable,
       glf,
@@ -63,6 +63,12 @@
             maccel.nixosModules.default
             home-manager.nixosModules.home-manager
             nix-minecraft.nixosModules.minecraft-servers
+            # Pass Plasma Manager artifacts to Home Manager without relying on `inputs` inside modules
+            {
+              home-manager.extraSpecialArgs.self = self;
+              home-manager.extraSpecialArgs.plasmaManagerRc2nix = inputs."plasma-manager".packages.${system}.rc2nix;
+              home-manager.extraSpecialArgs.plasmaManagerHomeModule = inputs."plasma-manager".homeModules."plasma-manager";
+            }
           ];
 
         specialArgs = {

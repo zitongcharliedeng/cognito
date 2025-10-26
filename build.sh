@@ -215,15 +215,14 @@ select_action() {
     echo "  0. First-time installation (setup new device from GLFOS generated configs)"
     echo "  1. Build configuration (compile only)"
     echo "  2. Build and switch to new configuration (some on-start services may need a reboot after to start)"
-    echo "  3. Build and switch to new configuration, and auto-reboot (some on-start services may need a reboot after to start)"
-    echo "  4. Test configuration (dry run)"
-    echo "  5. Regenerate hardware configuration"
-    echo "  6. List available devices"
-    echo "  7. Exit"
+    echo "  3. Test configuration (dry run)"
+    echo "  4. Regenerate hardware configuration"
+    echo "  5. List available devices"
+    echo "  6. Exit"
     echo ""
     
     while true; do
-        read -p "Select action (0-7): " choice
+        read -p "Select action (0-6): " choice
         case "$choice" in
             0)
                 selected_action="first-time-install"
@@ -238,27 +237,23 @@ select_action() {
                 break
                 ;;
             3)
-                selected_action="switch-reboot"
-                break
-                ;;
-            4)
                 selected_action="test"
                 break
                 ;;
-            5)
+            4)
                 selected_action="regenerate"
                 break
                 ;;
-            6)
+            5)
                 selected_action="list"
                 break
                 ;;
-            7)
+            6)
                 selected_action="exit"
                 break
                 ;;
             *)
-                print_error "Invalid selection. Please enter a number between 0 and 7"
+                print_error "Invalid selection. Please enter a number between 0 and 6"
                 ;;
         esac
     done
@@ -271,7 +266,7 @@ select_action() {
 execute_action() {
     local device=$1
     local action=$2
-    
+
     case "$action" in
         "first-time-install")
             first_time_install
@@ -285,18 +280,6 @@ execute_action() {
             print_status "Building and switching to configuration for device: $device"
             nixos-rebuild switch --flake ".#$device"
             print_success "Successfully switched to configuration for $device"
-            ;;
-        "switch-reboot")
-            print_status "Caching sudo credentials..."
-            sudo -v || { print_error "Sudo authentication failed"; exit 1; }
-            print_status "Building configuration for device: $device (will apply on next boot)"
-            nixos-rebuild boot --flake ".#$device"
-            print_success "Configuration built and set as next boot for $device"
-            echo ""
-            print_warning "Rebooting now to apply the new configuration."
-            echo ""
-            print_status "Rebooting system now..."
-            sudo bash -c 'loginctl reboot || systemctl reboot -i || systemctl reboot --force --force || shutdown -r now || reboot -f -n'
             ;;
         "test")
             print_status "Testing configuration for device: $device"

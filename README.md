@@ -77,7 +77,6 @@ The script will present you with:
 2. Actions to perform:
    - **Build configuration** (compile only)
    - **Build and switch** to configuration
-   - **Build, switch, and reboot** (perfect for testing new builds)
    - **Test configuration** (dry run)
    - **Regenerate hardware configuration** (for hardware changes)
    - **List available devices**
@@ -85,6 +84,8 @@ The script will present you with:
 3. Option to perform multiple actions in one session
 
 No parameters needed - just run `./build.sh` and follow the interactive prompts!
+
+Warning: This setup assumes the repository is cloned at `~/cognito`. If it is not at that exact path, some features and paths may not work as intended.
 
 ### Hardware Changes
 
@@ -102,12 +103,4 @@ When you change your desktop hardware (new GPU, motherboard, etc.):
    - Ensures proper NVIDIA setup, bootloader config, and other firmware-specific settings
 
 ### Notes
-
-- GLF curated channels are followed via `inputs.glf-channels` and `nixpkgs.follows` in `flake.nix`.
-- System-agnostic configuration lives in `system-interface/software-configuration.nix`.
-- Hardware-specific configuration lives in `system-hardware-shims/device-name/`.
-- Device-specific settings (NVIDIA, bootloader, hostname, timezone, etc.) live in `system-hardware-shims/{device}/firmware-configuration.nix`.
-- The `hosts` list in `flake.nix` is automatically generated from the `system-hardware-shims/` directory structure.
-- Automatic updates use NixOS's built-in auto-upgrade service (a systemd timer) that periodically rebuilds from this flake and switches to it.
-
-
+o
